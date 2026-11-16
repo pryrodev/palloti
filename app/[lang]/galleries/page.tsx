@@ -4,40 +4,71 @@ import { getDictionary } from "@/lib/getDictionary";
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
 import VideoPlayer from "../../components/VideoPlayer";
 import { LayoutGrid, Card } from "../../components/ui/LayoutGrid";
+import type { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params;
+  const isFr = lang === "fr";
+  return {
+    title: isFr ? "Galerie Photos" : "Photo Gallery",
+    description: isFr
+      ? "Galerie de photos de la vie et des activités de la Province Sainte Famille SAC."
+      : "Photo gallery of the life and activities of the Holy Family Province SAC.",
+  };
+}
 
 const allImages = [
-  { src: "/images/picture1.jpeg",   alt: "Community 1",     title: "Communauté de Bruxelles",         sub: "Belgium" },
-  { src: "/images/p2.jpg",          alt: "Community 2",     title: "Provincial Assembly",              sub: "Kigali, Rwanda" },
-  { src: "/images/p5.jpg",          alt: "Community 3",     title: "Appointments 2026-2027",           sub: "Holy Family Province" },
-  { src: "/images/p6.jpg",          alt: "Community 4",     title: "International Meeting",            sub: "Kigali, Rwanda" },
-  { src: "/images/p7.jpg",          alt: "Community 5",     title: "Info PSF No 25",                   sub: "March 2026" },
-  { src: "/images/p8.jpg",          alt: "Community 6",     title: "Handover Ceremony",                sub: "Holy Family Province" },
-  { src: "/images/pic1.jpeg",       alt: "Community 7",     title: "Provincial Council",               sub: "Holy Family Province" },
-  { src: "/images/home2.jpeg",      alt: "Community 8",     title: "Formation & Apostolate",           sub: "Holy Family Province" },
-  { src: "/images/picture2.jpg",    alt: "Congress 1",      title: "XII Consultative Congress",        sub: "SAC Major Superiors" },
-  { src: "/images/home3.jpg",       alt: "Congress 2",      title: "Youth & Vocations",                sub: "Union of Catholic Apostolate" },
-  { src: "/images/home4.jpeg",      alt: "Congress 3",      title: "SAC Congress",                     sub: "2020" },
-  { src: "/images/home5.jpeg",      alt: "Congress 4",      title: "SAC Congress",                     sub: "Community Life" },
-  { src: "/images/home6.jpeg",      alt: "Congress 5",      title: "SAC Congress",                     sub: "Apostolic Work" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.22%20AM.jpeg",     alt: "Life 1",  title: "Holy Family Province",  sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.22%20AM%20(1).jpeg", alt: "Life 2", title: "Holy Family Province", sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.22%20AM%20(2).jpeg", alt: "Life 3", title: "Holy Family Province", sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.23%20AM.jpeg",     alt: "Life 4",  title: "Holy Family Province",  sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.23%20AM%20(1).jpeg", alt: "Life 5", title: "Holy Family Province", sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.23%20AM%20(2).jpeg", alt: "Life 6", title: "Holy Family Province", sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.24%20AM.jpeg",     alt: "Life 7",  title: "Holy Family Province",  sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.24%20AM%20(1).jpeg", alt: "Life 8", title: "Holy Family Province", sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.24%20AM%20(2).jpeg", alt: "Life 9", title: "Holy Family Province", sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.25%20AM.jpeg",     alt: "Life 10", title: "Holy Family Province",  sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.25%20AM%20(1).jpeg", alt: "Life 11", title: "Holy Family Province", sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.26%20AM.jpeg",     alt: "Life 12", title: "Holy Family Province",  sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.26%20AM%20(1).jpeg", alt: "Life 13", title: "Holy Family Province", sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.26%20AM%20(2).jpeg", alt: "Life 14", title: "Holy Family Province", sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.26%20AM%20(3).jpeg", alt: "Life 15", title: "Holy Family Province", sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.27%20AM.jpeg",     alt: "Life 16", title: "Holy Family Province",  sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.27%20AM%20(1).jpeg", alt: "Life 17", title: "Holy Family Province", sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.27%20AM%20(2).jpeg", alt: "Life 18", title: "Holy Family Province", sub: "Life & Ministry" },
-  { src: "/images/WhatsApp%20Image%202026-11-16%20at%209.44.28%20AM.jpeg",     alt: "Life 19", title: "SAC Province",           sub: "Recent Moments" },
+  { src: "/images/picture1.jpeg",  title: "Communauté de Bruxelles",        sub: "Belgium" },
+  { src: "/images/p2.jpg",         title: "Provincial Assembly",             sub: "Kigali, Rwanda" },
+  { src: "/images/p5.jpg",         title: "Appointments 2026-2027",          sub: "Holy Family Province" },
+  { src: "/images/p6.jpg",         title: "International Meeting",           sub: "Kigali, Rwanda" },
+  { src: "/images/p7.jpg",         title: "Info PSF No 25",                  sub: "March 2026" },
+  { src: "/images/p8.jpg",         title: "Handover Ceremony",               sub: "Holy Family Province" },
+  { src: "/images/pic1.jpeg",      title: "Provincial Council",              sub: "Holy Family Province" },
+  { src: "/images/home2.jpeg",     title: "Formation & Apostolate",          sub: "Holy Family Province" },
+  { src: "/images/picture2.jpg",   title: "XII Consultative Congress",       sub: "SAC Major Superiors" },
+  { src: "/images/home3.jpg",      title: "Youth & Vocations",               sub: "Union of Catholic Apostolate" },
+  { src: "/images/home4.jpeg",     title: "SAC Congress",                    sub: "2020" },
+  { src: "/images/home5.jpeg",     title: "SAC Congress",                    sub: "Community Life" },
+  { src: "/images/home6.jpeg",     title: "SAC Congress",                    sub: "Apostolic Work" },
+  { src: "/images/image1.jpeg",    title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image2.jpeg",    title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image3.jpeg",    title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image4.jpeg",    title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image5.jpeg",    title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image6.jpeg",    title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image16.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image17.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image18.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image19.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image20.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image21.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image22.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image23.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image24.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image25.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image26.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image27.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image28.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image29.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image30.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image31.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image32.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image33.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image34.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image35.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image36.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image37.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image38.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image39.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image40.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image41.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image42.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image43.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image44.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image45.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image46.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+  { src: "/images/image47.jpeg",   title: "SAC Province",                    sub: "Recent Moments" },
 ];
 
 // Assign layout classes in a repeating pattern for a bento-style grid
@@ -62,12 +93,8 @@ const cards: Card[] = allImages.map((img, i) => ({
   className: classNames[i % classNames.length],
   content: (
     <div>
-      <p className="font-bold text-white text-base md:text-xl font-sans">
-        {img.title}
-      </p>
-      <p className="font-normal text-base text-white/80 font-sans mt-1">
-        {img.sub}
-      </p>
+      <p className="font-bold text-white text-base md:text-xl font-sans">{img.title}</p>
+      <p className="font-normal text-base text-white/80 font-sans mt-1">{img.sub}</p>
     </div>
   ),
 }));

@@ -3,6 +3,18 @@ import { Footer } from "../../components/Footer";
 import { getDictionary } from "@/lib/getDictionary";
 import NewsFilter from "../../components/NewsFilter";
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
+import type { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params;
+  const isFr = lang === "fr";
+  return {
+    title: isFr ? "Actualités & Publications" : "News & Publications",
+    description: isFr
+      ? "Dernières nouvelles, bulletins et publications de la Province Sainte Famille SAC."
+      : "Latest news, newsletters and publications from the Holy Family Province SAC.",
+  };
+}
 
 export default async function NewsPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;

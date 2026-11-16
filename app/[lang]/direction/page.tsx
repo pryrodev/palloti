@@ -2,6 +2,18 @@ import Image from "next/image";
 import { Header } from "../../components/header";
 import { Footer } from "../../components/Footer";
 import { getDictionary } from "@/lib/getDictionary";
+import type { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params;
+  const isFr = lang === "fr";
+  return {
+    title: isFr ? "Gouvernement Provincial" : "Provincial Government",
+    description: isFr
+      ? "Rencontrez les membres du gouvernement provincial de la Province Sainte Famille SAC."
+      : "Meet the members of the provincial government of the Holy Family Province SAC.",
+  };
+}
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
 
 type Member = { name: string; role: string; image: string };
