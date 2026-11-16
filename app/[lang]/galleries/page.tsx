@@ -2,7 +2,6 @@ import { Header } from "../../components/header";
 import { Footer } from "../../components/Footer";
 import { getDictionary } from "@/lib/getDictionary";
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
-import VideoPlayer from "../../components/VideoPlayer";
 import { LayoutGrid, Card } from "../../components/ui/LayoutGrid";
 import type { Metadata } from "next";
 
@@ -134,21 +133,6 @@ export default async function GalleriesPage({ params }: { params: Promise<{ lang
 
         {/* ── LayoutGrid — full-width bento ── */}
         <LayoutGrid cards={cards} />
-
-        {/* ── Videos section ── */}
-        <div className="container mx-auto px-4 sm:px-6 md:px-12 lg:px-20 mt-6">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-1 h-8 bg-[var(--red)] rounded" />
-            <div>
-              <p className="text-[10px] font-black tracking-[0.35em] uppercase text-[var(--gold)]">
-                {lang === "fr" ? "Vidéos & Films" : "Videos & Movies"}
-              </p>
-            </div>
-            <div className="flex-1 h-px bg-[#e8e2d9]" />
-          </div>
-
-          <VideoPlayer src="/videos/video1.mp4" poster="/images/gikondo.jpg" />
-        </div>
 
       </main>
 
