@@ -57,17 +57,15 @@ const allImages = [
   { src: "/images/image33.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
   { src: "/images/image34.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
   { src: "/images/image35.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
-  { src: "/images/image36.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
+
   { src: "/images/image37.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
   { src: "/images/image38.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
-  { src: "/images/image39.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
   { src: "/images/image40.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
   { src: "/images/image41.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
   { src: "/images/image42.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
   { src: "/images/image43.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
   { src: "/images/image44.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
   { src: "/images/image45.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
-  { src: "/images/image46.jpeg",   title: "Holy Family Province",            sub: "Life & Ministry" },
   { src: "/images/image47.jpeg",   title: "SAC Province",                    sub: "Recent Moments" },
 ];
 
