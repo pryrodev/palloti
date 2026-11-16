@@ -4,6 +4,18 @@ import { Header } from "../../components/header";
 import { Footer } from "../../components/Footer";
 import { getDictionary } from "@/lib/getDictionary";
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
+import type { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params;
+  const isFr = lang === "fr";
+  return {
+    title: isFr ? "Identité — Saint Vincent Pallotti" : "Identity — Saint Vincent Pallotti",
+    description: isFr
+      ? "Découvrez le fondateur des Pallottins, Saint Vincent Pallotti, et le charisme de la Société de l'Apostolat Catholique."
+      : "Discover the founder of the Pallottines, Saint Vincent Pallotti, and the charisma of the Society of the Catholic Apostolate.",
+  };
+}
 
 export default async function IdentityPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;

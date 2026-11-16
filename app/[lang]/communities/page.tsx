@@ -3,6 +3,18 @@ import { Footer } from "../../components/Footer";
 import { getDictionary } from "@/lib/getDictionary";
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
 import CommunitiesFilter from "../../components/CommunitiesFilter";
+import type { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params;
+  const isFr = lang === "fr";
+  return {
+    title: isFr ? "Communautés & Apostolats" : "Communities & Apostolates",
+    description: isFr
+      ? "Découvrez les communautés et les œuvres apostoliques de la Province Sainte Famille au Rwanda, en RD Congo, en Belgique et au-delà."
+      : "Discover the communities and apostolic works of the Holy Family Province in Rwanda, DR Congo, Belgium and beyond.",
+  };
+}
 
 export default async function CommunitiesPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;

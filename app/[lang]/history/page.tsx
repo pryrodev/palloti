@@ -2,6 +2,18 @@ import Image from "next/image";
 import { Header } from "../../components/header";
 import { Footer } from "../../components/Footer";
 import { getDictionary } from "@/lib/getDictionary";
+import type { Metadata } from "next";
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params;
+  const isFr = lang === "fr";
+  return {
+    title: isFr ? "Histoire de la Province Sainte Famille" : "History of the Holy Family Province",
+    description: isFr
+      ? "Découvrez l'histoire de la Province Sainte Famille SAC, depuis les missions en 1890 jusqu'à l'érection canonique en Province en 2015."
+      : "Discover the history of the Holy Family Province SAC, from the 1890 missions to the canonical erection as a Province in 2015.",
+  };
+}
 
 type Chapter = { year: string; image: string; text: string; caption?: string };
 
