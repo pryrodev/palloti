@@ -1,6 +1,7 @@
 import { Header } from "../../components/header";
 import { Footer } from "../../components/Footer";
 import { getDictionary } from "@/lib/getDictionary";
+import { readData } from "@/lib/getData";
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
 import VideoPlayer from "../../components/VideoPlayer";
 import type { Metadata } from "next";
@@ -16,15 +17,12 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   };
 }
 
-const videos = [
-  { src: "/videos/video1.mp4", poster: "/images/gikondo.jpg",  title: "Video 1 — Holy Family Province" },
-  { src: "/videos/video2.mp4", poster: "/images/image31.jpeg", title: "Video 2 — Holy Family Province" },
-  { src: "/videos/video3.mp4", poster: "/images/image16.jpeg", title: "Video 3 — Holy Family Province" },
-];
+type Video = { src: string; poster: string; title: string };
 
 export default async function VideosPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   const dict = getDictionary(lang);
+  const videos = readData<Video[]>("videos.json");
 
   return (
     <>

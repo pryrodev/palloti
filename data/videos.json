@@ -1,0 +1,5 @@
+[
+  { "src": "/videos/video1.mp4", "poster": "/images/gikondo.jpg",  "title": "Video 1 — Holy Family Province" },
+  { "src": "/videos/video2.mp4", "poster": "/images/image31.jpeg", "title": "Video 2 — Holy Family Province" },
+  { "src": "/videos/video3.mp4", "poster": "/images/image16.jpeg", "title": "Video 3 — Holy Family Province" }
+]
