@@ -87,6 +87,15 @@ export default function HeroSlider({
   const slides = getSlides(lang);
   const [current, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotionPreference = () => setReducedMotion(mediaQuery.matches);
+    updateMotionPreference();
+    mediaQuery.addEventListener("change", updateMotionPreference);
+    return () => mediaQuery.removeEventListener("change", updateMotionPreference);
+  }, []);
 
   const goTo = useCallback(
     (index: number) => {
@@ -103,195 +112,146 @@ export default function HeroSlider({
   }, [current, goTo, slides.length]);
 
   useEffect(() => {
+    if (reducedMotion) return;
     const timer = setInterval(next, 6000);
     return () => clearInterval(timer);
-  }, [next]);
+  }, [next, reducedMotion]);
 
   return (
-    <section className="relative w-full h-[70vh] sm:h-screen min-h-[500px] max-h-[900px] overflow-hidden">
-      {/* Slides */}
-      {slides.map((slide, i) => (
-        <div
-          key={i}
-          className="absolute inset-0 transition-opacity duration-1000"
-          style={{ opacity: i === current ? 1 : 0, zIndex: i === current ? 1 : 0 }}
-        >
-          {/* Image with Ken Burns */}
-          <div
-            className="absolute inset-0"
-            style={{
-              animation: i === current ? "kenburns 8s ease-out forwards" : "none",
-            }}
-          >
-            <Image
-              src={slide.image}
-              alt={slide.title}
-              fill
-              className="object-cover"
-              priority={i === 0}
-            />
+    <section
+      className="relative overflow-hidden pt-2 pb-5 sm:pt-3 sm:pb-8 lg:pt-2 lg:pb-10"
+      style={{ background: "linear-gradient(180deg, var(--cream3) 0 34%, var(--red-dk) 34% 100%)" }}
+      aria-label={lang === "fr" ? "À la une" : "Featured stories"}
+    >
+      <div className="mx-auto grid max-w-[1480px] grid-cols-1 px-3 sm:px-6 lg:grid-cols-[minmax(300px,0.78fr)_minmax(0,1.8fr)] lg:px-10">
+        {/* This brand panel stays fixed while the story and image change. */}
+        <div className="relative z-10 flex min-h-[510px] flex-col items-center bg-[var(--cream)] px-5 py-7 text-center shadow-xl sm:px-8 sm:py-9 lg:min-h-[610px] lg:px-8 xl:px-10">
+          <div className="flex h-[88px] w-[min(100%,240px)] shrink-0 items-center justify-center border border-[var(--cream3)] bg-white px-5 shadow-sm sm:h-[104px]">
+            <Image src="/p4.png" alt="SAC Pallottins" width={240} height={48} className="h-auto w-full object-contain" priority />
           </div>
 
-          {/* Gradient overlay */}
-          <div
-            className="absolute inset-0"
-            style={{ background: "rgba(28,15,5,0.25)" }}
-          />
-        </div>
-      ))}
-
-      {/* Content */}
-      <div className="absolute inset-0 z-10 flex flex-col justify-end pb-24 sm:pb-28 md:pb-32">
-        <div className="container mx-auto px-4 sm:px-6 md:px-12 lg:px-20">
-          {slides.map((slide, i) => (
-            <div
-              key={i}
-              className="transition-all duration-700"
-              style={{
-                opacity: i === current ? 1 : 0,
-                transform: i === current ? "translateY(0)" : "translateY(24px)",
-                position: i === current ? "relative" : "absolute",
-                pointerEvents: i === current ? "auto" : "none",
-              }}
-            >
-              {/* Location badge + Logo */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className="relative w-7 h-7 rounded-full bg-black/40 backdrop-blur-md p-1 border border-[var(--gold)]/60 shrink-0">
-                  <Image src="/p4.png" alt="SAC Logo" fill className="object-contain p-0.5" />
-                </div>
-                <div className="w-8 h-px bg-[var(--gold)]" />
-                <span
-                  className="text-[10px] font-bold tracking-[0.35em] uppercase text-[var(--gold)]"
-                >
-                  {slide.location}
-                </span>
-              </div>
-
-              {/* Title */}
-              <h1
-                className="font-bold leading-tight mb-3 max-w-3xl"
+          <div className="mt-8 grid w-full content-start sm:mt-9">
+            {slides.map((slide, i) => (
+              <div
+                key={`${slide.image}-${i}`}
+                aria-hidden={i !== current}
+                className="col-start-1 row-start-1 mx-auto w-full max-w-[360px] self-start transition-all duration-700 motion-reduce:transition-none"
                 style={{
-                  fontFamily: "Georgia, serif",
-                  fontSize: "clamp(1.8rem, 4.5vw, 3.8rem)",
-                  textShadow: "0 2px 20px rgba(0,0,0,0.4)",
-                  color: slide.titleGold ? "var(--gold)" : "#ffffff",
+                  opacity: i === current ? 1 : 0,
+                  transform: `translateY(${i === current ? "0px" : "12px"})`,
+                  pointerEvents: i === current ? "auto" : "none",
                 }}
               >
-                {slide.title}
-              </h1>
-
-              {/* Subtitle */}
-              {slide.subtitle && (
-                <p className="font-light italic mb-6 max-w-xl"
-                  style={{ fontSize: "clamp(0.9rem, 1.5vw, 1.1rem)", color: slide.subtitleGold ? "var(--gold)" : "rgba(255,255,255,0.8)" }}>
-                  {slide.subtitle}
-                </p>
-              )}
-
-              {/* CTAs */}
-              <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 mt-6">
-                <Link
-                  href={`/${lang}/identity`}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--gold)] text-[var(--dark)] text-[11px] font-bold uppercase tracking-[0.14em] rounded-full transition-all duration-300 hover:bg-[var(--gold-lt)] hover:shadow-xl"
+                <div className="mb-4 flex items-center justify-center gap-3 text-[var(--gold-dk)]">
+                  <span className="h-px w-8 bg-[var(--gold)]" />
+                  <span className="text-[10px] font-extrabold uppercase tracking-[0.2em]">{slide.location}</span>
+                  <span className="h-px w-8 bg-[var(--gold)]" />
+                </div>
+                <h1
+                  className="mx-auto max-w-md font-bold leading-[1.08] text-[var(--red-dk)]"
+                  style={{ fontFamily: "Georgia, 'Times New Roman', serif", fontSize: "clamp(2rem, 3.25vw, 3.15rem)" }}
                 >
-                  {ctaPrimary}
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                </Link>
-                <Link
-                  href={`/${lang}/communities`}
-                  className="inline-flex items-center gap-2 px-6 py-3 border-2 border-white/50 text-white text-[11px] font-bold uppercase tracking-[0.14em] rounded-full transition-all duration-300 hover:bg-white hover:text-[var(--red-dk)]"
-                >
-                  {ctaSecondary}
-                </Link>
+                  {slide.title}
+                </h1>
+                {slide.subtitle && (
+                  <p className="mx-auto mt-4 max-w-sm text-sm leading-6 text-[var(--mid)] sm:text-base">
+                    {slide.subtitle}
+                  </p>
+                )}
+                <div className="mx-auto mt-6 h-px w-20 bg-[var(--gold)]/70" />
+                <div className="mx-auto mt-6 flex w-full flex-wrap justify-center gap-3">
+                  <Link
+                    href={`/${lang}/identity`}
+                    tabIndex={i === current ? 0 : -1}
+                    className="inline-flex min-h-14 min-w-0 flex-[1_1_160px] items-center justify-center gap-2 bg-[var(--red)] px-3 py-3 text-[10px] font-bold uppercase tracking-[0.1em] text-white transition-colors hover:bg-[var(--red-dk)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)]"
+                  >
+                    <span className="text-center leading-4">{ctaPrimary}</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                  <Link
+                    href={`/${lang}/communities`}
+                    tabIndex={i === current ? 0 : -1}
+                    className="inline-flex min-h-14 min-w-0 flex-[1_1_140px] items-center justify-center border border-[var(--red)]/30 px-3 py-3 text-center text-[10px] font-bold uppercase leading-4 tracking-[0.1em] text-[var(--red)] transition-colors hover:border-[var(--red)] hover:bg-[var(--cream2)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)]"
+                  >
+                    {ctaSecondary}
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Only this image panel advances with the story content. */}
+        <div className="relative min-h-[340px] overflow-hidden border-t-4 border-[var(--gold)] bg-[var(--red-dk)] sm:min-h-[440px] lg:min-h-[610px] lg:border-l-4 lg:border-t-0">
+          {slides.map((slide, i) => (
+            <div
+              key={`image-${slide.image}`}
+              className="absolute inset-0 transition-opacity duration-1000 motion-reduce:transition-none"
+              style={{ opacity: i === current ? 1 : 0, zIndex: i === current ? 1 : 0 }}
+              aria-hidden={i !== current}
+            >
+              <div className="absolute inset-0" style={{ animation: i === current && !reducedMotion ? "hero-kenburns 8s ease-out forwards" : "none" }}>
+                <Image src={slide.image} alt={slide.title} fill sizes="(min-width: 1024px) 65vw, 100vw" className="object-cover" priority={i === 0} />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-[rgba(28,15,5,0.42)] via-transparent to-[rgba(28,15,5,0.08)]" />
+            </div>
+          ))}
+
+          <div className="absolute right-4 top-4 z-10 bg-[var(--red-dk)]/80 px-3 py-1.5 text-[10px] font-bold tracking-[0.16em] text-[var(--gold-lt)] backdrop-blur-sm sm:right-6 sm:top-6">
+            {String(current + 1).padStart(2, "0")} <span className="mx-1 text-white/50">/</span> {String(slides.length).padStart(2, "0")}
+          </div>
+
+          <button
+            onClick={() => goTo((current - 1 + slides.length) % slides.length)}
+            className="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/60 bg-[var(--red-dk)]/35 text-white backdrop-blur-sm transition-colors hover:bg-[var(--red-dk)]/75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold-lt)] sm:left-5 sm:h-12 sm:w-12"
+            aria-label={lang === "fr" ? "Diapositive précédente" : "Previous slide"}
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+          </button>
+          <button
+            onClick={next}
+            className="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/60 bg-[var(--red-dk)]/35 text-white backdrop-blur-sm transition-colors hover:bg-[var(--red-dk)]/75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold-lt)] sm:right-5 sm:h-12 sm:w-12"
+            aria-label={lang === "fr" ? "Diapositive suivante" : "Next slide"}
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+          </button>
+
+          <div className="absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 bg-[var(--red-dk)]/50 px-3 py-2 backdrop-blur-sm sm:bottom-7">
+            {slides.map((slide, i) => (
+              <button
+                key={`dot-${slide.image}`}
+                onClick={() => goTo(i)}
+                className="h-2 rounded-full transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold-lt)] motion-reduce:transition-none"
+                style={{ width: i === current ? "1.75rem" : "0.5rem", background: i === current ? "var(--gold-lt)" : "rgba(255,255,255,0.65)" }}
+                aria-label={lang === "fr" ? `Aller à la diapositive ${i + 1}` : `Go to slide ${i + 1}`}
+                aria-current={i === current ? "true" : undefined}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto mt-5 max-w-[1400px] border-t border-[var(--gold)]/70 bg-[var(--red-dk)] sm:mt-7 lg:mt-8">
+        <div className="grid grid-cols-3 divide-x divide-white/15">
+          {[
+            { num: "1890", label: statFounded, Icon: Landmark, color: "#E8B84B" },
+            { num: "111+", label: statMembers, Icon: Users, color: "#E8B84B" },
+            { num: "3", label: statCountries, Icon: Globe, color: "#E8B84B" },
+          ].map(({ num, label, Icon, color }) => (
+            <div key={label} className="flex items-center justify-center gap-2 px-2 py-4 sm:gap-4 sm:py-5">
+              <Icon className="hidden h-5 w-5 shrink-0 text-[var(--gold)] sm:block" strokeWidth={1.7} aria-hidden="true" />
+              <div>
+                <span className="block text-center font-bold leading-none sm:text-left" style={{ fontFamily: "Georgia, serif", fontSize: "clamp(1.1rem, 2.5vw, 1.5rem)", color }}>{num}</span>
+                <span className="mt-1 block text-center text-[9px] font-semibold uppercase tracking-[0.12em] text-white/80 sm:text-left sm:text-[10px]">{label}</span>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Dot navigation */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
-        {slides.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => goTo(i)}
-            className="transition-all duration-300"
-            style={{
-              width: i === current ? "2rem" : "0.5rem",
-              height: "0.5rem",
-              borderRadius: "9999px",
-              background: i === current ? "var(--gold)" : "rgba(255,255,255,0.4)",
-            }}
-            aria-label={`Go to slide ${i + 1}`}
-          />
-        ))}
-      </div>
-
-      {/* Arrow controls */}
-      <button
-        onClick={() => goTo((current - 1 + slides.length) % slides.length)}
-        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center rounded-full border border-white/30 text-white hover:bg-white/20 transition-all duration-300"
-        aria-label="Previous slide"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <path d="M15 18l-6-6 6-6" />
-        </svg>
-      </button>
-      <button
-        onClick={() => next()}
-        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 flex items-center justify-center rounded-full border border-white/30 text-white hover:bg-white/20 transition-all duration-300"
-        aria-label="Next slide"
-      >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <path d="M9 18l6-6-6-6" />
-        </svg>
-      </button>
-
-      {/* Slide counter */}
-      <div className="absolute top-8 right-8 z-20 text-[var(--gold)] text-[11px] font-bold tracking-widest hidden md:block">
-        {String(current + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
-      </div>
-
-      {/* Stats bar */}
-      <div className="absolute bottom-0 left-0 right-0 z-20" style={{ background: "linear-gradient(135deg, rgba(62,32,9,0.97) 0%, rgba(92,51,23,0.95) 50%, rgba(122,69,32,0.93) 100%)" }}>
-        <div className="h-px w-full" style={{ background: "var(--gold)" }} />
-        <div className="container mx-auto px-4 md:px-14 lg:px-20">
-          <div className="grid grid-cols-3 divide-x divide-white/10">
-            {[
-              { num: "1890", label: statFounded,   Icon: Landmark, color: "#C9952A" },
-              { num: "111+", label: statMembers,   Icon: Users,    color: "#E8B84B" },
-              { num: "3",    label: statCountries, Icon: Globe,    color: "#C9952A" },
-            ].map((s, i) => (
-              <div key={i} className="py-3 sm:py-4 px-2 sm:px-4 md:px-8 flex items-center justify-center gap-2 sm:gap-4 group">
-                {/* Icon box */}
-                <div className="hidden sm:flex items-center justify-center w-9 h-9 md:w-11 md:h-11 rounded-lg shrink-0"
-                  style={{ background: "rgba(201,149,42,0.15)", border: "1px solid rgba(201,149,42,0.35)" }}>
-                  <s.Icon size={18} style={{ color: s.color }} strokeWidth={1.8} />
-                </div>
-                {/* Text */}
-                <div className="text-left">
-                  <span className="block font-black leading-none" style={{ fontFamily: "Georgia, serif", fontSize: "clamp(1.1rem, 2.5vw, 1.5rem)", color: s.color }}>
-                    {s.num}
-                  </span>
-                  <span className="block uppercase tracking-[0.15em] font-semibold mt-0.5" style={{ fontSize: "clamp(0.55rem, 1vw, 0.7rem)", color: "rgba(255,255,255,0.85)" }}>
-                    {s.label}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Ken Burns keyframe */}
-      <style>{`
-        @keyframes kenburns {
-          0%   { transform: scale(1.08); }
-          100% { transform: scale(1); }
-        }
-      `}</style>
+      <style>{`@keyframes hero-kenburns { from { transform: scale(1.06); } to { transform: scale(1); } }`}</style>
     </section>
   );
 }

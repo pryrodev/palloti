@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "number": "01",
+    "title": "Umugisha w'Abageze mu Zabukuru",
+    "subtitle": "Document Officiel",
+    "description": "Document officiel de la Province Sainte Famille, Société de l'Apostolat Catholique.",
+    "color": "#5C3317",
+    "titleColor": "#ffffff",
+    "subtitleColor": "#C9952A",
+    "url": "/api/pdf/umugisha-abageze-mu-zabukuru.pdf"
+  },
+  {
+    "id": 2,
+    "number": "02",
+    "title": "Umunsi Mpuzamahanga w'Abageze mu Zabukuru 2026",
+    "subtitle": "Journée Internationale",
+    "description": "Umunsi mpuzamahanga w'Abageze mu zabukuru 2026 — Province Sainte Famille SAC.",
+    "color": "#3A1F0A",
+    "titleColor": "#E8B84B",
+    "subtitleColor": "#ffffff",
+    "url": "/api/pdf/umunsi-mpuzamahanga-2026.pdf"
+  }
+]

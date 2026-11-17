@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model CmsCollection {
+  key       String   @id @db.VarChar(64)
+  payload   Json
+  revision  Int      @default(1)
+  updatedAt DateTime @updatedAt
+
+  @@map("cms_collections")
+}
+
+model MediaAsset {
+  id           String   @id @default(cuid()) @db.VarChar(30)
+  publicId     String?  @unique @db.VarChar(191)
+  url          String   @db.Text
+  secureUrl    String   @db.Text
+  provider     String   @default("cloudinary") @db.VarChar(16)
+  resourceType String   @db.VarChar(16)
+  format       String?  @db.VarChar(32)
+  bytes        Int      @default(0)
+  width        Int?
+  height       Int?
+  createdAt    DateTime @default(now())
+
+  @@index([resourceType, createdAt])
+  @@map("media_assets")
+}

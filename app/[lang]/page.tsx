@@ -12,7 +12,7 @@ type NewsItem = { date: string; tags: string; title: string; excerpt: string; im
 
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
-  const dict = getDictionary(lang);
+  const dict = await getDictionary(lang);
   const news: NewsItem[] = dict.home.newsItems;
 
   return (

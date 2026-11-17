@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { i18n } from "../../i18n.config";
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params;
   const isFr = lang === "fr";
