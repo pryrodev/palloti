@@ -20,7 +20,7 @@ type Member = { name: string; role: string; image: string };
 
 export default async function DirectionPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
-  const dict = getDictionary(lang);
+  const dict = await getDictionary(lang);
   const members = dict.direction.members as Member[];
   const rector = members[0];
   const consultors = members.slice(1);

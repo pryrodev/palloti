@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useCmsCollection, useSaveCmsCollection } from "@/lib/useCmsCollection";
+import CloudinaryMediaPicker from "./CloudinaryMediaPicker";
 
 type Member = { name: string; role: string; image: string };
 
@@ -10,15 +12,20 @@ export default function DirectionEditor() {
   const [lang, setLang] = useState<"en"|"fr">("en");
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
+  const serverSnapshot = useRef<string | null>(null);
 
   const members = lang === "en" ? enMembers : frMembers;
   const setMembers = lang === "en" ? setEnMembers : setFrMembers;
 
+  const query = useCmsCollection<{ en: Member[]; fr: Member[] }>("direction");
+  const saveCollection = useSaveCmsCollection<{ en: Member[]; fr: Member[] }>("direction");
   useEffect(() => {
-    fetch("/api/admin/direction", { credentials: "include" })
-      .then((r) => r.json())
-      .then(({ en, fr }) => { setEnMembers(en); setFrMembers(fr); });
-  }, []);
+    if (!query.data) return;
+    const incoming = JSON.stringify(query.data);
+    const draft = JSON.stringify({ en: enMembers, fr: frMembers });
+    if (serverSnapshot.current === null) { setEnMembers(query.data.en); setFrMembers(query.data.fr); serverSnapshot.current = incoming; }
+    else if (draft === serverSnapshot.current && incoming !== serverSnapshot.current) { setEnMembers(query.data.en); setFrMembers(query.data.fr); serverSnapshot.current = incoming; }
+  }, [query.data, enMembers, frMembers]);
 
   function update(idx: number, field: keyof Member, value: string) {
     setMembers((prev) => prev.map((m, i) => i === idx ? { ...m, [field]: value } : m));
@@ -26,17 +33,16 @@ export default function DirectionEditor() {
 
   async function save() {
     setSaving(true); setMsg("");
-    const res = await fetch("/api/admin/direction", {
-      method: "PUT", credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ en: enMembers, fr: frMembers }),
-    });
+    const payload = { en: enMembers, fr: frMembers };
+    const res = await saveCollection.mutateAsync(payload).then(() => { serverSnapshot.current = JSON.stringify(payload); return { ok: true }; }).catch(() => ({ ok: false }));
     setMsg(res.ok ? "✅ Saved!" : "❌ Error");
     setSaving(false);
   }
 
   return (
     <div>
+      {query.isLoading && <p className="mb-4 text-sm text-gray-500">Loading direction…</p>}
+      {query.error && <p role="alert" className="mb-4 text-sm text-red-700">{query.error.message}</p>}
       <div className="flex items-center justify-between mb-6">
         <div className="flex gap-2">
           {(["en","fr"] as const).map((l) => (
@@ -77,8 +83,7 @@ export default function DirectionEditor() {
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-gray-400 uppercase mb-0.5">Image path</label>
-                <input value={m.image} onChange={(e) => update(idx, "image", e.target.value)}
-                  className="w-full text-xs text-gray-500 border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-[#C9952A]" />
+                <CloudinaryMediaPicker label="Pick image" resourceType="image" onSelect={(asset) => update(idx, "image", asset.secureUrl)} />
               </div>
             </div>
           </div>

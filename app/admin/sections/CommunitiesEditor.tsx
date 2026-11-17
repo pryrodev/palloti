@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useCmsCollection, useSaveCmsCollection } from "@/lib/useCmsCollection";
 
 type Community = {
   id: string; name: string; location: string; region: string;
@@ -16,23 +17,25 @@ export default function CommunitiesEditor() {
   const [editing, setEditing] = useState<Community | null>(null);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
+  const serverSnapshot = useRef<string | null>(null);
 
   const items = lang === "en" ? enItems : frItems;
   const setItems = lang === "en" ? setEnItems : setFrItems;
 
+  const query = useCmsCollection<{ en: Community[]; fr: Community[] }>("communities");
+  const saveCollection = useSaveCmsCollection<{ en: Community[]; fr: Community[] }>("communities");
   useEffect(() => {
-    fetch("/api/admin/communities", { credentials: "include" })
-      .then((r) => r.json())
-      .then(({ en, fr }) => { setEnItems(en); setFrItems(fr); });
-  }, []);
+    if (!query.data) return;
+    const incoming = JSON.stringify(query.data);
+    const draft = JSON.stringify({ en: enItems, fr: frItems });
+    if (serverSnapshot.current === null) { setEnItems(query.data.en); setFrItems(query.data.fr); serverSnapshot.current = incoming; }
+    else if (draft === serverSnapshot.current && incoming !== serverSnapshot.current) { setEnItems(query.data.en); setFrItems(query.data.fr); serverSnapshot.current = incoming; }
+  }, [query.data, enItems, frItems]);
 
   async function save() {
     setSaving(true); setMsg("");
-    const res = await fetch("/api/admin/communities", {
-      method: "PUT", credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ en: enItems, fr: frItems }),
-    });
+    const payload = { en: enItems, fr: frItems };
+    const res = await saveCollection.mutateAsync(payload).then(() => { serverSnapshot.current = JSON.stringify(payload); return { ok: true }; }).catch(() => ({ ok: false }));
     setMsg(res.ok ? "✅ Saved!" : "❌ Error");
     setSaving(false);
   }
@@ -53,6 +56,8 @@ export default function CommunitiesEditor() {
 
   return (
     <div>
+      {query.isLoading && <p className="mb-4 text-sm text-gray-500">Loading communities…</p>}
+      {query.error && <p role="alert" className="mb-4 text-sm text-red-700">{query.error.message}</p>}
       <div className="flex items-center justify-between mb-6">
         <div className="flex gap-2">
           {(["en","fr"] as const).map((l) => (

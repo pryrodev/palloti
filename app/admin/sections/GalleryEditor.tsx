@@ -1,89 +1,52 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useCmsCollection, useSaveCmsCollection } from "@/lib/useCmsCollection";
+import CloudinaryMediaPicker from "./CloudinaryMediaPicker";
 
 type GalleryItem = { src: string; title: string; sub: string };
 
 export default function GalleryEditor() {
   const [items, setItems] = useState<GalleryItem[]>([]);
+  const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [msg, setMsg] = useState("");
-  const fileRef = useRef<HTMLInputElement>(null);
+  const serverSnapshot = useRef<string | null>(null);
+  const query = useCmsCollection<GalleryItem[]>("gallery");
+  const saveCollection = useSaveCmsCollection<GalleryItem[]>("gallery");
 
   useEffect(() => {
-    fetch("/api/admin/gallery", { credentials: "include" })
-      .then((r) => r.json()).then(setItems);
-  }, []);
-
-  async function uploadImage(file: File) {
-    setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("type", "image");
-    const res = await fetch("/api/admin/upload", { method: "POST", credentials: "include", body: fd });
-    const { url } = await res.json();
-    setItems((prev) => [...prev, { src: url, title: file.name.replace(/\.[^.]+$/, ""), sub: "Holy Family Province" }]);
-    setUploading(false);
-  }
-
-  function remove(idx: number) {
-    if (!confirm("Remove this image?")) return;
-    setItems((prev) => prev.filter((_, i) => i !== idx));
-  }
+    if (!query.data) return;
+    const incoming = JSON.stringify(query.data);
+    const draft = JSON.stringify(items);
+    if (serverSnapshot.current === null) { setItems(query.data); serverSnapshot.current = incoming; }
+    else if (draft === serverSnapshot.current && incoming !== serverSnapshot.current) { setItems(query.data); serverSnapshot.current = incoming; }
+  }, [query.data, items]);
 
   async function save() {
-    setSaving(true); setMsg("");
-    const res = await fetch("/api/admin/gallery", {
-      method: "PUT", credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(items),
-    });
-    setMsg(res.ok ? "✅ Saved!" : "❌ Error");
-    setSaving(false);
+    setSaving(true); setMessage("");
+    try { await saveCollection.mutateAsync(items); serverSnapshot.current = JSON.stringify(items); setMessage("Saved."); }
+    catch (error) { setMessage(error instanceof Error ? error.message : "Could not save gallery."); }
+    finally { setSaving(false); }
   }
 
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <p className="text-sm text-gray-500">{items.length} photos</p>
-        <div className="flex gap-3 items-center">
-          {msg && <span className="text-sm font-bold">{msg}</span>}
-          <input ref={fileRef} type="file" accept="image/*" multiple className="hidden"
-            onChange={async (e) => { for (const f of Array.from(e.target.files ?? [])) await uploadImage(f); }} />
-          <button onClick={() => fileRef.current?.click()} disabled={uploading}
-            className="px-4 py-2 rounded-lg text-sm font-black disabled:opacity-50"
-            style={{ background: "#C9952A", color: "#3e2009" }}>
-            {uploading ? "Uploading…" : "+ Upload Photos"}
-          </button>
-          <button onClick={save} disabled={saving}
-            className="px-4 py-2 rounded-lg text-sm font-black disabled:opacity-50"
-            style={{ background: "#5C3317", color: "#fff" }}>
-            {saving ? "Saving…" : "Save"}
-          </button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {items.map((item, idx) => (
-          <div key={idx} className="group relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={item.src} alt={item.title} className="w-full aspect-square object-cover" />
-            <div className="p-2">
-              <input value={item.title}
-                onChange={(e) => setItems((prev) => prev.map((it, i) => i === idx ? { ...it, title: e.target.value } : it))}
-                className="w-full text-xs font-bold text-gray-700 border-none outline-none bg-transparent truncate" />
-              <input value={item.sub}
-                onChange={(e) => setItems((prev) => prev.map((it, i) => i === idx ? { ...it, sub: e.target.value } : it))}
-                className="w-full text-[10px] text-gray-400 border-none outline-none bg-transparent" />
-            </div>
-            <button onClick={() => remove(idx)}
-              className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs font-black opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-              ×
-            </button>
-          </div>
-        ))}
+  return <div>
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <p className="text-sm text-gray-500">{items.length} photos</p>
+      <div className="flex items-center gap-3">
+        {message && <span role="status" className="text-sm font-bold">{message}</span>}
+        <CloudinaryMediaPicker label="+ Add Photos" resourceType="image" onSelect={(asset) => setItems((previous) => [...previous, { src: asset.secureUrl, title: asset.publicId.split("/").pop() ?? "Photo", sub: "Holy Family Province" }])} />
+        <button onClick={save} disabled={saving} className="rounded-lg bg-[#5C3317] px-4 py-2 text-sm font-black text-white disabled:opacity-50">{saving ? "Saving…" : "Save"}</button>
       </div>
     </div>
-  );
+    {query.isLoading && <p className="mb-4 text-sm text-gray-500">Loading gallery…</p>}
+    {query.error && <p role="alert" className="mb-4 text-sm text-red-700">{query.error.message}</p>}
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+      {items.map((item, index) => <div key={`${item.src}-${index}`} className="group relative overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+        <img src={item.src} alt={item.title} className="aspect-square w-full object-cover" />
+        <div className="p-2"><input aria-label="Photo title" value={item.title} onChange={(event) => setItems((previous) => previous.map((entry, i) => i === index ? { ...entry, title: event.target.value } : entry))} className="w-full truncate border-none bg-transparent text-xs font-bold text-gray-700 outline-none" />
+          <input aria-label="Photo subtitle" value={item.sub} onChange={(event) => setItems((previous) => previous.map((entry, i) => i === index ? { ...entry, sub: event.target.value } : entry))} className="w-full border-none bg-transparent text-[10px] text-gray-400 outline-none" /></div>
+        <button type="button" aria-label="Remove photo" onClick={() => setItems((previous) => previous.filter((_, i) => i !== index))} className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-red-600 text-white opacity-0 transition-opacity group-hover:opacity-100">×</button>
+      </div>)}
+    </div>
+  </div>;
 }

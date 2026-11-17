@@ -19,7 +19,7 @@ type Chapter = { year: string; image: string; text: string; caption?: string };
 
 export default async function HistoryPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
-  const dict = getDictionary(lang);
+  const dict = await getDictionary(lang);
   const { history } = dict;
 
   return (

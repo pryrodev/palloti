@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useCmsCollection, useSaveCmsCollection } from "@/lib/useCmsCollection";
+import { newsArticleSchema } from "@/lib/cmsSchemas";
+import CloudinaryMediaPicker from "./CloudinaryMediaPicker";
 
 type Article = {
   id: number;
@@ -24,14 +27,20 @@ export default function NewsEditor() {
   const articles = lang === "en" ? enArticles : frArticles;
   const setArticles = lang === "en" ? setEnArticles : setFrArticles;
 
+  const serverSnapshot = useRef<string | null>(null);
+  const query = useCmsCollection<{ en: Article[]; fr: Article[] }>("news");
+  const saveCollection = useSaveCmsCollection<{ en: Article[]; fr: Article[] }>("news");
   useEffect(() => {
-    fetch("/api/admin/news", { credentials: "include" })
-      .then((r) => r.json())
-      .then(({ en, fr }) => { setEnArticles(en); setFrArticles(fr); });
-  }, []);
+    if (!query.data) return;
+    const incoming = JSON.stringify(query.data);
+    const draft = JSON.stringify({ en: enArticles, fr: frArticles });
+    if (serverSnapshot.current === null) { setEnArticles(query.data.en); setFrArticles(query.data.fr); serverSnapshot.current = incoming; }
+    else if (draft === serverSnapshot.current && incoming !== serverSnapshot.current) { setEnArticles(query.data.en); setFrArticles(query.data.fr); serverSnapshot.current = incoming; }
+  }, [query.data, enArticles, frArticles]);
 
   function saveEditing() {
     if (!editing) return;
+    if (!newsArticleSchema.safeParse(editing).success) return;
     setArticles((prev) => {
       const idx = prev.findIndex((a) => a.id === editing.id);
       if (idx >= 0) { const copy = [...prev]; copy[idx] = editing; return copy; }
@@ -42,11 +51,8 @@ export default function NewsEditor() {
 
   async function publish() {
     setSaving(true); setMsg("");
-    const res = await fetch("/api/admin/news", {
-      method: "PUT", credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ en: enArticles, fr: frArticles }),
-    });
+    const payload = { en: enArticles, fr: frArticles };
+    const res = await saveCollection.mutateAsync(payload).then(() => { serverSnapshot.current = JSON.stringify(payload); return { ok: true }; }).catch(() => ({ ok: false }));
     setMsg(res.ok ? "✅ Published successfully!" : "❌ Failed to publish");
     setSaving(false);
   }
@@ -56,8 +62,12 @@ export default function NewsEditor() {
     setArticles((prev) => prev.filter((a) => a.id !== id));
   }
 
+  const validation = editing ? newsArticleSchema.safeParse(editing) : null;
+
   return (
     <div>
+      {query.isLoading && <p className="mb-4 text-sm text-gray-500">Loading news…</p>}
+      {query.error && <p role="alert" className="mb-4 text-sm text-red-700">{query.error.message}</p>}
       {/* Lang toggle + actions */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex gap-2">
@@ -134,12 +144,17 @@ export default function NewsEditor() {
                 onChange={(e) => setEditing({ ...editing, summary: e.target.value })}
                 className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#C9952A]" />
             </div>
+            <div className="mb-4 flex items-center gap-3">
+              <span className="text-xs font-bold text-gray-500">Article image</span>
+              <CloudinaryMediaPicker label="Choose image" resourceType="image" onSelect={(asset) => setEditing({ ...editing, imageUrl: asset.secureUrl })} />
+            </div>
+            {validation && !validation.success && <p role="alert" className="mb-3 text-xs text-red-700">{validation.error.issues[0]?.message}</p>}
             <div className="flex gap-3 justify-end">
               <button onClick={() => setEditing(null)}
                 className="px-4 py-2 text-sm font-bold rounded-lg bg-gray-100 hover:bg-gray-200">Cancel</button>
-              <button onClick={saveEditing}
+              <button onClick={saveEditing} disabled={!validation?.success}
                 className="px-4 py-2 text-sm font-black rounded-lg text-white"
-                style={{ background: "#5C3317" }}>Save</button>
+                style={{ background: "#5C3317", opacity: validation?.success ? 1 : 0.5 }}>Save</button>
             </div>
           </div>
         </div>

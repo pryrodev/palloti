@@ -1,7 +1,7 @@
 import { Header } from "../../components/header";
 import { Footer } from "../../components/Footer";
 import { getDictionary } from "@/lib/getDictionary";
-import { readData } from "@/lib/getData";
+import { readPublishedData } from "@/lib/getData";
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
 import VideoPlayer from "../../components/VideoPlayer";
 import type { Metadata } from "next";
@@ -21,8 +21,10 @@ type Video = { src: string; poster: string; title: string };
 
 export default async function VideosPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
-  const dict = getDictionary(lang);
-  const videos = readData<Video[]>("videos.json");
+  const [dict, videos] = await Promise.all([
+    getDictionary(lang),
+    readPublishedData<Video[]>("videos", "videos.json"),
+  ]);
 
   return (
     <>

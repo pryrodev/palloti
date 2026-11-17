@@ -1,0 +1,23 @@
+services:
+  db:
+    image: mysql:8
+    container_name: pallotti_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-local-root-password}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-pallotti_cms}
+      MYSQL_USER: ${MYSQL_USER:-pallotti}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-local-app-password}
+    ports:
+      - "${MYSQL_PORT:-33306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD:-local-root-password}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  mysql_data:

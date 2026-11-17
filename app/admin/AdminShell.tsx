@@ -8,6 +8,8 @@ import VideosEditor from "./sections/VideosEditor";
 import PublicationsEditor from "./sections/PublicationsEditor";
 import CommunitiesEditor from "./sections/CommunitiesEditor";
 import DirectionEditor from "./sections/DirectionEditor";
+import CmsQueryProvider from "./CmsQueryProvider";
+import MediaLibrary from "./sections/MediaLibrary";
 
 const NAV = [
   { key: "news",         label: "News",          icon: "📰" },
@@ -16,6 +18,7 @@ const NAV = [
   { key: "publications", label: "Publications",   icon: "📄" },
   { key: "communities",  label: "Communities",    icon: "🏘️" },
   { key: "direction",    label: "Direction",      icon: "👥" },
+  { key: "media",        label: "Media Library",  icon: "🗂️" },
 ];
 
 export default function AdminShell() {
@@ -28,6 +31,7 @@ export default function AdminShell() {
   }
 
   return (
+    <CmsQueryProvider>
     <div className="min-h-screen flex" style={{ background: "#f8f4ef", fontFamily: "system-ui, sans-serif" }}>
       {/* Sidebar */}
       <aside className="w-56 flex-shrink-0 flex flex-col"
@@ -98,8 +102,10 @@ export default function AdminShell() {
           {active === "publications" && <PublicationsEditor />}
           {active === "communities"  && <CommunitiesEditor />}
           {active === "direction"    && <DirectionEditor />}
+          {active === "media"        && <MediaLibrary />}
         </div>
       </main>
     </div>
+    </CmsQueryProvider>
   );
 }

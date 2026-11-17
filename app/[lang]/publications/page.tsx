@@ -6,7 +6,7 @@ import PublicationsClient from "./PublicationsClient";
 
 export default async function PublicationsPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
-  const dict = getDictionary(lang);
+  const dict = await getDictionary(lang);
 
   return (
     <>

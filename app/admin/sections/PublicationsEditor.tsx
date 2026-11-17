@@ -1,157 +1,63 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useCmsCollection, useSaveCmsCollection } from "@/lib/useCmsCollection";
+import CloudinaryMediaPicker from "./CloudinaryMediaPicker";
 
-type Book = {
-  id: number; number: string; title: string; subtitle: string;
-  description: string; color: string; titleColor: string; subtitleColor: string; url?: string;
-};
-
-const COLORS = ["#5C3317","#3A1F0A","#7A4520","#C9952A","#2C4A1E","#1A3A5C","#4A2060","#1A4A3A"];
+type Book = { id: number; number: string; title: string; subtitle: string; description: string; color: string; titleColor: string; subtitleColor: string; url: string };
+const COLORS = ["#5C3317", "#3A1F0A", "#7A4520", "#C9952A", "#2C4A1E", "#1A3A5C", "#4A2060", "#1A4A3A"];
+const EMPTY: Omit<Book, "id" | "number" | "url"> = { title: "", subtitle: "Document", description: "", color: COLORS[0], titleColor: "#ffffff", subtitleColor: "#C9952A" };
 
 export default function PublicationsEditor() {
   const [books, setBooks] = useState<Book[]>([]);
-  const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [msg, setMsg] = useState("");
   const [editing, setEditing] = useState<Book | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const serverSnapshot = useRef<string | null>(null);
+  const query = useCmsCollection<Book[]>("publications");
+  const saveCollection = useSaveCmsCollection<Book[]>("publications");
 
   useEffect(() => {
-    fetch("/api/admin/publications", { credentials: "include" })
-      .then((r) => r.json()).then(setBooks);
-  }, []);
-
-  async function uploadPdf(file: File) {
-    setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("type", "pdf");
-    const res = await fetch("/api/admin/upload", { method: "POST", credentials: "include", body: fd });
-    const { url } = await res.json();
-    const newBook: Book = {
-      id: Date.now(),
-      number: String(books.length + 1).padStart(2, "0"),
-      title: file.name.replace(/\.pdf$/i, ""),
-      subtitle: "Document",
-      description: "",
-      color: COLORS[books.length % COLORS.length],
-      titleColor: "#ffffff",
-      subtitleColor: "#C9952A",
-      url,
-    };
-    setBooks((prev) => [...prev, newBook]);
-    setEditing(newBook);
-    setUploading(false);
-  }
-
-  function remove(id: number) {
-    if (!confirm("Remove this publication?")) return;
-    setBooks((prev) => prev.filter((b) => b.id !== id));
-  }
+    if (!query.data) return;
+    const incoming = JSON.stringify(query.data);
+    const draft = JSON.stringify(books);
+    if (serverSnapshot.current === null) { setBooks(query.data); serverSnapshot.current = incoming; }
+    else if (draft === serverSnapshot.current && incoming !== serverSnapshot.current) { setBooks(query.data); serverSnapshot.current = incoming; }
+  }, [query.data, books]);
 
   async function save() {
-    setSaving(true); setMsg("");
-    const res = await fetch("/api/admin/publications", {
-      method: "PUT", credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(books),
-    });
-    setMsg(res.ok ? "✅ Saved!" : "❌ Error");
-    setSaving(false);
+    setSaving(true); setMessage("");
+    try { await saveCollection.mutateAsync(books); serverSnapshot.current = JSON.stringify(books); setMessage("Saved."); }
+    catch (error) { setMessage(error instanceof Error ? error.message : "Could not save publications."); }
+    finally { setSaving(false); }
   }
 
-  function saveEditing() {
-    if (!editing) return;
-    setBooks((prev) => prev.map((b) => b.id === editing.id ? editing : b));
-    setEditing(null);
+  function addPublication(url: string, name: string) {
+    const book: Book = { ...EMPTY, id: Date.now(), number: String(books.length + 1).padStart(2, "0"), title: name, url };
+    setBooks((previous) => [...previous, book]); setEditing(book);
   }
 
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <p className="text-sm text-gray-500">{books.length} publication{books.length !== 1 ? "s" : ""}</p>
-        <div className="flex gap-3 items-center">
-          {msg && <span className="text-sm font-bold">{msg}</span>}
-          <input ref={fileRef} type="file" accept=".pdf" className="hidden"
-            onChange={async (e) => { const f = e.target.files?.[0]; if (f) await uploadPdf(f); }} />
-          <button onClick={() => fileRef.current?.click()} disabled={uploading}
-            className="px-4 py-2 rounded-lg text-sm font-black disabled:opacity-50"
-            style={{ background: "#C9952A", color: "#3e2009" }}>
-            {uploading ? "Uploading…" : "+ Upload PDF"}
-          </button>
-          <button onClick={save} disabled={saving}
-            className="px-4 py-2 rounded-lg text-sm font-black disabled:opacity-50"
-            style={{ background: "#5C3317", color: "#fff" }}>
-            {saving ? "Saving…" : "Save"}
-          </button>
-        </div>
+  return <div>
+    <div className="mb-6 flex items-center justify-between gap-3">
+      <p className="text-sm text-gray-500">{books.length} publications</p>
+      <div className="flex items-center gap-3">{message && <span role="status" className="text-sm font-bold">{message}</span>}
+        <CloudinaryMediaPicker label="+ Add document" resourceType="raw" onSelect={(asset) => addPublication(asset.secureUrl, asset.publicId.split("/").pop() ?? "New document")} />
+        <button onClick={() => setEditing({ ...EMPTY, id: Date.now(), number: String(books.length + 1).padStart(2, "0"), url: "" })} className="rounded-lg bg-[#f2e9da] px-4 py-2 text-sm font-bold text-[#5C3317]">New publication</button>
+        <button onClick={save} disabled={saving} className="rounded-lg bg-[#5C3317] px-4 py-2 text-sm font-black text-white disabled:opacity-50">{saving ? "Saving…" : "Save"}</button>
       </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {books.map((book) => (
-          <div key={book.id} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100">
-            {/* Mini cover preview */}
-            <div className="h-32 flex flex-col justify-between p-3 relative"
-              style={{ background: book.color }}>
-              <p style={{ color: book.titleColor, fontSize: "7px", opacity: 0.6, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                PSF / {book.number}
-              </p>
-              <p style={{ color: book.titleColor, fontSize: "10px", fontWeight: 900, lineHeight: 1.3, fontFamily: "Georgia, serif" }}>
-                {book.title}
-              </p>
-              <p style={{ color: book.subtitleColor, fontSize: "7px", opacity: 0.8, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                {book.subtitle}
-              </p>
-            </div>
-            <div className="p-3 flex gap-2">
-              <button onClick={() => setEditing(book)}
-                className="flex-1 py-1.5 text-xs font-bold rounded bg-gray-100 hover:bg-gray-200">Edit</button>
-              <button onClick={() => remove(book.id)}
-                className="flex-1 py-1.5 text-xs font-bold rounded bg-red-50 text-red-600 hover:bg-red-100">Remove</button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Edit modal */}
-      {editing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
-            <h2 className="font-black text-lg mb-4">Edit Publication</h2>
-            {[
-              { key: "number", label: "Number" },
-              { key: "title", label: "Title" },
-              { key: "subtitle", label: "Subtitle" },
-              { key: "description", label: "Description" },
-            ].map(({ key, label }) => (
-              <div key={key} className="mb-3">
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">{label}</label>
-                <input value={(editing as unknown as Record<string, string>)[key]}
-                  onChange={(e) => setEditing({ ...editing, [key]: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#C9952A]" />
-              </div>
-            ))}
-            <div className="mb-3">
-              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Cover Color</label>
-              <div className="flex flex-wrap gap-2">
-                {COLORS.map((c) => (
-                  <button key={c} onClick={() => setEditing({ ...editing, color: c })}
-                    className="w-8 h-8 rounded-full border-2 transition-all"
-                    style={{ background: c, borderColor: editing.color === c ? "#C9952A" : "transparent" }} />
-                ))}
-              </div>
-            </div>
-            <div className="flex gap-3 justify-end mt-4">
-              <button onClick={() => setEditing(null)}
-                className="px-4 py-2 text-sm font-bold rounded-lg bg-gray-100 hover:bg-gray-200">Cancel</button>
-              <button onClick={saveEditing}
-                className="px-4 py-2 text-sm font-black rounded-lg text-white"
-                style={{ background: "#5C3317" }}>Save</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
-  );
+    {query.isLoading && <p className="mb-4 text-sm text-gray-500">Loading publications…</p>}
+    {query.error && <p role="alert" className="mb-4 text-sm text-red-700">{query.error.message}</p>}
+    <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">{books.map((book) => <article key={book.id} className="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+      <div className="flex h-32 flex-col justify-between p-3" style={{ background: book.color }}><p className="text-[7px] uppercase tracking-widest" style={{ color: book.titleColor }}>PSF / {book.number}</p><p className="text-[10px] font-black" style={{ color: book.titleColor }}>{book.title}</p><p className="text-[7px] uppercase tracking-widest" style={{ color: book.subtitleColor }}>{book.subtitle}</p></div>
+      <div className="flex gap-2 p-3"><button onClick={() => setEditing(book)} className="flex-1 rounded bg-gray-100 py-1.5 text-xs font-bold">Edit</button><button onClick={() => setBooks((previous) => previous.filter((entry) => entry.id !== book.id))} className="flex-1 rounded bg-red-50 py-1.5 text-xs font-bold text-red-600">Remove</button></div>
+    </article>)}</div>
+    {editing && <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4"><div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
+      <h2 className="mb-4 text-lg font-black">Publication details</h2>
+      {(["number", "title", "subtitle", "description"] as const).map((field) => <label key={field} className="mb-3 block text-xs font-bold capitalize text-gray-500">{field}<input value={editing[field]} onChange={(event) => setEditing({ ...editing, [field]: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-800" /></label>)}
+      <div className="mb-4 flex items-center gap-3"><span className="text-xs font-bold text-gray-500">PDF/document</span><CloudinaryMediaPicker label="Choose from media" resourceType="raw" onSelect={(asset) => setEditing({ ...editing, url: asset.secureUrl })} /></div>
+      <div className="mb-4 flex flex-wrap gap-2">{COLORS.map((color) => <button key={color} onClick={() => setEditing({ ...editing, color })} aria-label={`Cover color ${color}`} className="h-8 w-8 rounded-full border-2" style={{ background: color, borderColor: editing.color === color ? "#C9952A" : "transparent" }} />)}</div>
+      <div className="flex justify-end gap-3"><button onClick={() => setEditing(null)} className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-bold">Cancel</button><button onClick={() => { setBooks((previous) => previous.some((book) => book.id === editing.id) ? previous.map((book) => book.id === editing.id ? editing : book) : [...previous, editing]); setEditing(null); }} className="rounded-lg bg-[#5C3317] px-4 py-2 text-sm font-black text-white">Apply</button></div>
+    </div></div>}
+  </div>;
 }

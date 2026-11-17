@@ -1,7 +1,7 @@
 import { Header } from "../../components/header";
 import { Footer } from "../../components/Footer";
 import { getDictionary } from "@/lib/getDictionary";
-import { readData } from "@/lib/getData";
+import { readPublishedData } from "@/lib/getData";
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
 import { LayoutGrid, Card } from "../../components/ui/LayoutGrid";
 import type { Metadata } from "next";
@@ -19,8 +19,10 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 
 export default async function GalleriesPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
-  const dict = getDictionary(lang);
-  const allImages = readData<{ src: string; title: string; sub: string }[]>("gallery.json");
+  const [dict, allImages] = await Promise.all([
+    getDictionary(lang),
+    readPublishedData<{ src: string; title: string; sub: string }[]>("gallery", "gallery.json"),
+  ]);
   const classNames = [
     "md:col-span-2","col-span-1","col-span-1","col-span-1",
     "md:col-span-2","col-span-1","col-span-1","col-span-1",
