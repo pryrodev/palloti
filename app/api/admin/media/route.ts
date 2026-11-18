@@ -16,9 +16,36 @@ const assetSchema = z.object({
 
 export async function GET(req: NextRequest) {
   if (!isAuthenticated(req)) return unauthorized();
+  const page = Number(req.nextUrl.searchParams.get("page") ?? "1");
+  const pageSize = Number(req.nextUrl.searchParams.get("pageSize") ?? "24");
+  const resourceType = req.nextUrl.searchParams.get("resourceType");
+  if (!Number.isSafeInteger(page) || page < 1 || !Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 100) {
+    return NextResponse.json({ error: "Invalid pagination. Use page >= 1 and pageSize between 1 and 100." }, { status: 400 });
+  }
+  if (resourceType && !["image", "video", "raw"].includes(resourceType)) {
+    return NextResponse.json({ error: "Invalid media resource type." }, { status: 400 });
+  }
+  const where = resourceType ? { resourceType } : undefined;
   try {
-    const assets = await prisma.mediaAsset.findMany({ orderBy: { createdAt: "desc" } });
-    return NextResponse.json(assets, { headers: { "Cache-Control": "no-store" } });
+    const [items, total] = await Promise.all([
+      prisma.mediaAsset.findMany({
+        where,
+        orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.mediaAsset.count({ where }),
+    ]);
+    return NextResponse.json({
+      items,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
+        offset: (page - 1) * pageSize,
+      },
+    }, { headers: { "Cache-Control": "no-store" } });
   } catch {
     return NextResponse.json({ error: "Media database is unavailable" }, { status: 503 });
   }

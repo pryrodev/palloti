@@ -1,23 +1,29 @@
-import { Header } from "../../components/header";
-import { Footer } from "../../components/Footer";
-import { getDictionary } from "@/lib/getDictionary";
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
 import PublicationsClient from "./PublicationsClient";
+import type { Metadata } from "next";
+import { getDictionary } from "@/lib/getDictionary";
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
+  return {
+    title: dict.siteSeo.publicationsTitle,
+    description: dict.siteSeo.publicationsDescription,
+  };
+}
 
 export default async function PublicationsPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
-
   return (
     <>
-      <Header lang={lang} navigation={dict.navigation} />
       <DecorativeDivider />
 
       <div className="page-banner">
         <div className="container mx-auto px-6">
-          <p className="badge">{lang === "fr" ? "Médias" : "Media"}</p>
-          <h1>{lang === "fr" ? "Publications" : "Publications"}</h1>
-          <p className="subtitle">{lang === "fr" ? "Documents, livres et ressources · Province Sainte Famille" : "Documents, books & resources · Holy Family Province"}</p>
+          <p className="badge">{dict.siteSeo.publicationsBadge}</p>
+          <h1>{dict.navigation.publications}</h1>
+          <p className="subtitle">{dict.siteSeo.publicationsSubtitle}</p>
         </div>
       </div>
 
@@ -27,7 +33,6 @@ export default async function PublicationsPage({ params }: { params: Promise<{ l
         </div>
       </main>
 
-      <Footer lang={lang} dict={dict.footer} navigation={dict.navigation} />
     </>
   );
 }

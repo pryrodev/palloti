@@ -47,16 +47,16 @@ export const TopBar = ({ phone, email }: TopBarProps) => {
   ];
 
   return (
-    <div className="w-full bg-[#1A1A1A] text-white/80 py-2 border-b border-white/10 overflow-hidden">
+    <div className="w-full bg-[var(--red-dk)] text-white/80 py-2 border-b border-white/10 overflow-hidden">
       <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
         
         {/* LEFT: CONTACT INFO */}
         <div className="flex items-center gap-6 text-[11px] font-bold tracking-widest uppercase">
-          <a href={`tel:${phone}`} className="hidden sm:flex items-center gap-2 hover:text-[#C9A84C] transition-colors">
-            <span className="text-[#C9A84C]">CALL:</span> {phone}
+          <a href={`tel:${phone}`} className="hidden sm:flex items-center gap-2 hover:text-[var(--gold-lt)] transition-colors">
+            <span className="text-[var(--gold-lt)]">CALL:</span> {phone}
           </a>
-          <a href={`mailto:${email}`} className="flex items-center gap-2 hover:text-[#C9A84C] transition-colors">
-            <span className="text-[#C9A84C]">EMAIL:</span> {email}
+          <a href={`mailto:${email}`} className="flex items-center gap-2 hover:text-[var(--gold-lt)] transition-colors">
+            <span className="text-[var(--gold-lt)]">EMAIL:</span> {email}
           </a>
         </div>
 
@@ -72,7 +72,7 @@ export const TopBar = ({ phone, email }: TopBarProps) => {
                 href={social.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#8B1A1A] hover:text-white transition-all duration-300"
+                className="w-8 h-8 flex items-center justify-center  hover:bg-[var(--red-lt)] hover:text-white transition-all duration-300"
                 title={social.name}
               >
                 {social.icon}

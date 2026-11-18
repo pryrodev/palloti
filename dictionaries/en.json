@@ -1,5 +1,16 @@
 {
+  "siteSeo": {
+    "homeTitle": "Home — Holy Family Province",
+    "homeDescription": "Official website of the Holy Family Province of the Society of the Catholic Apostolate (SAC — Pallottines). Inspired by Saint Vincent Pallotti.",
+    "newsTitle": "News & Publications",
+    "newsDescription": "Latest news, newsletters and publications from the Holy Family Province SAC.",
+    "publicationsTitle": "Holy Family Province Publications",
+    "publicationsDescription": "Browse official documents, books, and publications from the Holy Family Province SAC.",
+    "publicationsBadge": "Media",
+    "publicationsSubtitle": "Documents, books & resources · Holy Family Province"
+  },
   "navigation": {
+    "contact": "Contact",
     "home": "Home",
     "identity": "Identity",
     "provincialDirection": "Provincial Government",
@@ -11,10 +22,48 @@
     "videos": "Videos",
     "publications": "Publications"
   },
+  "contactPage": {
+    "badge": "We are here to help",
+    "title": "Get in touch",
+    "subtitle": "Reach the Holy Family Province office in Gikondo, Kigali.",
+    "contactInfo": "Contact information",
+    "addressLabel": "Visit us",
+    "phoneLabel": "Call us",
+    "messageTitle": "Send us a message",
+    "name": "Your name",
+    "email": "Email address",
+    "subject": "Subject",
+    "message": "How can we help?",
+    "namePlaceholder": "Enter your name",
+    "emailPlaceholder": "you@example.com",
+    "subjectPlaceholder": "What is this about?",
+    "messagePlaceholder": "Write your message",
+    "send": "Send message",
+    "sending": "Sending message...",
+    "sent": "Your message has been sent. We’ll get back to you soon.",
+    "error": "We couldn’t send your message. Please try again or call us.",
+    "deliveryNote": "Your message will be sent to the Holy Family Province office.",
+    "validationName": "Enter at least 2 characters.",
+    "validationEmail": "Enter a valid email address.",
+    "validationSubject": "Enter a subject with at least 2 characters.",
+    "validationMessage": "Enter a message with at least 10 characters.",
+    "mapTitle": "Find the Holy Family Province office",
+    "openMap": "Open in Google Maps"
+  },
   "home": {
     "heroBadge": "Holy Family Province",
     "heroTitle": "Welcome to the Official Website of the Holy Family Province",
     "heroSubtitle": "Inspired by Saint Vincent Pallotti, we are a community of priests and brothers united in the mission of spreading God's love through charity, apostolate, and service.",
+    "heroSlides": [
+      { "image": "/images/gikondo.jpg", "location": "Kigali — Gikondo, Rwanda", "title": "Holy Family Provincial House", "subtitle": "Seat of the Holy Family Province · Mother House" },
+      { "image": "/images/hero.jpg", "location": "Kigali — Rwanda", "title": "Sanctuary of Divine Mercy", "subtitle": "A place of prayer and welcome" },
+      { "image": "/images/hero2.jpg", "location": "Kibeho — Rwanda", "title": "The New Community of Kibeho", "subtitle": "Serving the faithful in a place of pilgrimage" },
+      { "image": "/images/home2.jpeg", "location": "Holy Family Province", "title": "Formation & Apostolate", "subtitle": "Community life and pastoral service" },
+      { "image": "/images/home3.jpg", "location": "Union of Catholic Apostolate", "title": "Youth & Vocations", "subtitle": "Union of Catholic Apostolate" },
+      { "image": "/images/hero3.jpeg", "location": "Montereau — France", "title": "The New Pallottine Community of Montereau", "subtitle": "A mission beyond borders" },
+      { "image": "/images/hero4.jpg", "location": "Holy Family Province", "title": "Pallottines of the Holy Family Province", "subtitle": "Come, let us rebuild the walls of Jerusalem." },
+      { "image": "/images/hero5.jpg", "location": "Kabuga — Rwanda", "title": "Genezareth Pallottine Formation Centre", "subtitle": "Formation and service across our communities" }
+    ],
     "ctaPrimary": "Discover Our Mission",
     "ctaSecondary": "Our Communities",
     "statFounded": "Founded",
@@ -162,7 +211,14 @@
       "members": "Community Members",
       "works": "Works",
       "viewDetails": "View Members",
-      "hideDetails": "Hide Members"
+      "hideDetails": "Hide Members",
+      "imageUnavailable": "Community photo coming soon",
+      "showing": "Showing",
+      "of": "of",
+      "results": "communities",
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page"
     },
     "items": [
       {

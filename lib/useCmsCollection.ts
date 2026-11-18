@@ -8,37 +8,94 @@ export const cmsQueryKeys = {
   all: ["cms"] as const,
   collection: (key: CmsCollectionKey) => ["cms", "collection", key] as const,
   media: ["cms", "media"] as const,
+  mediaPage: (page: number, pageSize: number, resourceType?: string) => ["cms", "media", page, pageSize, resourceType ?? "all"] as const,
 };
 
-async function fetchCollection<T>(key: CmsCollectionKey): Promise<T> {
-  const response = await fetch(collectionUrl(key), { credentials: "include", cache: "no-store" });
+type CmsCollectionSnapshot<T> = { payload: T; revision: number };
+
+type PageInfo = { page: number; pageSize: number; total: number; totalPages: number; offset: number };
+type PageEnvelope<T> = { data: T; pagination: PageInfo | { en: PageInfo; fr: PageInfo } };
+// Editors currently publish a collection snapshot, so hydrate it through the
+// paginated endpoint using its supported maximum page size.
+const COLLECTION_PAGE_SIZE = 500;
+
+async function fetchCollectionPage<T>(key: CmsCollectionKey, page: number, signal: AbortSignal, revision?: number) {
+  const url = new URL(collectionUrl(key), window.location.origin);
+  url.searchParams.set("page", String(page));
+  url.searchParams.set("pageSize", String(COLLECTION_PAGE_SIZE));
+  const headers = revision === undefined ? undefined : { "If-Match": `"${revision}"` };
+  const response = await fetch(url, { credentials: "include", cache: "no-store", signal, headers });
   if (!response.ok) throw new Error((await response.json()).error ?? "Could not load content");
-  return response.json();
+  const currentRevision = Number(response.headers.get("X-CMS-Revision"));
+  if (!Number.isSafeInteger(currentRevision) || currentRevision < 1) throw new Error("The CMS response is missing its revision.");
+  if (revision !== undefined && currentRevision !== revision) throw new Error("CMS content changed while loading pages. Retry the request.");
+  return { ...(await response.json() as PageEnvelope<T>), revision: currentRevision };
 }
 
-async function saveCollection<T>(key: CmsCollectionKey, payload: T): Promise<T> {
+function getTotalPages(pagination: PageEnvelope<unknown>["pagination"]) {
+  return "en" in pagination
+    ? Math.max(pagination.en.totalPages, pagination.fr.totalPages)
+    : pagination.totalPages;
+}
+
+async function fetchCollection<T>(key: CmsCollectionKey, signal: AbortSignal): Promise<CmsCollectionSnapshot<T>> {
+  const firstPage = await fetchCollectionPage<T>(key, 1, signal);
+  const pageCount = getTotalPages(firstPage.pagination);
+  const remainingPages: PageEnvelope<T>[] = [];
+  for (let first = 2; first <= pageCount; first += 4) {
+    const batch = await Promise.all(Array.from({ length: Math.min(4, pageCount - first + 1) }, (_, index) =>
+      fetchCollectionPage<T>(key, first + index, signal, firstPage.revision),
+    ));
+    remainingPages.push(...batch);
+  }
+
+  if (key === "siteContent") return { payload: firstPage.data as T, revision: firstPage.revision };
+  const pages = [firstPage, ...remainingPages];
+  if ("en" in firstPage.pagination) {
+    const payload = {
+      en: pages.flatMap((result) => (result.data as { en: unknown[]; fr: unknown[] }).en),
+      fr: pages.flatMap((result) => (result.data as { en: unknown[]; fr: unknown[] }).fr),
+    };
+    return { payload: payload as T, revision: firstPage.revision };
+  }
+  return { payload: pages.flatMap((result) => result.data as unknown[]) as T, revision: firstPage.revision };
+}
+
+async function saveCollection<T>(key: CmsCollectionKey, payload: T, expectedRevision: number): Promise<number> {
   cmsSchemas[key].parse(payload);
   const response = await fetch(collectionUrl(key), {
-    method: "PUT", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+    method: "PUT", credentials: "include", headers: { "Content-Type": "application/json", "If-Match": `"${expectedRevision}"` }, body: JSON.stringify(payload),
   });
   if (!response.ok) {
     const body = await response.json();
     throw new Error(body.issues?.map((issue: { message: string }) => issue.message).join(" ") ?? body.error ?? "Save failed");
   }
-  return payload;
+  const revision = Number(response.headers.get("X-CMS-Revision"));
+  if (!Number.isSafeInteger(revision) || revision <= expectedRevision) throw new Error("The saved CMS revision is invalid.");
+  return revision;
 }
 
 export function useCmsCollection<T>(key: CmsCollectionKey) {
-  return useQuery({ queryKey: cmsQueryKeys.collection(key), queryFn: () => fetchCollection<T>(key), refetchInterval: 15_000 });
+  const query = useQuery({
+    queryKey: cmsQueryKeys.collection(key),
+    queryFn: ({ signal }) => fetchCollection<T>(key, signal),
+    staleTime: 60_000,
+  });
+  return { ...query, data: query.data?.payload, revision: query.data?.revision };
 }
 
-export function useSaveCmsCollection<T>(key: CmsCollectionKey) {
+export function useSaveCmsCollection<T>(key: CmsCollectionKey, getExpectedRevision: () => number | null) {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: (payload: T) => saveCollection(key, payload),
-    onSuccess: (payload) => {
-      client.setQueryData(cmsQueryKeys.collection(key), payload);
-      client.invalidateQueries({ queryKey: cmsQueryKeys.collection(key) });
+    mutationFn: async (payload: T) => {
+      const expectedRevision = getExpectedRevision();
+      if (expectedRevision === null) throw new Error("Wait for the latest content revision before saving.");
+      await client.cancelQueries({ queryKey: cmsQueryKeys.collection(key) });
+      const revision = await saveCollection(key, payload, expectedRevision);
+      return { payload, revision };
+    },
+    onSuccess: ({ payload, revision }) => {
+      client.setQueryData(cmsQueryKeys.collection(key), { payload, revision });
     },
   });
 }

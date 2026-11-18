@@ -1,9 +1,7 @@
-import { Header } from "../../components/header";
-import { Footer } from "../../components/Footer";
 import { getDictionary } from "@/lib/getDictionary";
 import { readPublishedData } from "@/lib/getData";
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
-import { LayoutGrid, Card } from "../../components/ui/LayoutGrid";
+import PaginatedGallery from "./PaginatedGallery";
 import type { Metadata } from "next";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
@@ -23,27 +21,8 @@ export default async function GalleriesPage({ params }: { params: Promise<{ lang
     getDictionary(lang),
     readPublishedData<{ src: string; title: string; sub: string }[]>("gallery", "gallery.json"),
   ]);
-  const classNames = [
-    "md:col-span-2","col-span-1","col-span-1","col-span-1",
-    "md:col-span-2","col-span-1","col-span-1","col-span-1",
-    "md:col-span-2","col-span-1","col-span-1","col-span-1",
-  ];
-
-  const cards: Card[] = allImages.map((img, i) => ({
-    id: i + 1,
-    thumbnail: img.src,
-    className: classNames[i % classNames.length],
-    content: (
-      <div>
-        <p className="font-bold text-white text-base md:text-xl font-sans">{img.title}</p>
-        <p className="font-normal text-base text-white/80 font-sans mt-1">{img.sub}</p>
-      </div>
-    ),
-  }));
-
   return (
     <>
-      <Header lang={lang} navigation={dict.navigation} />
       <DecorativeDivider />
 
       <div className="page-banner">
@@ -59,7 +38,7 @@ export default async function GalleriesPage({ params }: { params: Promise<{ lang
         {/* ── Photos section header ── */}
         <div className="container mx-auto px-4 sm:px-6 md:px-12 lg:px-20">
           <div className="flex items-center gap-4 mb-2">
-            <div className="w-1 h-8 bg-[var(--red)] rounded" />
+            <div className="w-1 h-8 bg-[var(--red)] " />
             <div>
               <p className="text-[10px] font-black tracking-[0.35em] uppercase text-[var(--gold)]">
                 {lang === "fr" ? "Albums Photos" : "Photo Albums"}
@@ -68,16 +47,15 @@ export default async function GalleriesPage({ params }: { params: Promise<{ lang
                 {allImages.length} {lang === "fr" ? "photos" : "photos"}
               </p>
             </div>
-            <div className="flex-1 h-px bg-[#e8e2d9]" />
+            <div className="flex-1 h-px bg-[var(--cream3)]" />
           </div>
         </div>
 
         {/* ── LayoutGrid — full-width bento ── */}
-        <LayoutGrid cards={cards} />
+        <PaginatedGallery images={allImages} lang={lang} />
 
       </main>
 
-      <Footer lang={lang} dict={dict.footer} navigation={dict.navigation} />
     </>
   );
 }

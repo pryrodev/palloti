@@ -9,6 +9,7 @@ function readData<T>(filename: string): T {
 }
 
 async function readPublishedData<T>(key: CmsCollectionKey, fallbackFile: string): Promise<T> {
+  if (!process.env.DATABASE_URL) return readData<T>(fallbackFile);
   try { return await getCmsCollection(key) as T; }
   catch { return readData<T>(fallbackFile); }
 }

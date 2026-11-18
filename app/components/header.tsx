@@ -16,6 +16,7 @@ type Navigation = {
   provincialDirection: string;
   communitiesAndWorks: string;
   news: string;
+  contact: string;
   galleries: string;
   media: string;
   gallery: string;
@@ -55,6 +56,7 @@ export const Header = ({ lang, navigation }: HeaderProps) => {
     { href: `/${lang}/direction`,   label: navigation.provincialDirection },
     { href: `/${lang}/communities`, label: navigation.communitiesAndWorks },
     { href: `/${lang}/news`,        label: navigation.news },
+    { href: `/${lang}/contact`,     label: navigation.contact },
   ];
 
   const mediaLabel = navigation.media;

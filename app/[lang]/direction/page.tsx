@@ -1,6 +1,4 @@
 import Image from "next/image";
-import { Header } from "../../components/header";
-import { Footer } from "../../components/Footer";
 import { getDictionary } from "@/lib/getDictionary";
 import type { Metadata } from "next";
 
@@ -27,7 +25,6 @@ export default async function DirectionPage({ params }: { params: Promise<{ lang
 
   return (
     <>
-      <Header lang={lang} navigation={dict.navigation} />
       <DecorativeDivider />
 
       <div className="page-banner">
@@ -38,49 +35,43 @@ export default async function DirectionPage({ params }: { params: Promise<{ lang
         </div>
       </div>
 
-      <main className="py-8 md:py-12 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 max-w-5xl">
+      <main className="bg-[var(--cream)] py-8 md:py-12">
+        <div className="container mx-auto max-w-6xl px-4 sm:px-6">
 
           {/* Rector — featured card */}
-          <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center p-5 md:p-6 rounded-2xl mb-7 md:mb-10 border-2 border-[var(--gold)]"
-            style={{ boxShadow: "0 8px 40px rgba(139,26,26,0.10)" }}>
-            <div className="relative flex-shrink-0 rounded-xl overflow-hidden border-[3px] border-[var(--gold)]"
-              style={{ width: 160, height: 200 }}>
-              <Image src={rector.image} alt={rector.name} fill className="object-cover object-top" />
+          <article className="mb-8 grid overflow-hidden bg-white shadow-[0_12px_36px_rgba(58,31,10,0.08)] md:mb-12 md:grid-cols-[220px_minmax(0,1fr)]">
+            <div className="relative mx-auto aspect-[4/5] w-full max-w-[220px] bg-[var(--cream2)] md:mx-0">
+              <Image src={rector.image} alt={rector.name} fill sizes="(max-width: 767px) 80vw, 220px" className="object-contain p-2" priority />
             </div>
-            <div className="text-center md:text-left">
-              <p className="badge mb-2">{rector.role}</p>
-              <h2 className="text-2xl md:text-3xl font-bold mb-3 text-[var(--red)]"
+            <div className="flex min-w-0 flex-col justify-center px-6 py-7 text-center sm:px-9 md:px-12 md:py-10 md:text-left">
+              <p className="mb-3 text-[10px] font-extrabold uppercase tracking-[0.22em] text-[var(--gold-dk)]">{rector.role}</p>
+              <h2 className="text-2xl font-bold leading-tight text-[var(--red)] sm:text-3xl"
                 style={{ fontFamily: "Georgia, serif" }}>{rector.name}</h2>
-              <div className="w-12 h-[3px] rounded bg-[var(--gold)] mx-auto md:mx-0" />
             </div>
-          </div>
+          </article>
 
           {/* Consultors grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4 lg:gap-6">
             {consultors.map((member, index) => (
-              <div key={index} className="card text-center overflow-hidden">
-                <div className="relative w-full" style={{ height: 200 }}>
-                  <Image src={member.image} alt={member.name} fill className="object-cover object-top" />
-                  <div className="absolute inset-0"
-                    style={{ background: "linear-gradient(to top, rgba(139,26,26,0.7) 0%, transparent 60%)" }} />
+              <article key={index} className="group flex h-full min-w-0 flex-col overflow-hidden bg-white shadow-[0_8px_24px_rgba(58,31,10,0.07)] transition-shadow duration-300 hover:shadow-[0_14px_32px_rgba(58,31,10,0.13)]">
+                <div className="relative aspect-[4/5] w-full bg-[var(--cream2)]">
+                  <Image src={member.image} alt={member.name} fill sizes="(max-width: 419px) 100vw, (max-width: 1023px) 45vw, 22vw" className="object-contain p-2" />
                 </div>
-                <div className="p-5">
-                  <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: "var(--gold)" }}>
+                <div className="flex flex-1 flex-col px-4 py-5 text-center sm:px-5">
+                  <p className="mb-2 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[var(--gold-dk)]">
                     {member.role}
                   </p>
-                  <h3 className="text-sm font-bold leading-snug" style={{ fontFamily: "Georgia, serif", color: "var(--dark)" }}>
+                  <h3 className="text-sm font-bold leading-snug text-[var(--dark)]" style={{ fontFamily: "Georgia, serif" }}>
                     {member.name}
                   </h3>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
 
         </div>
       </main>
 
-      <Footer lang={lang} dict={dict.footer} navigation={dict.navigation} />
     </>
   );
 }

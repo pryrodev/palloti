@@ -1,36 +1,36 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useMemo } from "react";
+import Link from "next/link";
+import { useState } from "react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  Church,
+  Cross,
+  Globe2,
+  ListFilter,
+  Megaphone,
+  Newspaper,
+  Shapes,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { getArticleSegment } from "@/lib/seoPaths";
 
 type Article = {
-  id: number;
+  id: number | string;
+  slug?: string;
   title: string;
   date: string;
   tags: string;
   summary: string;
+  content?: string;
   imageUrl: string;
 };
 
-type Category = {
-  key: string;
-  label: string;
-  match: string;
-  icon: string;
-};
-
-const CATEGORIES: Category[] = [
-  { key: "all",         label: "All",                           match: "",                              icon: "◈" },
-  { key: "province",   label: "Holy Family Province",          match: "Holy Family Province",          icon: "🏛" },
-  { key: "newspaper",  label: "Pallottines' Newspaper",        match: "Pallottines' Newspaper",        icon: "📰" },
-  { key: "generalate", label: "Generalate",                    match: "Generalate",                    icon: "✦" },
-  { key: "union",      label: "Union of the Catholic Apostolate", match: "Union of the Catholic Apostolate", icon: "✝" },
-  { key: "announce",   label: "Announcements",                 match: "Announcements",                 icon: "📣" },
-  { key: "reflections",label: "Reflections & Life",            match: "Reflections",                   icon: "🕊" },
-  { key: "others",     label: "Others",                        match: "__others__",                    icon: "⊕" },
-];
-
-const KNOWN_MATCHES = CATEGORIES.slice(1, 7).map((c) => c.match);
+type CategoryKey = "all" | "province" | "newspaper" | "generalate" | "union" | "announce" | "reflections" | "others";
+type Category = { key: CategoryKey; label: string; match: string; icon: LucideIcon };
 
 const PAGE_SIZE = 6;
 
@@ -41,121 +41,114 @@ interface NewsFilterProps {
   allPublicationsLabel: string;
 }
 
+const CATEGORY_COPY = {
+  en: {
+    eyebrow: "Filter by category",
+    all: "All",
+    province: "Holy Family Province",
+    newspaper: "Pallottines’ Newspaper",
+    generalate: "Generalate",
+    union: "Union of the Catholic Apostolate",
+    announce: "Announcements",
+    reflections: "Reflections & Life",
+    others: "Others",
+    results: "Showing results for",
+    noResults: "No articles in this category.",
+    showAll: "View all articles",
+    showing: "Showing",
+    page: "Page",
+    previous: "Previous",
+    next: "Next",
+  },
+  fr: {
+    eyebrow: "Filtrer par catégorie",
+    all: "Toutes",
+    province: "Province Sainte Famille",
+    newspaper: "Journal Pallottin",
+    generalate: "Généralat",
+    union: "Union de l’Apostolat Catholique",
+    announce: "Communiqués",
+    reflections: "Réflexions et vie",
+    others: "Autres",
+    results: "Résultats pour",
+    noResults: "Aucun article dans cette catégorie.",
+    showAll: "Voir tous les articles",
+    showing: "Affichage",
+    page: "Page",
+    previous: "Précédent",
+    next: "Suivant",
+  },
+} as const;
+
 export default function NewsFilter({ articles, readMore, lang, allPublicationsLabel }: NewsFilterProps) {
-  const [activeKey, setActiveKey] = useState("all");
+  const isFrench = lang === "fr";
+  const copy = isFrench ? CATEGORY_COPY.fr : CATEGORY_COPY.en;
+  const categories: Category[] = [
+    { key: "all", label: copy.all, match: "", icon: ListFilter },
+    { key: "province", label: copy.province, match: isFrench ? "Province Sainte Famille" : "Holy Family Province", icon: Church },
+    { key: "newspaper", label: copy.newspaper, match: isFrench ? "Journal Pallottin" : "Pallottines' Newspaper", icon: Newspaper },
+    { key: "generalate", label: copy.generalate, match: isFrench ? "Généralat" : "Generalate", icon: Globe2 },
+    { key: "union", label: copy.union, match: "Union de l'Apostolat Catholique", icon: Cross },
+    { key: "announce", label: copy.announce, match: isFrench ? "Communiqués" : "Announcements", icon: Megaphone },
+    { key: "reflections", label: copy.reflections, match: isFrench ? "Réflexions" : "Reflections", icon: BookOpen },
+    { key: "others", label: copy.others, match: "__others__", icon: Shapes },
+  ];
+  const knownMatches = categories.slice(1, 7).map((category) => category.match);
+  const [activeKey, setActiveKey] = useState<CategoryKey>("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [expandedArticle, setExpandedArticle] = useState<Article | null>(null);
 
-  const filtered = useMemo(() => {
-    if (activeKey === "all") return articles;
-    const cat = CATEGORIES.find((c) => c.key === activeKey)!;
-    if (cat.match === "__others__") {
-      return articles.filter((a) => !KNOWN_MATCHES.some((m) => a.tags.includes(m)));
-    }
-    return articles.filter((a) => a.tags.includes(cat.match));
-  }, [activeKey, articles]);
+  const activeCategory = categories.find((item) => item.key === activeKey)!;
+  const filtered = activeKey === "all"
+    ? articles
+    : activeCategory.match === "__others__"
+      ? articles.filter((article) => !knownMatches.some((match) => article.tags.includes(match)))
+      : articles.filter((article) => article.tags.includes(activeCategory.match));
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const isFirstPage = currentPage === 1;
-  const pageArticles = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
-  const featured   = isFirstPage && activeKey === "all" ? pageArticles[0]      : null;
-  const secondary  = isFirstPage && activeKey === "all" ? pageArticles.slice(1, 4) : [];
-  const listArticles = isFirstPage && activeKey === "all" ? pageArticles.slice(4) : pageArticles;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const page = Math.min(currentPage, totalPages);
+  const pageArticles = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const hasMagazineLayout = page === 1 && activeKey === "all";
+  const featured = hasMagazineLayout ? pageArticles[0] : undefined;
+  const cardArticles = hasMagazineLayout ? pageArticles.slice(1, 4) : pageArticles;
+  const listArticles = hasMagazineLayout ? pageArticles.slice(4) : [];
 
-  function handleFilter(key: string) {
+  function handleFilter(key: CategoryKey) {
     setActiveKey(key);
     setCurrentPage(1);
   }
 
+  function articleHref(article: Article) {
+    return `/${lang}/news/${getArticleSegment(article)}`;
+  }
+
   return (
-    <>
-      {/* ── Article Modal ── */}
-      {expandedArticle && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(26,20,16,0.75)", backdropFilter: "blur(4px)" }}
-          onClick={() => setExpandedArticle(null)}>
-          <div className="relative bg-white max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-            style={{ border: "1px solid #e8e2d9", boxShadow: "0 24px 80px rgba(58,31,10,0.3)" }}
-            onClick={(e) => e.stopPropagation()}>
-            {/* Close */}
-            <button onClick={() => setExpandedArticle(null)}
-              className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-[var(--cream2)] hover:bg-[var(--gold)] transition-colors"
-              aria-label="Close">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
-            </button>
-            {/* Image */}
-            <div className="relative w-full" style={{ height: "240px" }}>
-              <Image src={expandedArticle.imageUrl} alt={expandedArticle.title} fill className="object-cover" />
-              <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(26,20,16,0.6), transparent 50%)" }} />
-              <div className="absolute bottom-4 left-5">
-                <span className="bg-[var(--red)] px-3 py-1 text-xs font-bold tracking-[0.2em] uppercase text-[var(--gold)]">
-                  {expandedArticle.date}
-                </span>
-              </div>
-            </div>
-            {/* Content */}
-            <div className="p-6 md:p-8">
-              <p className="text-xs font-bold tracking-[0.18em] uppercase text-[var(--gold)] mb-3">{expandedArticle.tags}</p>
-              <h2 className="font-bold leading-snug text-[var(--dark)] mb-4"
-                style={{ fontFamily: "Georgia, serif", fontSize: "clamp(1.1rem, 2.5vw, 1.5rem)" }}>
-                {expandedArticle.title}
-              </h2>
-              <div className="w-10 h-[2px] bg-[var(--gold)] mb-5" />
-              <p className="text-base text-[var(--gray)] leading-relaxed">{expandedArticle.summary}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Filter bar ── */}
-      <div className="mb-10">
-        {/* Label */}
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-8 h-px bg-[var(--gold)]" />
-          <span className="text-xs font-black tracking-[0.35em] uppercase text-[var(--gold)]">
-            {lang === "fr" ? "Filtrer par catégorie" : "Filter by category"}
-          </span>
-          <div className="flex-1 h-px bg-[#e8e2d9]" />
+    <section aria-label={copy.eyebrow}>
+      <div className="mb-8 border-b border-[var(--cream3)] pb-5 md:mb-10">
+        <div className="mb-4 flex items-center gap-3">
+          <span className="h-px w-8 bg-[var(--gold)]" />
+          <h2 className="text-[10px] font-bold uppercase tracking-[0.24em] text-[var(--gold-dk)]">{copy.eyebrow}</h2>
+          <span className="h-px flex-1 bg-[var(--cream3)]" />
         </div>
 
-        {/* Pills */}
-        <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map((cat) => {
-            const isActive = activeKey === cat.key;
-            const count = cat.key === "all"
+        <div className="flex flex-wrap gap-2" role="group" aria-label={copy.eyebrow}>
+          {categories.map(({ key, label, icon: Icon }) => {
+            const count = key === "all"
               ? articles.length
-              : cat.match === "__others__"
-                ? articles.filter((a) => !KNOWN_MATCHES.some((m) => a.tags.includes(m))).length
-                : articles.filter((a) => a.tags.includes(cat.match)).length;
-
+              : key === "others"
+                ? articles.filter((article) => !knownMatches.some((match) => article.tags.includes(match))).length
+                : articles.filter((article) => article.tags.includes(categories.find((category) => category.key === key)!.match)).length;
+            const selected = activeKey === key;
             return (
               <button
-                key={cat.key}
-                onClick={() => handleFilter(cat.key)}
-                className="group relative flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-[0.1em] rounded-full transition-all duration-300 overflow-hidden"
-                style={{
-                  background: isActive ? "var(--red)" : "white",
-                  color: isActive ? "white" : "var(--mid)",
-                  border: isActive ? "2px solid var(--red)" : "2px solid #e8e2d9",
-                  boxShadow: isActive ? "0 4px 16px rgba(92,51,23,0.25)" : "none",
-                  transform: isActive ? "translateY(-1px)" : "translateY(0)",
-                }}
+                key={key}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => handleFilter(key)}
+                className={`inline-flex min-h-10 items-center gap-2 border px-3 py-2 text-[10px] font-bold uppercase tracking-[0.11em] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)] sm:px-4 ${selected ? "border-[var(--red)] bg-[var(--red)] text-white" : "border-[var(--cream3)] bg-white text-[var(--mid)] hover:bg-[var(--cream2)]"}`}
               >
-                {/* Hover fill effect */}
-                {!isActive && (
-                  <span className="absolute inset-0 bg-[var(--cream2)] opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full" />
-                )}
-                <span className="relative z-10 text-base leading-none">{cat.icon}</span>
-                <span className="relative z-10">{cat.label}</span>
-                <span
-                  className="relative z-10 flex items-center justify-center w-5 h-5 rounded-full text-xs font-black"
-                  style={{
-                    background: isActive ? "rgba(255,255,255,0.2)" : "var(--cream2)",
-                    color: isActive ? "white" : "var(--red)",
-                  }}
-                >
+                <Icon aria-hidden="true" className="size-3.5 shrink-0" />
+                <span>{label}</span>
+                <span className={`min-w-5 px-1 py-0.5 text-center text-[10px] tabular-nums ${selected ? "bg-white/15 text-white" : "bg-[var(--cream2)] text-[var(--red)]"}`}>
                   {count}
                 </span>
               </button>
@@ -163,183 +156,114 @@ export default function NewsFilter({ articles, readMore, lang, allPublicationsLa
           })}
         </div>
 
-        {/* Active filter indicator */}
         {activeKey !== "all" && (
-          <div className="mt-4 flex items-center gap-2">
-            <span className="text-xs text-[var(--gold)]">
-              {lang === "fr" ? "Résultats pour" : "Showing results for"}:
-            </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[var(--red)]/10 text-[var(--red)] text-xs font-bold uppercase tracking-wider rounded-full">
-              {CATEGORIES.find((c) => c.key === activeKey)?.label}
-              <button onClick={() => handleFilter("all")} className="hover:text-[var(--red-dk)] transition-colors">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              </button>
-            </span>
-            <span className="text-xs text-[var(--gold)]">
-              — {filtered.length} {lang === "fr" ? "article(s)" : "article(s)"}
-            </span>
-          </div>
+          <p className="mt-4 text-xs text-[var(--mid)]" aria-live="polite">
+            {copy.results}: <span className="font-semibold text-[var(--red)]">{categories.find((category) => category.key === activeKey)?.label}</span>
+            <span className="ml-2 text-[var(--gray)]">({filtered.length})</span>
+          </p>
         )}
       </div>
 
-      {/* ── No results ── */}
-      {filtered.length === 0 && (
-        <div className="text-center py-20">
-          <p className="text-5xl mb-4">📭</p>
-          <p className="text-[var(--gray)] font-medium">
-            {lang === "fr" ? "Aucun article dans cette catégorie." : "No articles in this category."}
-          </p>
-          <button onClick={() => handleFilter("all")}
-            className="mt-4 text-sm font-bold uppercase tracking-wider text-[var(--red)] hover:text-[var(--gold)] transition-colors">
-            {lang === "fr" ? "Voir tous les articles" : "View all articles"}
+      {filtered.length === 0 ? (
+        <div className="border border-[var(--cream3)] bg-white px-6 py-16 text-center">
+          <p className="font-serif text-xl text-[var(--dark)]">{copy.noResults}</p>
+          <button type="button" onClick={() => handleFilter("all")} className="mt-5 text-xs font-bold uppercase tracking-wider text-[var(--red)] underline decoration-[var(--gold)] underline-offset-4">
+            {copy.showAll}
           </button>
         </div>
-      )}
-
-      {/* ── Featured (page 1, all filter only) ── */}
-      {featured && (
-        <div className="group grid grid-cols-1 lg:grid-cols-2 gap-0 mb-10 md:mb-14 bg-white overflow-hidden cursor-pointer"
-          style={{ border: "1px solid #e8e2d9", boxShadow: "0 8px 40px rgba(92,51,23,0.08)" }}
-          onClick={() => setExpandedArticle(featured)}>
-          <div className="relative overflow-hidden" style={{ minHeight: "260px" }}>
-            <Image src={featured.imageUrl} alt={featured.title} fill
-              className="object-cover transition-transform duration-[2s] group-hover:scale-105" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
-            <div className="absolute top-5 left-5 bg-[var(--red)] px-3 py-1.5">
-              <span className="text-xs font-bold tracking-[0.2em] uppercase text-[var(--gold)]">{featured.date}</span>
-            </div>
-          </div>
-          <div className="p-6 md:p-8 lg:p-10 flex flex-col justify-center">
-            <p className="text-xs font-bold tracking-[0.18em] uppercase text-[var(--gold)] mb-3">{featured.tags}</p>
-            <h2 className="font-bold leading-snug text-[var(--dark)] group-hover:text-[var(--red)] transition-colors mb-4"
-              style={{ fontFamily: "Georgia, serif", fontSize: "clamp(1.2rem, 2.5vw, 1.7rem)" }}>
-              {featured.title}
-            </h2>
-            <div className="w-10 h-[2px] bg-[var(--gold)] mb-4" />
-            <p className="text-base text-[var(--gray)] leading-relaxed mb-6 line-clamp-3">{featured.summary}</p>
-            <div className="flex items-center gap-3">
-              <span className="read-more">{readMore}</span>
-              <span className="w-6 h-px bg-[var(--gold)] group-hover:w-12 transition-all duration-300" />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── Secondary 3-col grid (page 1, all filter only) ── */}
-      {secondary.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14">
-          {secondary.map((article) => (
-            <article key={article.id} className="card group cursor-pointer" onClick={() => setExpandedArticle(article)}>
-              <div className="relative overflow-hidden" style={{ height: "200px" }}>
-                <Image src={article.imageUrl} alt={article.title} fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-[var(--dark)]/0 group-hover:bg-[var(--dark)]/20 transition-all duration-500" />
-                <div className="absolute top-4 left-4 bg-[var(--red)] px-2.5 py-1">
-                  <span className="text-xs font-bold tracking-[0.2em] uppercase text-[var(--gold)]">{article.date}</span>
+      ) : (
+        <>
+          {featured && (
+            <article className="mb-7 border border-[var(--cream3)] bg-white shadow-[0_8px_32px_rgba(58,31,10,0.07)] md:mb-9">
+                <Link href={articleHref(featured)} className="group grid focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--gold)] lg:grid-cols-[1.08fr_0.92fr]">
+                <div className="relative aspect-[16/10] min-h-64 overflow-hidden bg-[var(--cream2)] lg:aspect-auto lg:min-h-[360px]">
+                  <Image src={featured.imageUrl} alt={featured.title} fill sizes="(max-width: 1023px) 100vw, 56vw" priority className="object-cover transition-transform duration-700 group-hover:scale-[1.025]" />
+                  <span className="absolute left-4 top-4 bg-[var(--red)] px-3 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--gold)] sm:left-6 sm:top-6">{featured.date}</span>
                 </div>
-              </div>
-              <div className="p-6">
-                <p className="text-xs font-bold tracking-[0.15em] uppercase text-[var(--gold)] mb-2 line-clamp-1">{article.tags}</p>
-                <h3 className="font-bold text-base leading-snug text-[var(--dark)] group-hover:text-[var(--red)] transition-colors mb-3"
-                  style={{ fontFamily: "Georgia, serif" }}>{article.title}</h3>
-                <p className="text-sm text-[var(--gray)] leading-relaxed line-clamp-2 mb-4">{article.summary}</p>
-                <div className="flex items-center gap-2 pt-3 border-t border-[#e8e2d9]">
-                  <span className="read-more">{readMore}</span>
-                  <span className="w-4 h-px bg-[var(--gold)] group-hover:w-8 transition-all duration-300" />
+                <div className="flex flex-col justify-center p-5 sm:p-8 lg:p-10">
+                  <p className="mb-3 text-[10px] font-bold uppercase leading-relaxed tracking-[0.18em] text-[var(--gold-dk)] line-clamp-2">{featured.tags}</p>
+                  <h3 className="font-serif text-2xl font-bold leading-tight text-[var(--dark)] transition-colors group-hover:text-[var(--red)] sm:text-3xl">{featured.title}</h3>
+                  <span className="my-5 h-px w-12 bg-[var(--gold)]" />
+                  <p className="mb-6 max-w-xl text-sm leading-7 text-[var(--mid)] line-clamp-3">{featured.summary}</p>
+                  <span className="inline-flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--red)]">
+                    {readMore}<ArrowRight aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-1" />
+                  </span>
                 </div>
-              </div>
+              </Link>
             </article>
-          ))}
-        </div>
-      )}
+          )}
 
-      {/* ── List articles ── */}
-      {listArticles.length > 0 && (
-        <div className="bg-white" style={{ border: "1px solid #e8e2d9" }}>
-          <div className="px-6 py-4 border-b border-[#e8e2d9] flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-1 h-5 bg-[var(--red)] rounded" />
-              <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--dark)]">{allPublicationsLabel}</h3>
+          {cardArticles.length > 0 && (
+            <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-5">
+              {cardArticles.map((article) => (
+                <article key={article.id} className="group flex min-w-0 flex-col border border-[var(--cream3)] bg-white transition-shadow hover:shadow-[0_8px_24px_rgba(58,31,10,0.09)]">
+                  <Link href={articleHref(article)} className="flex h-full flex-col focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--gold)]">
+                    <div className="relative aspect-[16/10] overflow-hidden bg-[var(--cream2)]">
+                      <Image src={article.imageUrl} alt={article.title} fill sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                      <span className="absolute left-3 top-3 bg-[var(--red)] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--gold)]">{article.date}</span>
+                    </div>
+                    <div className="flex flex-1 flex-col p-4 sm:p-5">
+                      <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--gold-dk)] line-clamp-1">{article.tags}</p>
+                      <h3 className="mb-3 font-serif text-base font-bold leading-snug text-[var(--dark)] transition-colors group-hover:text-[var(--red)] line-clamp-2">{article.title}</h3>
+                      <p className="mb-4 text-sm leading-relaxed text-[var(--mid)] line-clamp-3">{article.summary}</p>
+                      <span className="mt-auto inline-flex items-center gap-2 border-t border-[var(--cream3)] pt-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--red)]">
+                        {readMore}<ArrowRight aria-hidden="true" className="size-3.5 transition-transform group-hover:translate-x-1" />
+                      </span>
+                    </div>
+                  </Link>
+                </article>
+              ))}
             </div>
-            <span className="text-xs text-[var(--gold)] font-medium">
-              {lang === "fr" ? `Page ${currentPage} sur ${totalPages}` : `Page ${currentPage} of ${totalPages}`}
-            </span>
-          </div>
-          <div className="divide-y divide-[#f0ebe3]">
-            {listArticles.map((article) => (
-              <article key={article.id}
-                onClick={() => setExpandedArticle(article)}
-                className="group flex flex-col sm:flex-row gap-4 sm:gap-5 p-4 sm:p-5 cursor-pointer hover:bg-[var(--cream)] transition-colors duration-200">
-                <div className="relative shrink-0 overflow-hidden rounded mx-auto sm:mx-0" style={{ width: 90, height: 70 }}>
-                  <Image src={article.imageUrl} alt={article.title} fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-1 h-1 rounded-full bg-[var(--gold)]" />
-                    <span className="text-xs font-bold tracking-[0.2em] uppercase text-[var(--gold)]">{article.date}</span>
-                  </div>
-                  <h4 className="font-bold text-base leading-snug text-[var(--dark)] group-hover:text-[var(--red)] transition-colors mb-1 line-clamp-2"
-                    style={{ fontFamily: "Georgia, serif" }}>{article.title}</h4>
-                  <p className="text-sm text-[var(--gray)] line-clamp-1">{article.tags}</p>
-                </div>
-                <div className="shrink-0 flex items-center">
-                  <svg className="text-[var(--gold)] group-hover:translate-x-1 transition-transform duration-200"
-                    width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
+          )}
+
+          {listArticles.length > 0 && (
+            <section className="border border-[var(--cream3)] bg-white" aria-labelledby="all-publications-heading">
+              <div className="flex items-center justify-between gap-3 border-b border-[var(--cream3)] px-4 py-4 sm:px-6">
+                <h2 id="all-publications-heading" className="border-l-2 border-[var(--red)] pl-3 text-xs font-bold uppercase tracking-[0.18em] text-[var(--dark)]">{allPublicationsLabel}</h2>
+                <span className="text-[10px] font-medium text-[var(--gold-dk)]">{copy.page} {page} {isFrench ? "sur" : "of"} {totalPages}</span>
+              </div>
+              <div className="divide-y divide-[var(--cream3)]">
+                {listArticles.map((article) => (
+                  <article key={article.id}>
+                    <Link href={articleHref(article)} className="group flex items-center gap-4 p-4 transition-colors hover:bg-[var(--cream)] focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-[var(--gold)] sm:gap-5 sm:px-6">
+                      <div className="relative size-16 shrink-0 overflow-hidden bg-[var(--cream2)] sm:size-[76px]">
+                        <Image src={article.imageUrl} alt="" fill sizes="76px" className="object-cover transition-transform duration-500 group-hover:scale-105" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--gold-dk)]">{article.date}</p>
+                        <h3 className="font-serif text-sm font-bold leading-snug text-[var(--dark)] transition-colors group-hover:text-[var(--red)] line-clamp-2">{article.title}</h3>
+                        <p className="mt-1 text-xs text-[var(--gray)] line-clamp-1">{article.tags}</p>
+                      </div>
+                      <ArrowRight aria-hidden="true" className="size-4 shrink-0 text-[var(--gold-dk)] transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {totalPages > 1 && (
+            <nav aria-label={isFrench ? "Pagination des actualités" : "News pagination"} className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-[var(--cream3)] pt-5 sm:flex-row">
+              <p className="text-xs text-[var(--mid)]" aria-live="polite">
+                {copy.showing} {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} {isFrench ? "sur" : "of"} {filtered.length}
+              </p>
+              <div className="flex items-center gap-1.5">
+                <button type="button" onClick={() => setCurrentPage((current) => Math.max(1, current - 1))} disabled={page === 1} aria-label={copy.previous} className="inline-flex min-h-10 items-center gap-2 border border-[var(--cream3)] px-3 text-xs font-bold uppercase tracking-wider text-[var(--red)] hover:bg-[var(--cream2)] disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)]">
+                  <ArrowLeft aria-hidden="true" className="size-4" /><span className="hidden sm:inline">{copy.previous}</span>
+                </button>
+                {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+                  <button key={pageNumber} type="button" onClick={() => setCurrentPage(pageNumber)} aria-label={`${copy.page} ${pageNumber}`} aria-current={pageNumber === page ? "page" : undefined} className={`size-10 border text-xs font-bold tabular-nums focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)] ${pageNumber === page ? "border-[var(--red)] bg-[var(--red)] text-white" : "border-[var(--cream3)] bg-white text-[var(--red)] hover:bg-[var(--cream2)]"}`}>
+                    {pageNumber}
+                  </button>
+                ))}
+                <button type="button" onClick={() => setCurrentPage((current) => Math.min(totalPages, current + 1))} disabled={page === totalPages} aria-label={copy.next} className="inline-flex min-h-10 items-center gap-2 border border-[var(--cream3)] px-3 text-xs font-bold uppercase tracking-wider text-[var(--red)] hover:bg-[var(--cream2)] disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)]">
+                  <span className="hidden sm:inline">{copy.next}</span><ArrowRight aria-hidden="true" className="size-4" />
+                </button>
+              </div>
+            </nav>
+          )}
+        </>
       )}
-
-      {/* ── Pagination ── */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-12">
-          <button
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] border rounded transition-all duration-200 border-[var(--red)] text-[var(--red)] hover:bg-[var(--red)] hover:text-white disabled:opacity-40 disabled:pointer-events-none"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-            {lang === "fr" ? "Précédent" : "Previous"}
-          </button>
-
-          <div className="flex items-center gap-1">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                onClick={() => setCurrentPage(p)}
-                className="w-9 h-9 flex items-center justify-center text-sm font-bold rounded transition-all duration-200"
-                style={{
-                  background: p === currentPage ? "var(--red)" : "white",
-                  color: p === currentPage ? "white" : "var(--mid)",
-                  border: p === currentPage ? "2px solid var(--red)" : "2px solid #e8e2d9",
-                }}
-              >
-                {p}
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-[0.12em] border rounded transition-all duration-200 border-[var(--red)] text-[var(--red)] hover:bg-[var(--red)] hover:text-white disabled:opacity-40 disabled:pointer-events-none"
-          >
-            {lang === "fr" ? "Suivant" : "Next"}
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M9 18l6-6-6-6" />
-            </svg>
-          </button>
-        </div>
-      )}
-    </>
+    </section>
   );
 }

@@ -10,65 +10,11 @@ type Slide = {
   location: string;
   title: string;
   subtitle?: string;
-  titleGold?: boolean;
-  subtitleGold?: boolean;
 };
-
-const getSlides = (lang: string): Slide[] => [
-  {
-    image: "/images/gikondo.jpg",
-    location: "Kigali — Gikondo, Rwanda",
-    title: lang === "fr" ? "Maison Provinciale Sainte Famille" : "Holy Family Provincial House",
-    subtitle: lang === "fr" ? "Siège de la Province Sainte Famille · Maison Mère" : "Seat of the Holy Family Province · Mother House",
-    titleGold: true,
-  },
-  {
-    image: "/images/hero.jpg",
-    location: "Kigali — Rwanda",
-    title: "Sanctuaire de la Miséricorde Divine",
-  },
-  {
-    image: "/images/hero2.jpg",
-    location: "Kibeho — Rwanda",
-    title: lang === "fr" ? "La Nouvelle Communauté de Kibeho" : "The New Community of Kibeho",
-    titleGold: true,
-  },
-  {
-    image: "/images/home2.jpeg",
-    location: lang === "fr" ? "Province Sainte Famille" : "Holy Family Province",
-    title: lang === "fr" ? "Formation & Apostolat" : "Formation & Apostolate",
-    subtitle: lang === "fr" ? "Vie communautaire et pastorale" : "Community & Pastoral Life",
-  },
-  {
-    image: "/images/home3.jpg",
-    location: lang === "fr" ? "Union de l'Apostolat Catholique" : "Union of Catholic Apostolate",
-    title: lang === "fr" ? "Jeunesse & Vocations" : "Youth & Vocations",
-    subtitle: lang === "fr" ? "Union de l'Apostolat Catholique" : "Union of Catholic Apostolate",
-    subtitleGold: true,
-  },
-  {
-    image: "/images/hero3.jpeg",
-    location: "Montereau — France",
-    title: "La Nouvelle Communauté Pallottine de Montereau",
-  },
-  {
-    image: "/images/hero4.jpg",
-    location: "PSF Province",
-    title: "Pallottins de la PSF",
-    subtitle: "Venez et rebâtissons les murailles de Jérusalem.",
-    subtitleGold: true,
-  },
-  {
-    image: "/images/hero5.jpg",
-    location: "Kabuga — Rwanda",
-    title: "Centre Pallottin de formation Genezareth",
-    subtitle: "Keshero - R D Congo",
-    subtitleGold: true,
-  },
-];
 
 interface HeroSliderProps {
   lang: string;
+  slides: Slide[];
   ctaPrimary: string;
   ctaSecondary: string;
   statFounded: string;
@@ -78,13 +24,13 @@ interface HeroSliderProps {
 
 export default function HeroSlider({
   lang,
+  slides,
   ctaPrimary,
   ctaSecondary,
   statFounded,
   statMembers,
   statCountries,
 }: HeroSliderProps) {
-  const slides = getSlides(lang);
   const [current, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -126,8 +72,8 @@ export default function HeroSlider({
       <div className="mx-auto grid max-w-[1480px] grid-cols-1 px-3 sm:px-6 lg:grid-cols-[minmax(300px,0.78fr)_minmax(0,1.8fr)] lg:px-10">
         {/* This brand panel stays fixed while the story and image change. */}
         <div className="relative z-10 flex min-h-[510px] flex-col items-center bg-[var(--cream)] px-5 py-7 text-center shadow-xl sm:px-8 sm:py-9 lg:min-h-[610px] lg:px-8 xl:px-10">
-          <div className="flex h-[88px] w-[min(100%,240px)] shrink-0 items-center justify-center border border-[var(--cream3)] bg-white px-5 shadow-sm sm:h-[104px]">
-            <Image src="/p4.png" alt="SAC Pallottins" width={240} height={48} className="h-auto w-full object-contain" priority />
+          <div className="relative flex h-[88px] w-[min(100%,240px)] shrink-0 items-center justify-center border border-[var(--cream3)] bg-white px-5 shadow-sm sm:h-[104px]">
+            <Image src="/p4.png" alt="SAC Pallottins" fill sizes="(max-width: 640px) 200px, 240px" className="object-contain p-5" priority />
           </div>
 
           <div className="mt-8 grid w-full content-start sm:mt-9">
@@ -193,7 +139,7 @@ export default function HeroSlider({
               aria-hidden={i !== current}
             >
               <div className="absolute inset-0" style={{ animation: i === current && !reducedMotion ? "hero-kenburns 8s ease-out forwards" : "none" }}>
-                <Image src={slide.image} alt={slide.title} fill sizes="(min-width: 1024px) 65vw, 100vw" className="object-cover" priority={i === 0} />
+                <Image src={slide.image} alt={slide.title} fill sizes="(min-width: 1024px) 65vw, 100vw" className="object-cover" loading={i === current ? "eager" : "lazy"} />
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-[rgba(28,15,5,0.42)] via-transparent to-[rgba(28,15,5,0.08)]" />
             </div>
@@ -223,7 +169,7 @@ export default function HeroSlider({
               <button
                 key={`dot-${slide.image}`}
                 onClick={() => goTo(i)}
-                className="h-2 rounded-full transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold-lt)] motion-reduce:transition-none"
+                className="h-2  transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold-lt)] motion-reduce:transition-none"
                 style={{ width: i === current ? "1.75rem" : "0.5rem", background: i === current ? "var(--gold-lt)" : "rgba(255,255,255,0.65)" }}
                 aria-label={lang === "fr" ? `Aller à la diapositive ${i + 1}` : `Go to slide ${i + 1}`}
                 aria-current={i === current ? "true" : undefined}
@@ -236,9 +182,9 @@ export default function HeroSlider({
       <div className="mx-auto mt-5 max-w-[1400px] border-t border-[var(--gold)]/70 bg-[var(--red-dk)] sm:mt-7 lg:mt-8">
         <div className="grid grid-cols-3 divide-x divide-white/15">
           {[
-            { num: "1890", label: statFounded, Icon: Landmark, color: "#E8B84B" },
-            { num: "111+", label: statMembers, Icon: Users, color: "#E8B84B" },
-            { num: "3", label: statCountries, Icon: Globe, color: "#E8B84B" },
+            { num: "1890", label: statFounded, Icon: Landmark, color: "var(--gold-lt)" },
+            { num: "111+", label: statMembers, Icon: Users, color: "var(--gold-lt)" },
+            { num: "3", label: statCountries, Icon: Globe, color: "var(--gold-lt)" },
           ].map(({ num, label, Icon, color }) => (
             <div key={label} className="flex items-center justify-center gap-2 px-2 py-4 sm:gap-4 sm:py-5">
               <Icon className="hidden h-5 w-5 shrink-0 text-[var(--gold)] sm:block" strokeWidth={1.7} aria-hidden="true" />

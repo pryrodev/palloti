@@ -1,7 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Header } from "../../components/header";
-import { Footer } from "../../components/Footer";
 import { getDictionary } from "@/lib/getDictionary";
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
 import type { Metadata } from "next";
@@ -24,7 +22,6 @@ export default async function IdentityPage({ params }: { params: Promise<{ lang:
 
   return (
     <>
-      <Header lang={lang} navigation={dict.navigation} />
       <DecorativeDivider />
 
       <div className="page-banner">
@@ -42,13 +39,12 @@ export default async function IdentityPage({ params }: { params: Promise<{ lang:
 
             {/* Photo + quote */}
             <div className="lg:col-span-2 flex flex-col items-center gap-6">
-              <div className="rounded-xl overflow-hidden w-full max-w-sm border-[3px] border-[var(--gold)]"
+              <div className=" overflow-hidden w-full max-w-sm border-[3px] border-[var(--gold)]"
                 style={{ boxShadow: "0 12px 40px rgba(139,26,26,0.15)" }}>
                 <Image src="/founder.png" alt="Saint Vincent Pallotti" width={380} height={480}
-                  className="w-full object-cover"
-                  style={{ maxHeight: "420px" }} />
+                  className="h-auto w-full object-contain" />
               </div>
-              <blockquote className="w-full max-w-sm rounded-lg p-6 text-center italic bg-[var(--red)]"
+              <blockquote className="w-full max-w-sm  p-6 text-center italic bg-[var(--red)]"
                 style={{ color: "#ffffff" }}>
                 <p className="text-lg mb-2">&ldquo;{founder.quote}&rdquo;</p>
                 <footer className="text-sm font-semibold" style={{ color: "var(--gold)" }}>{founder.quoteAuthor}</footer>
@@ -89,11 +85,9 @@ export default async function IdentityPage({ params }: { params: Promise<{ lang:
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-start">
 
             {/* Image */}
-            <div className="relative rounded-xl overflow-hidden border-[3px] border-[var(--gold)]"
+            <div className="relative mx-auto w-full max-w-sm flex items-center justify-center overflow-hidden border-[3px] border-[var(--gold)] bg-[var(--cream2)]"
               style={{ height: "420px", boxShadow: "0 12px 40px rgba(139,26,26,0.12)" }}>
-              <Image src={charisma.image} alt="Charisma" fill className="object-cover" />
-              <div className="absolute inset-0"
-                style={{ background: "linear-gradient(to top, rgba(139,26,26,0.35), transparent 60%)" }} />
+              <Image src={charisma.image} alt="Charisma" fill sizes="(max-width: 639px) 90vw, 384px" className="object-contain" />
             </div>
 
             {/* Text */}
@@ -120,7 +114,6 @@ export default async function IdentityPage({ params }: { params: Promise<{ lang:
         </div>
       </section>
 
-      <Footer lang={lang} dict={dict.footer} navigation={dict.navigation} />
     </>
   );
 }

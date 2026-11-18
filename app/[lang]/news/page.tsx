@@ -1,5 +1,3 @@
-import { Header } from "../../components/header";
-import { Footer } from "../../components/Footer";
 import { getDictionary } from "@/lib/getDictionary";
 import NewsFilter from "../../components/NewsFilter";
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
@@ -7,12 +5,10 @@ import type { Metadata } from "next";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params;
-  const isFr = lang === "fr";
+  const dict = await getDictionary(lang);
   return {
-    title: isFr ? "Actualités & Publications" : "News & Publications",
-    description: isFr
-      ? "Dernières nouvelles, bulletins et publications de la Province Sainte Famille SAC."
-      : "Latest news, newsletters and publications from the Holy Family Province SAC.",
+    title: dict.siteSeo.newsTitle,
+    description: dict.siteSeo.newsDescription,
   };
 }
 
@@ -23,7 +19,6 @@ export default async function NewsPage({ params }: { params: Promise<{ lang: str
 
   return (
     <>
-      <Header lang={lang} navigation={dict.navigation} />
       <DecorativeDivider />
 
       <div className="page-banner">
@@ -45,7 +40,6 @@ export default async function NewsPage({ params }: { params: Promise<{ lang: str
         </div>
       </main>
 
-      <Footer lang={lang} dict={dict.footer} navigation={dict.navigation} />
     </>
   );
 }

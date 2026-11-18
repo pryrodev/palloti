@@ -89,8 +89,8 @@ export default function MovingShowcase({ lang }: MovingShowcaseProps) {
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 mb-8 text-center relative z-10">
-        <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full bg-white/70 border border-[var(--gold)]/40 shadow-sm mb-3">
-          <div className="w-2 h-2 rounded-full bg-[var(--gold)] animate-pulse" />
+        <div className="inline-flex items-center gap-3 px-4 py-1.5  bg-white/70 border border-[var(--gold)]/40 shadow-sm mb-3">
+          <div className="w-2 h-2  bg-[var(--gold)] animate-pulse" />
           <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-[var(--red)]">
             {isFr ? "Province Sainte Famille · En Mouvement" : "Holy Family Province · In Motion"}
           </span>
@@ -112,11 +112,11 @@ export default function MovingShowcase({ lang }: MovingShowcaseProps) {
             <Link
               key={index}
               href={item.href}
-              className={`group flex-shrink-0 relative overflow-hidden rounded-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${
+              className={`group flex-shrink-0 relative overflow-hidden  transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${
                 item.featured
                   ? "w-80 md:w-96 ring-2 ring-[var(--gold)] shadow-lg"
                   : item.type === "logo"
-                  ? "w-64 md:w-72 bg-gradient-to-br from-[#3e2009] to-[#5c3317] border border-[var(--gold)]/50"
+                  ? "w-64 md:w-72 bg-gradient-to-br from-[var(--red-dk)] to-[var(--red)] border border-[var(--gold)]/50"
                   : "w-72 md:w-80 border border-[var(--cream3)] bg-white"
               }`}
               style={{ height: 260 }}
@@ -124,11 +124,11 @@ export default function MovingShowcase({ lang }: MovingShowcaseProps) {
               {item.type === "logo" ? (
                 /* Logo card */
                 <div className="h-full flex flex-col items-center justify-center p-6 text-center text-white relative">
-                  <div className="absolute top-3 right-3 px-2 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase bg-[var(--gold)] text-[var(--dark)]">
+                  <div className="absolute top-3 right-3 px-2 py-0.5  text-[9px] font-bold tracking-wider uppercase bg-[var(--gold)] text-[var(--dark)]">
                     {item.tag}
                   </div>
                   <div className="relative w-24 h-24 mb-4 transition-transform duration-500 group-hover:scale-110">
-                    <Image src={item.image} alt={item.title} fill className="object-contain" />
+                    <Image src={item.image} alt={item.title} fill sizes="96px" className="object-contain" />
                   </div>
                   <h4 className="font-bold text-base text-[var(--gold-lt)] leading-tight mb-1" style={{ fontFamily: "Georgia, serif" }}>
                     {item.title}
@@ -142,6 +142,7 @@ export default function MovingShowcase({ lang }: MovingShowcaseProps) {
                     src={item.image}
                     alt={item.title}
                     fill
+                    sizes="(max-width: 768px) 288px, 384px"
                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                   />
                   {/* Gradient shadow */}
@@ -150,7 +151,7 @@ export default function MovingShowcase({ lang }: MovingShowcaseProps) {
                   {/* Badge */}
                   <div className="absolute top-3 left-3">
                     <span
-                      className={`inline-block px-2.5 py-1 rounded text-[10px] font-bold tracking-wider uppercase ${
+                      className={`inline-block px-2.5 py-1  text-[10px] font-bold tracking-wider uppercase ${
                         item.featured
                           ? "bg-[var(--gold)] text-[var(--dark)] shadow-md"
                           : "bg-white/90 text-[var(--red)] backdrop-blur-sm"

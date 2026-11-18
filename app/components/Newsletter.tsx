@@ -30,62 +30,56 @@ export const Newsletter = ({
   };
 
   return (
-    <section className="relative w-full py-6 md:py-10 overflow-hidden bg-slate-50/50">
+    <section className="relative w-full py-6 md:py-10 overflow-hidden bg-[var(--cream)]">
       <div className="container mx-auto px-4">
         <div
-          className="relative overflow-hidden rounded-3xl border border-[#D4AF37]/20 shadow-[0_20px_50px_rgba(0,0,0,0.05)] group bg-white"
+          className="relative overflow-hidden border border-[var(--cream3)] shadow-[0_20px_50px_rgba(58,31,10,0.12)]"
+          style={{ background: "linear-gradient(135deg, rgba(62,32,9,1) 0%, rgba(92,51,23,0.97) 50%, rgba(122,69,32,0.95) 100%)" }}
         >
-          {/* 1. Subtle Paper Texture (Light version) */}
-          <div className="absolute inset-0 opacity-[0.4] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/linen.png')]" />
-
-          {/* 2. Abstract Aesthetic: Soft Gold Glows */}
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-[var(--gold)]/5 blur-[100px] rounded-full pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-[var(--gold)]/5 blur-[100px] rounded-full pointer-events-none" />
-
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 items-stretch">
             
             {/* LEFT SIDE: Typography focused on Gold */}
-            <div className="lg:col-span-7 p-8 md:p-12 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-slate-100">
+            <div className="lg:col-span-7 p-8 md:p-12 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-white/20">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-[var(--gold)] text-white flex items-center justify-center shadow-lg shadow-[var(--gold)]/20">
+                <div className="w-8 h-8  bg-[var(--gold)] text-white flex items-center justify-center shadow-lg shadow-[var(--gold)]/20">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                   </svg>
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--gold)]">Stay Connected</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--gold-lt)]">Stay Connected</span>
               </div>
 
-              <h2 className="text-3xl md:text-5xl font-serif font-black text-[var(--gold)] leading-[1.1] mb-4 tracking-tighter">
+              <h2 className="text-3xl md:text-5xl font-serif font-black text-[var(--gold-lt)] leading-[1.1] mb-4 tracking-tighter">
                 {title}
               </h2>
               
-              <p className="text-slate-500 text-sm md:text-lg leading-relaxed max-w-lg font-medium">
+              <p className="text-white/85 text-sm md:text-lg leading-relaxed max-w-lg font-medium">
                 {description}
               </p>
 
               {/* Tightly packed feature markers */}
               <div className="flex items-center gap-6 mt-8">
                 <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[var(--gold)]" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Weekly Wisdom</span>
+                  <div className="w-1.5 h-1.5  bg-[var(--gold)]" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-white/65">Weekly Wisdom</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[var(--gold)]" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Updates</span>
+                  <div className="w-1.5 h-1.5  bg-[var(--gold)]" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-white/65">Updates</span>
                 </div>
               </div>
             </div>
 
             {/* RIGHT SIDE: Clean Form Card */}
-            <div className="lg:col-span-5 p-8 md:p-12 bg-slate-50 flex flex-col justify-center">
+            <div className="lg:col-span-5 p-8 md:p-12 bg-[var(--cream)] flex flex-col justify-center">
               {status === "success" ? (
                 <div className="flex flex-col items-center animate-in zoom-in-95 duration-500 text-center">
-                  <div className="w-16 h-16 bg-[var(--gold)] rounded-full flex items-center justify-center shadow-xl mb-4">
+                  <div className="w-16 h-16 flex items-center justify-center shadow-xl mb-4" style={{ background: "linear-gradient(135deg, rgba(62,32,9,1) 0%, rgba(92,51,23,0.97) 50%, rgba(122,69,32,0.95) 100%)" }}>
                     <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <p className="text-[var(--gold)] font-black text-2xl tracking-tight leading-tight">
+                  <p className="text-[var(--red)] font-black text-2xl tracking-tight leading-tight">
                     {successMessage}
                   </p>
                   <p className="text-slate-400 text-xs mt-2 font-bold uppercase tracking-widest">Check your inbox</p>
@@ -93,7 +87,7 @@ export const Newsletter = ({
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--gold)]/60 ml-1">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--red)] ml-1">
                       Email Address
                     </label>
                     <div className="relative group/input">
@@ -103,7 +97,7 @@ export const Newsletter = ({
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder={placeholder}
-                        className="w-full px-5 py-4 rounded-xl text-sm bg-white border border-slate-200 text-slate-900 placeholder:text-slate-300 outline-none transition-all focus:border-[var(--gold)] focus:ring-4 focus:ring-[var(--gold)]/5 shadow-sm"
+                        className="w-full px-5 py-4 text-sm bg-white border border-[var(--cream3)] text-slate-900 placeholder:text-slate-400 outline-none transition-all focus:border-[var(--gold)] focus:ring-2 focus:ring-[var(--gold)] shadow-sm"
                       />
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-200 group-focus-within/input:text-[var(--gold)] transition-colors">
                         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -117,11 +111,11 @@ export const Newsletter = ({
                   <button
                     type="submit"
                     disabled={status === "loading"}
-                    className="w-full py-4 rounded-xl font-black text-xs uppercase tracking-[0.3em] transition-all duration-300 relative overflow-hidden group/btn shadow-lg hover:shadow-[var(--gold)]/20 active:scale-[0.98]"
-                    style={{ background: "var(--gold)", color: "#ffffff" }}
+                    className="w-full py-4 font-black text-xs uppercase tracking-[0.3em] text-white transition-all duration-300 relative overflow-hidden group/btn shadow-lg hover:brightness-110 disabled:opacity-60"
+                    style={{ background: "linear-gradient(135deg, rgba(62,32,9,1) 0%, rgba(92,51,23,0.97) 50%, rgba(122,69,32,0.95) 100%)" }}
                   >
                     {status === "loading" ? (
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white  animate-spin mx-auto" />
                     ) : (
                       <div className="flex items-center justify-center gap-3">
                         {buttonText}

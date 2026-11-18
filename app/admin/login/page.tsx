@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,12 +17,12 @@ export default function AdminLoginPage() {
     const res = await fetch("/api/admin/auth", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
+      body: JSON.stringify({ email, password }),
     });
     if (res.ok) {
       router.push("/admin");
     } else {
-      setError("Invalid password");
+      setError("Invalid email or password");
       setLoading(false);
     }
   }
@@ -29,7 +30,7 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center"
       style={{ background: "linear-gradient(135deg, #3e2009 0%, #5c3317 50%, #7a4520 100%)" }}>
-      <div className="bg-white rounded-2xl p-10 w-full max-w-sm shadow-2xl">
+      <div className="bg-white  p-10 w-full max-w-sm shadow-2xl">
         <div className="text-center mb-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/p4.png" alt="SAC Logo" className="w-16 h-16 mx-auto mb-4 object-contain" />
@@ -41,14 +42,31 @@ export default function AdminLoginPage() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">
+            <label htmlFor="admin-email" className="mb-1 block text-xs font-bold uppercase tracking-wider text-gray-600">
+              Email address
+            </label>
+            <input
+              id="admin-email"
+              type="email"
+              autoComplete="username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full border border-gray-200 px-4 py-3 text-sm focus:border-[#C9952A] focus:outline-none focus:ring-2 focus:ring-[#C9952A]"
+              placeholder="admin@example.com"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="admin-password" className="mb-1 block text-xs font-bold uppercase tracking-wider text-gray-600">
               Password
             </label>
             <input
+              id="admin-password"
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#C9952A] focus:border-[#C9952A]"
+              className="w-full px-4 py-3  border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#C9952A] focus:border-[#C9952A]"
               placeholder="Enter admin password"
               required
             />
@@ -57,7 +75,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-lg font-black text-sm uppercase tracking-wider transition-opacity disabled:opacity-50"
+            className="w-full py-3  font-black text-sm uppercase tracking-wider transition-opacity disabled:opacity-50"
             style={{ background: "#5C3317", color: "#C9952A" }}
           >
             {loading ? "Signing in..." : "Sign In"}

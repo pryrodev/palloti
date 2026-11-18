@@ -3,6 +3,8 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import { PrismaClient } from "@prisma/client";
 import { cmsSchemas, type CmsCollectionKey } from "../lib/cmsSchemas";
+import { cmsRecordsFor } from "../lib/cmsRecords";
+import { DEFAULT_SITE_THEME } from "../lib/siteTheme";
 
 const prisma = new PrismaClient();
 const root = process.cwd();
@@ -32,6 +34,20 @@ async function legacyMediaFiles(folder: "images" | "videos" | "pdfs") {
   }));
 }
 
+function mergeMissingDefaults(defaults: unknown, current: unknown): unknown {
+  if (Array.isArray(defaults)) return Array.isArray(current) ? current : defaults;
+  if (typeof defaults === "object" && defaults !== null) {
+    const currentRecord = typeof current === "object" && current !== null && !Array.isArray(current)
+      ? current as Record<string, unknown>
+      : {};
+    return Object.fromEntries(Object.entries(defaults).map(([key, value]) => [
+      key,
+      Object.hasOwn(currentRecord, key) ? mergeMissingDefaults(value, currentRecord[key]) : value,
+    ]));
+  }
+  return current === undefined ? defaults : current;
+}
+
 async function seed() {
   const [gallery, videos, publications, en, fr] = await Promise.all([
     jsonFile<unknown>("data/gallery.json"),
@@ -48,15 +64,30 @@ async function seed() {
     news: { en: en.newsSection.articles, fr: fr.newsSection.articles },
     communities: { en: en.communities.items, fr: fr.communities.items },
     direction: { en: en.direction.members, fr: fr.direction.members },
+    siteContent: { en, fr, theme: DEFAULT_SITE_THEME },
   };
 
   for (const [key, payload] of Object.entries(collections) as [CmsCollectionKey, unknown][]) {
     const validatedPayload = cmsSchemas[key].parse(payload);
+    if (key === "siteContent") {
+      const existing = await prisma.cmsCollection.findUnique({ where: { key } });
+      if (existing) {
+        const merged = mergeMissingDefaults(validatedPayload, existing.payload);
+        await prisma.cmsCollection.update({ where: { key }, data: { payload: cmsSchemas[key].parse(merged) as never, revision: { increment: 1 } } });
+        continue;
+      }
+    }
     await prisma.cmsCollection.upsert({
       where: { key },
       create: { key, payload: validatedPayload as never },
       update: {},
     });
+    const stored = await prisma.cmsCollection.findUniqueOrThrow({ where: { key }, select: { payload: true } });
+    const records = cmsRecordsFor(key, cmsSchemas[key].parse(stored.payload) as never);
+    await prisma.cmsRecord.deleteMany({ where: { collectionKey: key } });
+    for (let start = 0; start < records.length; start += 250) {
+      await prisma.cmsRecord.createMany({ data: records.slice(start, start + 250) as never });
+    }
   }
 
   const mediaFiles = (await Promise.all(["images", "videos", "pdfs"].map((folder) => legacyMediaFiles(folder as "images" | "videos" | "pdfs")))).flat();

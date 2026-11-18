@@ -1,4 +1,7 @@
 import { z } from "zod";
+import enDictionary from "../dictionaries/en.json";
+import frDictionary from "../dictionaries/fr.json";
+import { DEFAULT_SITE_THEME } from "./siteTheme";
 
 const nonEmptyText = z.string().trim().min(1).max(5000);
 const mediaUrl = z.string().trim().min(1).max(2048);
@@ -17,8 +20,11 @@ export const videoSchema = z.object({
 
 export const publicationSchema = z.object({
   id: z.union([z.string(), z.number()]),
+  slug: z.string().max(120).optional(),
   number: z.string().max(32),
   title: nonEmptyText,
+  seoTitle: z.string().max(70).optional(),
+  seoDescription: z.string().max(160).optional(),
   subtitle: z.string().max(500),
   description: z.string().max(5000),
   color: z.string().max(32),
@@ -29,10 +35,14 @@ export const publicationSchema = z.object({
 
 export const newsArticleSchema = z.object({
   id: z.union([z.string(), z.number()]),
+  slug: z.string().max(120).optional(),
   title: nonEmptyText,
+  seoTitle: z.string().max(70).optional(),
+  seoDescription: z.string().max(160).optional(),
   date: z.string().max(64),
   tags: z.string().max(500),
   summary: z.string().max(10000),
+  content: z.string().max(50000).optional(),
   imageUrl: mediaUrl,
 });
 
@@ -56,6 +66,55 @@ const directionMemberSchema = z.object({
 const bilingualCommunities = z.object({ en: z.array(communitySchema).max(1000), fr: z.array(communitySchema).max(1000) });
 const bilingualDirection = z.object({ en: z.array(directionMemberSchema).max(100), fr: z.array(directionMemberSchema).max(100) });
 
+function hasSameShape(value: unknown, baseline: unknown): boolean {
+  if (typeof baseline === "string") return typeof value === "string" && value.length <= 20000;
+  if (typeof baseline === "number") return typeof value === "number";
+  if (typeof baseline === "boolean") return typeof value === "boolean";
+  if (baseline === null) return value === null;
+  if (Array.isArray(baseline)) {
+    return Array.isArray(value) && (baseline.length === 0
+      ? value.length === 0
+      : value.every((entry) => baseline.some((sample) => hasSameShape(entry, sample))));
+  }
+  if (typeof baseline === "object" && baseline !== null) {
+    if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+    const expectedKeys = Object.keys(baseline);
+    const actualKeys = Object.keys(value);
+    return expectedKeys.length === actualKeys.length && expectedKeys.every((key) =>
+      Object.hasOwn(value, key) && hasSameShape((value as Record<string, unknown>)[key], (baseline as Record<string, unknown>)[key]),
+    );
+  }
+  return false;
+}
+
+const dictionaryCopySchema = z.record(z.string(), z.unknown()).refine(
+  (value) => hasSameShape(value, enDictionary),
+  "Dictionary keys and value types must match the site content structure",
+);
+const siteThemeSchema = z.object(Object.fromEntries(
+  Object.entries(DEFAULT_SITE_THEME).map(([key]) => [key, z.string().regex(/^#[0-9a-fA-F]{6}$/)]),
+) as Record<keyof typeof DEFAULT_SITE_THEME, z.ZodString>);
+const heroSlideSchema = z.object({
+  image: mediaUrl,
+  location: nonEmptyText.max(300),
+  title: nonEmptyText.max(500),
+  subtitle: z.string().max(1000),
+});
+const siteContentSchema = z.object({
+  en: dictionaryCopySchema,
+  fr: z.record(z.string(), z.unknown()).refine((value) => hasSameShape(value, frDictionary), "French dictionary structure cannot be changed"),
+  theme: siteThemeSchema,
+}).superRefine((value, context) => {
+  for (const locale of ["en", "fr"] as const) {
+    const home = value[locale].home;
+    const slides = typeof home === "object" && home !== null && !Array.isArray(home)
+      ? (home as Record<string, unknown>).heroSlides
+      : undefined;
+    const result = z.array(heroSlideSchema).min(1).max(12).safeParse(slides);
+    if (!result.success) context.addIssue({ code: "custom", path: [locale, "home", "heroSlides"], message: "Each language needs 1–12 complete hero slides" });
+  }
+});
+
 export const cmsSchemas = {
   gallery: z.array(galleryItemSchema).max(5000),
   videos: z.array(videoSchema).max(1000),
@@ -63,6 +122,7 @@ export const cmsSchemas = {
   news: bilingualNews,
   communities: bilingualCommunities,
   direction: bilingualDirection,
+  siteContent: siteContentSchema,
 } as const;
 
 export type CmsCollectionKey = keyof typeof cmsSchemas;

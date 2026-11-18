@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Mulish, Geist } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import QueryProvider from "@/components/QueryProvider";
+import { SITE_URL } from "@/lib/seoPaths";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -12,7 +14,7 @@ const mulish = Mulish({
   display: "swap",
 });
 
-const BASE_URL = "https://palloti-website.vercel.app";
+const BASE_URL = SITE_URL;
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -95,9 +97,9 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html className={cn("h-full", mulish.variable, "font-sans", geist.variable)}>
+    <html data-scroll-behavior="smooth" className={cn("h-full", mulish.variable, "font-sans", geist.variable)}>
       <body className={`min-h-full flex flex-col antialiased ${mulish.className}`}>
-        {children}
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );
