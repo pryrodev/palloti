@@ -7,14 +7,22 @@ import Negotiator from "negotiator";
 function getLocale(request: NextRequest): string {
   const negotiatorHeaders: Record<string, string> = {};
   request.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
-  // @ts-expect-error locales are readonly
-  const locales: string[] = i18n.locales;
-  const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
-  return matchLocale(languages, locales, i18n.defaultLocale);
+  const locales = [...i18n.locales];
+  const languages = new Negotiator({ headers: negotiatorHeaders }).languages().filter((language) => {
+    try {
+      return language !== "*" && Intl.getCanonicalLocales(language).length > 0;
+    } catch {
+      return false;
+    }
+  });
+  return matchLocale(languages.length > 0 ? languages : [i18n.defaultLocale], locales, i18n.defaultLocale);
 }
 
 export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+
+  // The CMS has its own routes and is not part of the public localized site.
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) return;
 
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`

@@ -1,29 +1,40 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import NewsEditor from "./sections/NewsEditor";
-import GalleryEditor from "./sections/GalleryEditor";
-import VideosEditor from "./sections/VideosEditor";
-import PublicationsEditor from "./sections/PublicationsEditor";
-import CommunitiesEditor from "./sections/CommunitiesEditor";
-import DirectionEditor from "./sections/DirectionEditor";
-import CmsQueryProvider from "./CmsQueryProvider";
-import MediaLibrary from "./sections/MediaLibrary";
+import type { ReactNode } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  FileText,
+  FolderOpen,
+  Globe,
+  Images,
+  LayoutDashboard,
+  LogOut,
+  Network,
+  Newspaper,
+  Palette,
+  Users,
+  Video,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-const NAV = [
-  { key: "news",         label: "News",          icon: "📰" },
-  { key: "gallery",      label: "Gallery",        icon: "🖼️" },
-  { key: "videos",       label: "Videos",         icon: "🎬" },
-  { key: "publications", label: "Publications",   icon: "📄" },
-  { key: "communities",  label: "Communities",    icon: "🏘️" },
-  { key: "direction",    label: "Direction",      icon: "👥" },
-  { key: "media",        label: "Media Library",  icon: "🗂️" },
+const NAV: { label: string; href: string; icon: LucideIcon }[] = [
+  { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { label: "News", href: "/admin/news", icon: Newspaper },
+  { label: "Gallery", href: "/admin/gallery", icon: Images },
+  { label: "Videos", href: "/admin/videos", icon: Video },
+  { label: "Publications", href: "/admin/publications", icon: FileText },
+  { label: "Communities", href: "/admin/communities", icon: Users },
+  { label: "Direction", href: "/admin/direction", icon: Network },
+  { label: "Media Library", href: "/admin/media", icon: FolderOpen },
+  { label: "Site Content & Theme", href: "/admin/site-content", icon: Palette },
 ];
 
-export default function AdminShell() {
-  const [active, setActive] = useState("news");
+export default function AdminShell({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
   const router = useRouter();
+  const activeItem = NAV.find((item) => item.href === "/admin" ? pathname === item.href : pathname.startsWith(item.href)) ?? NAV[0];
+  const ActiveIcon = activeItem.icon;
 
   async function logout() {
     await fetch("/api/admin/auth", { method: "DELETE" });
@@ -31,81 +42,61 @@ export default function AdminShell() {
   }
 
   return (
-    <CmsQueryProvider>
-    <div className="min-h-screen flex" style={{ background: "#f8f4ef", fontFamily: "system-ui, sans-serif" }}>
-      {/* Sidebar */}
-      <aside className="w-56 flex-shrink-0 flex flex-col"
-        style={{ background: "linear-gradient(180deg, #3e2009 0%, #5c3317 100%)", minHeight: "100vh" }}>
-        {/* Logo */}
-        <div className="flex flex-col items-center py-8 px-4 border-b border-white/10">
+    <div className="flex h-screen overflow-hidden" style={{ background: "#f8f4ef", fontFamily: "system-ui, sans-serif" }}>
+      <aside className="flex h-screen w-56 shrink-0 flex-col" style={{ background: "linear-gradient(180deg, #3e2009 0%, #5c3317 100%)" }}>
+        <div className="flex flex-col items-center border-b border-white/10 px-4 py-5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/p4.png" alt="SAC Logo" className="w-12 h-12 object-contain mb-2" />
-          <p className="text-xs font-black tracking-wider text-white text-center leading-tight">
-            SAC · PSF<br />
-            <span className="text-[#C9952A] font-bold">CMS Admin</span>
+          <img src="/p4.png" alt="SAC Logo" className="mb-1 h-10 w-10 object-contain" />
+          <p className="text-center text-xs font-black leading-tight tracking-wider text-white">
+            <span className="font-bold text-[#C9952A]">CMS Admin</span>
           </p>
         </div>
 
-        {/* Nav */}
-        <nav className="flex-1 py-4 px-2">
-          {NAV.map((item) => (
-            <button
-              key={item.key}
-              onClick={() => setActive(item.key)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left mb-1 transition-all text-sm font-bold"
-              style={{
-                background: active === item.key ? "rgba(201,149,42,0.2)" : "transparent",
-                color: active === item.key ? "#C9952A" : "rgba(255,255,255,0.7)",
-                borderLeft: active === item.key ? "3px solid #C9952A" : "3px solid transparent",
-              }}
-            >
-              <span>{item.icon}</span>
-              {item.label}
-            </button>
-          ))}
+        <nav aria-label="Admin sections" className="min-h-0 flex-1 overflow-y-auto px-2 py-4">
+          {NAV.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeItem.href === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={isActive ? "page" : undefined}
+                className="mb-1 flex w-full items-center gap-3 px-3 py-2.5 text-left text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#C9952A]"
+                style={{
+                  background: isActive ? "rgba(201,149,42,0.2)" : "transparent",
+                  color: isActive ? "#C9952A" : "rgba(255,255,255,0.7)",
+                  borderLeft: isActive ? "3px solid #C9952A" : "3px solid transparent",
+                }}
+              >
+                <Icon aria-hidden="true" className="size-4 shrink-0" />
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
-        {/* Footer links */}
-        <div className="p-4 border-t border-white/10 space-y-2">
-          <a href="/en" target="_blank"
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-white/60 hover:text-white transition-colors">
-            <span>🌐</span> View Site
+        <div className="space-y-2 border-t border-white/10 p-4">
+          <a href="/en" target="_blank" rel="noreferrer" className="flex w-full items-center gap-2 px-3 py-2 text-xs text-white/60 transition-colors hover:text-white">
+            <Globe aria-hidden="true" className="size-4" /> View Site
           </a>
-          <button onClick={logout}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-white/60 hover:text-red-400 transition-colors">
-            <span>🚪</span> Sign Out
+          <button type="button" onClick={logout} className="flex w-full items-center gap-2 px-3 py-2 text-xs text-white/60 transition-colors hover:text-red-300">
+            <LogOut aria-hidden="true" className="size-4" /> Sign Out
           </button>
         </div>
       </aside>
 
-      {/* Main content */}
-      <main className="flex-1 overflow-auto">
-        {/* Top bar */}
-        <div className="flex items-center justify-between px-8 py-4 bg-white border-b border-gray-100 shadow-sm">
+      <main className="flex h-screen min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <header className="flex shrink-0 items-center justify-between border-b border-gray-100 bg-white px-8 py-2.5 shadow-sm">
           <div>
-            <h1 className="text-lg font-black text-gray-800">
-              {NAV.find((n) => n.key === active)?.icon}{" "}
-              {NAV.find((n) => n.key === active)?.label}
+            <h1 className="flex items-center gap-2 text-base font-black text-gray-800">
+              <ActiveIcon aria-hidden="true" className="size-4 text-[#9e711a]" />
+              {activeItem.label}
             </h1>
-            <p className="text-xs text-gray-400">Manage and publish content</p>
+            <p className="text-[11px] text-gray-400">{activeItem.href === "/admin" ? "Overview of your site content" : "Manage and publish content"}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">● Live</span>
-          </div>
-        </div>
-
-        {/* Editor area */}
-        <div className="p-8">
-          {active === "news"         && <NewsEditor />}
-          {active === "gallery"      && <GalleryEditor />}
-          {active === "videos"       && <VideosEditor />}
-          {active === "publications" && <PublicationsEditor />}
-          {active === "communities"  && <CommunitiesEditor />}
-          {active === "direction"    && <DirectionEditor />}
-          {active === "media"        && <MediaLibrary />}
-        </div>
+        </header>
+        <div className="min-h-0 flex-1 overflow-y-auto p-8">{children}</div>
       </main>
     </div>
-    </CmsQueryProvider>
   );
 }

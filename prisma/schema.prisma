@@ -16,6 +16,21 @@ model CmsCollection {
   @@map("cms_collections")
 }
 
+model CmsRecord {
+  id             String   @id @default(cuid()) @db.VarChar(30)
+  collectionKey  String   @db.VarChar(64)
+  locale         String   @default("all") @db.VarChar(8)
+  itemKey        String   @db.VarChar(191)
+  position       Int
+  payload        Json
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([collectionKey, locale, itemKey])
+  @@index([collectionKey, locale, position, id])
+  @@map("cms_records")
+}
+
 model MediaAsset {
   id           String   @id @default(cuid()) @db.VarChar(30)
   publicId     String?  @unique @db.VarChar(191)
@@ -30,5 +45,6 @@ model MediaAsset {
   createdAt    DateTime @default(now())
 
   @@index([resourceType, createdAt])
+  @@index([createdAt, id])
   @@map("media_assets")
 }

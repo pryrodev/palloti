@@ -1,5 +1,16 @@
 {
+  "siteSeo": {
+    "homeTitle": "Accueil — Province Sainte Famille",
+    "homeDescription": "Site officiel de la Province Sainte Famille de la Société de l'Apostolat Catholique (SAC). Inspirés par Saint Vincent Pallotti.",
+    "newsTitle": "Actualités & Publications",
+    "newsDescription": "Dernières nouvelles, bulletins et publications de la Province Sainte Famille SAC.",
+    "publicationsTitle": "Publications de la Province Sainte Famille",
+    "publicationsDescription": "Consultez les documents, livres et publications de la Province Sainte Famille SAC.",
+    "publicationsBadge": "Médias",
+    "publicationsSubtitle": "Documents, livres et ressources · Province Sainte Famille"
+  },
   "navigation": {
+    "contact": "Contact",
     "home": "Accueil",
     "identity": "Identité",
     "provincialDirection": "Gouvernement Provincial",
@@ -11,10 +22,48 @@
     "videos": "Vidéos",
     "publications": "Publications"
   },
+  "contactPage": {
+    "badge": "Nous sommes à votre écoute",
+    "title": "Contactez-nous",
+    "subtitle": "Joignez le bureau de la Province Sainte Famille à Gikondo, Kigali.",
+    "contactInfo": "Coordonnées",
+    "addressLabel": "Nous rendre visite",
+    "phoneLabel": "Appelez-nous",
+    "messageTitle": "Envoyez-nous un message",
+    "name": "Votre nom",
+    "email": "Adresse e-mail",
+    "subject": "Objet",
+    "message": "Comment pouvons-nous vous aider ?",
+    "namePlaceholder": "Saisissez votre nom",
+    "emailPlaceholder": "vous@exemple.com",
+    "subjectPlaceholder": "Quel est le sujet ?",
+    "messagePlaceholder": "Écrivez votre message",
+    "send": "Envoyer le message",
+    "sending": "Envoi du message…",
+    "sent": "Votre message a été envoyé. Nous vous répondrons bientôt.",
+    "error": "Votre message n’a pas pu être envoyé. Réessayez ou appelez-nous.",
+    "deliveryNote": "Votre message sera envoyé au bureau de la Province Sainte Famille.",
+    "validationName": "Saisissez au moins 2 caractères.",
+    "validationEmail": "Saisissez une adresse e-mail valide.",
+    "validationSubject": "Saisissez un objet d'au moins 2 caractères.",
+    "validationMessage": "Saisissez un message d'au moins 10 caractères.",
+    "mapTitle": "Trouver le bureau de la Province Sainte Famille",
+    "openMap": "Ouvrir dans Google Maps"
+  },
   "home": {
     "heroBadge": "Province Sainte Famille",
     "heroTitle": "Bienvenue sur le Site Officiel de la Province Sainte Famille",
     "heroSubtitle": "Inspirés par Saint Vincent Pallotti, nous sommes une communauté de prêtres et de frères unis dans la mission de répandre l'amour de Dieu par la charité, l'apostolat et le service.",
+    "heroSlides": [
+      { "image": "/images/gikondo.jpg", "location": "Kigali — Gikondo, Rwanda", "title": "Maison Provinciale Sainte Famille", "subtitle": "Siège de la Province Sainte Famille · Maison Mère" },
+      { "image": "/images/hero.jpg", "location": "Kigali — Rwanda", "title": "Sanctuaire de la Miséricorde Divine", "subtitle": "Un lieu de prière et d'accueil" },
+      { "image": "/images/hero2.jpg", "location": "Kibeho — Rwanda", "title": "La Nouvelle Communauté de Kibeho", "subtitle": "Au service des fidèles dans un lieu de pèlerinage" },
+      { "image": "/images/home2.jpeg", "location": "Province Sainte Famille", "title": "Formation & Apostolat", "subtitle": "Vie communautaire et service pastoral" },
+      { "image": "/images/home3.jpg", "location": "Union de l'Apostolat Catholique", "title": "Jeunesse & Vocations", "subtitle": "Union de l'Apostolat Catholique" },
+      { "image": "/images/hero3.jpeg", "location": "Montereau — France", "title": "La Nouvelle Communauté Pallottine de Montereau", "subtitle": "Une mission au-delà des frontières" },
+      { "image": "/images/hero4.jpg", "location": "Province Sainte Famille", "title": "Pallottins de la Province Sainte Famille", "subtitle": "Venez et rebâtissons les murailles de Jérusalem." },
+      { "image": "/images/hero5.jpg", "location": "Kabuga — Rwanda", "title": "Centre Pallottin de Formation Genezareth", "subtitle": "Formation et service au sein de nos communautés" }
+    ],
     "ctaPrimary": "Découvrir Notre Mission",
     "ctaSecondary": "Nos Communautés",
     "statFounded": "Année de Fondation",
@@ -162,7 +211,14 @@
       "members": "Membres de la Communauté",
       "works": "Œuvres",
       "viewDetails": "Voir les Membres",
-      "hideDetails": "Masquer les Membres"
+      "hideDetails": "Masquer les Membres",
+      "imageUnavailable": "Photo de la communauté bientôt disponible",
+      "showing": "Affichage",
+      "of": "sur",
+      "results": "communautés",
+      "previous": "Précédent",
+      "next": "Suivant",
+      "page": "Page"
     },
     "items": [
       {

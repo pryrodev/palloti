@@ -16,10 +16,10 @@ type MediaItem = { href: string; label: string };
 
 const linkClass = (active: boolean) =>
   cn(
-    "px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors rounded-md relative",
+    "px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition-colors  relative",
     "hover:bg-transparent hover:text-[var(--gold)]",
     active
-      ? "text-[var(--red)] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:bg-[var(--red)] after:rounded"
+      ? "text-[var(--red)] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:bg-[var(--red)] "
       : "text-[var(--mid)]"
   );
 
@@ -70,7 +70,7 @@ export function DesktopNav({
                     <NavigationMenuLink
                       render={<Link href={item.href} />}
                       className={cn(
-                        "px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors rounded-md",
+                        "px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors ",
                         pathname === item.href
                           ? "text-[var(--red)] bg-[var(--cream2)]"
                           : "text-[var(--mid)] hover:text-[var(--gold)] hover:bg-[var(--cream2)]"

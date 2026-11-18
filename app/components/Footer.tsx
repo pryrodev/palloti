@@ -24,6 +24,7 @@ interface FooterProps {
     provincialDirection: string;
     communitiesAndWorks: string;
     news: string;
+    contact: string;
     galleries: string;
   };
 }
@@ -35,6 +36,7 @@ export const Footer = ({ lang, dict, navigation }: FooterProps) => {
     { href: `/${lang}/direction`,   label: navigation.provincialDirection },
     { href: `/${lang}/communities`, label: navigation.communitiesAndWorks },
     { href: `/${lang}/news`,        label: navigation.news },
+    { href: `/${lang}/contact`,     label: navigation.contact },
     { href: `/${lang}/galleries`,   label: navigation.galleries },
   ];
 
@@ -75,8 +77,8 @@ export const Footer = ({ lang, dict, navigation }: FooterProps) => {
           <div className="lg:col-span-4 space-y-6 md:space-y-8 text-center sm:text-left text-white">
             <Link href={`/${lang}`} className="flex flex-col sm:flex-row items-center gap-5 group text-white">
               <div className="relative shrink-0">
-                <div className="absolute -inset-2 rounded-full border border-[var(--gold)]/30 group-hover:border-[var(--gold)] transition-colors duration-700" />
-                <div className="relative bg-white p-2 rounded-full shadow-xl border-2 border-[var(--gold)] transition-transform group-hover:scale-105">
+                <div className="absolute -inset-2  border border-[var(--gold)]/30 group-hover:border-[var(--gold)] transition-colors duration-700" />
+                <div className="relative bg-white p-2  shadow-xl border-2 border-[var(--gold)] transition-transform group-hover:scale-105">
                   <Image src="/p4.png" alt="SAC Logo" width={60} height={60} className="object-contain" />
                 </div>
               </div>
@@ -84,12 +86,12 @@ export const Footer = ({ lang, dict, navigation }: FooterProps) => {
                 <p className="font-black text-xl md:text-2xl tracking-tight leading-none font-serif">
                   <span className="text-[var(--gold)]">SAC</span> <span className="text-white">Province</span>
                 </p>
-                <p className="text-xs font-bold tracking-[0.25em] uppercase mt-2" style={{ color: "#ffffff" }}>
+                <p className="text-xs font-bold tracking-[0.25em] uppercase mt-2" style={{ color: "var(--white)" }}>
                   Holy Family · Kigali
                 </p>
               </div>
             </Link>
-            <p className="text-base leading-relaxed max-w-md italic sm:border-l-2 border-white/50 sm:pl-4 mx-auto sm:mx-0" style={{ color: "#ffffff" }}>
+            <p className="text-base leading-relaxed max-w-md italic sm:border-l-2 border-white/50 sm:pl-4 mx-auto sm:mx-0" style={{ color: "var(--white)" }}>
               &ldquo;{dict.tagline}&rdquo;
             </p>
           </div>
@@ -135,7 +137,7 @@ export const Footer = ({ lang, dict, navigation }: FooterProps) => {
                 { icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z", text: dict.email },
               ].map((item, idx) => (
                 <li key={idx} className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 group">
-                  <div className="p-2 rounded-lg bg-white/5 text-[var(--gold)] group-hover:bg-[var(--gold)] group-hover:text-[var(--red-dk)] transition-all">
+                  <div className="p-2  bg-white/5 text-[var(--gold)] group-hover:bg-[var(--gold)] group-hover:text-[var(--red-dk)] transition-all">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
                     </svg>
@@ -180,7 +182,7 @@ export const Footer = ({ lang, dict, navigation }: FooterProps) => {
               <div className="flex items-center gap-2">
                 {socialLinks.map((social) => (
                   <a key={social.name} href={social.href} target="_blank" rel="noopener noreferrer"
-                    className="w-7 h-7 flex items-center justify-center rounded-full border border-white/40 text-white/80 hover:bg-white hover:text-[var(--red-dk)] hover:border-white transition-all duration-300"
+                    className="w-7 h-7 flex items-center justify-center  border border-white/40 text-white/80 hover:bg-white hover:text-[var(--red-dk)] hover:border-white transition-all duration-300"
                     title={social.name}>
                     {social.icon}
                   </a>

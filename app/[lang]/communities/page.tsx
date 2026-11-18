@@ -1,5 +1,3 @@
-import { Header } from "../../components/header";
-import { Footer } from "../../components/Footer";
 import { getDictionary } from "@/lib/getDictionary";
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
 import CommunitiesFilter from "../../components/CommunitiesFilter";
@@ -22,7 +20,6 @@ export default async function CommunitiesPage({ params }: { params: Promise<{ la
 
   return (
     <>
-      <Header lang={lang} navigation={dict.navigation} />
       <DecorativeDivider />
 
       <div className="page-banner">
@@ -42,7 +39,6 @@ export default async function CommunitiesPage({ params }: { params: Promise<{ la
         </div>
       </main>
 
-      <Footer lang={lang} dict={dict.footer} navigation={dict.navigation} />
     </>
   );
 }

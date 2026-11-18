@@ -22,7 +22,7 @@ export const LanguageSwitcher = () => {
           <span key={locale} className="flex items-center gap-1">
             <Link
               href={redirectedPathName(locale)}
-              className="text-xs font-bold uppercase tracking-widest px-2 py-1 rounded transition-colors"
+              className="text-xs font-bold uppercase tracking-widest px-2 py-1  transition-colors"
               style={{
                 color: isActive ? "#fff" : "var(--red)",
                 backgroundColor: isActive ? "var(--red)" : "transparent",

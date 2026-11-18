@@ -36,7 +36,7 @@ export default function PdfViewer({ url, title, number, onClose }: PdfViewerProp
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-4xl rounded-xl overflow-hidden flex flex-col"
+        className="relative w-full max-w-4xl  overflow-hidden flex flex-col"
         style={{ height: "92vh", background: "#1a1410", boxShadow: "0 24px 80px rgba(0,0,0,0.6)" }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -53,7 +53,7 @@ export default function PdfViewer({ url, title, number, onClose }: PdfViewerProp
                 <button
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="w-7 h-7 flex items-center justify-center rounded bg-white/10 text-white hover:bg-white/20 disabled:opacity-30 transition-colors"
+                  className="w-7 h-7 flex items-center justify-center  bg-white/10 text-white hover:bg-white/20 disabled:opacity-30 transition-colors"
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6"/></svg>
                 </button>
@@ -63,7 +63,7 @@ export default function PdfViewer({ url, title, number, onClose }: PdfViewerProp
                 <button
                   onClick={() => setCurrentPage((p) => Math.min(numPages, p + 1))}
                   disabled={currentPage === numPages}
-                  className="w-7 h-7 flex items-center justify-center rounded bg-white/10 text-white hover:bg-white/20 disabled:opacity-30 transition-colors"
+                  className="w-7 h-7 flex items-center justify-center  bg-white/10 text-white hover:bg-white/20 disabled:opacity-30 transition-colors"
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 18l6-6-6-6"/></svg>
                 </button>
@@ -73,7 +73,7 @@ export default function PdfViewer({ url, title, number, onClose }: PdfViewerProp
             <a
               href={url}
               download
-              className="w-7 h-7 flex items-center justify-center rounded bg-white/10 text-white hover:bg-[var(--gold)] transition-colors"
+              className="w-7 h-7 flex items-center justify-center  bg-white/10 text-white hover:bg-[var(--gold)] transition-colors"
               title="Download"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -81,7 +81,7 @@ export default function PdfViewer({ url, title, number, onClose }: PdfViewerProp
             {/* Close */}
             <button
               onClick={onClose}
-              className="w-7 h-7 flex items-center justify-center rounded bg-white/10 text-white hover:bg-red-500/60 transition-colors"
+              className="w-7 h-7 flex items-center justify-center  bg-white/10 text-white hover:bg-red-500/60 transition-colors"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
@@ -92,7 +92,7 @@ export default function PdfViewer({ url, title, number, onClose }: PdfViewerProp
         <div className="flex-1 overflow-y-auto flex flex-col items-center py-4 px-2" style={{ background: "#2a2a2a" }}>
           {loading && (
             <div className="flex items-center justify-center h-40">
-              <div className="w-8 h-8 border-2 border-[var(--gold)] border-t-transparent rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-[var(--gold)] border-t-transparent  animate-spin" />
             </div>
           )}
           <Document

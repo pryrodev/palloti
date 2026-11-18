@@ -1,6 +1,4 @@
 import Image from "next/image";
-import { Header } from "../../components/header";
-import { Footer } from "../../components/Footer";
 import { getDictionary } from "@/lib/getDictionary";
 import type { Metadata } from "next";
 
@@ -24,7 +22,6 @@ export default async function HistoryPage({ params }: { params: Promise<{ lang: 
 
   return (
     <>
-      <Header lang={lang} navigation={dict.navigation} />
 
       <div className="page-banner">
         <div className="container mx-auto px-6">
@@ -51,10 +48,10 @@ export default async function HistoryPage({ params }: { params: Promise<{ lang: 
 
                   {/* Image side */}
                   <div className={!isEven ? "md:order-2" : ""}>
-                    <div className="relative rounded-xl overflow-hidden border-[3px] border-[var(--gold)]"
+                    <div className="relative  overflow-hidden border-[3px] border-[var(--gold)]"
                       style={{ height: 320, boxShadow: "0 12px 40px rgba(139,26,26,0.12)" }}>
                       <Image src={chapter.image} alt={`History ${index + 1}`} fill className="object-cover" />
-                      <div className="absolute top-4 left-4 px-4 py-2 rounded-full font-bold text-sm bg-[var(--red)]"
+                      <div className="absolute top-4 left-4 px-4 py-2  font-bold text-sm bg-[var(--red)]"
                         style={{ fontFamily: "Georgia, serif", color: "#ffffff" }}>
                         {chapter.year}
                       </div>
@@ -68,7 +65,7 @@ export default async function HistoryPage({ params }: { params: Promise<{ lang: 
 
                   {/* Text side */}
                   <div className={!isEven ? "md:order-1" : ""}>
-                    <div className="mb-4 w-12 h-[3px] rounded bg-[var(--gold)]" />
+                    <div className="mb-4 w-12 h-[3px]  bg-[var(--gold)]" />
                     <p className="leading-relaxed text-[var(--mid)]" style={{ fontSize: "1rem", lineHeight: "1.85" }}>
                       {chapter.text}
                     </p>
@@ -80,7 +77,7 @@ export default async function HistoryPage({ params }: { params: Promise<{ lang: 
           })}
 
           {/* Stats banner */}
-          <div className="mt-10 rounded-2xl p-7 text-center bg-[var(--red)]" style={{ color: "#ffffff" }}>
+          <div className="mt-10  p-7 text-center bg-[var(--red)]" style={{ color: "#ffffff" }}>
             <p className="badge mb-4">
               {lang === "fr" ? "Province Sainte Famille · SAC" : "Holy Family Province · SAC"}
             </p>
@@ -102,7 +99,6 @@ export default async function HistoryPage({ params }: { params: Promise<{ lang: 
         </div>
       </main>
 
-      <Footer lang={lang} dict={dict.footer} navigation={dict.navigation} />
     </>
   );
 }

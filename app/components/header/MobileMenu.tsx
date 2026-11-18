@@ -21,7 +21,7 @@ export function MobileMenu({
   return (
     <div
       className={cn(
-        "fixed inset-0 z-[90] xl:hidden transition-all duration-500 ease-in-out bg-gradient-to-br from-[#3e2009] via-[#5c3317] to-[#7a4520]",
+        "fixed inset-0 z-[90] xl:hidden transition-all duration-500 ease-in-out bg-gradient-to-br from-[var(--red-dk)] via-[var(--red)] to-[var(--red-lt)]",
         isOpen ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
       )}
     >

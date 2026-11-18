@@ -1,23 +1,29 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Header } from "../components/header";
-import { Footer } from "../components/Footer";
 import { Newsletter } from "../components/Newsletter";
 import { getDictionary } from "@/lib/getDictionary";
 import { FadeUp, StaggerContainer, StaggerItem } from "../components/motion";
 import HeroSlider from "../components/HeroSlider";
 import DecorativeDivider from "../components/ui/DecorativeDivider";
+import { getArticleSegment } from "@/lib/seoPaths";
 
-type NewsItem = { date: string; tags: string; title: string; excerpt: string; image?: string };
+type NewsItem = { id: number | string; slug?: string; date: string; tags: string; title: string; excerpt: string; image?: string };
 
 export default async function Home({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
-  const news: NewsItem[] = dict.home.newsItems;
+  const news: NewsItem[] = (dict.newsSection.articles as (typeof dict.newsSection.articles[number] & { slug?: string })[]).slice(0, 6).map((article) => ({
+    id: article.id,
+    slug: article.slug,
+    date: article.date,
+    tags: article.tags,
+    title: article.title,
+    excerpt: article.summary,
+    image: article.imageUrl,
+  }));
 
   return (
     <>
-      <Header lang={lang} navigation={dict.navigation} />
 
       {/* ═══════════════════════════════════════
           § 1  HERO SLIDER
@@ -25,6 +31,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       <DecorativeDivider />
       <HeroSlider
         lang={lang}
+        slides={dict.home.heroSlides}
         ctaPrimary={dict.home.ctaPrimary}
         ctaSecondary={dict.home.ctaSecondary}
         statFounded={dict.home.statFounded}
@@ -50,7 +57,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
 
             {/* LEFT — balanced, clean portrait card (no dark or colored background) */}
             <FadeUp className="lg:col-span-5 flex flex-col items-center lg:items-start w-full">
-              <div className="w-full max-w-sm sm:max-w-md rounded-2xl overflow-hidden border-2 border-[var(--gold)]/50 shadow-xl bg-white">
+              <div className="w-full max-w-sm sm:max-w-md  overflow-hidden border-2 border-[var(--gold)]/50 shadow-xl bg-white">
                 <div className="relative w-full aspect-[4/5] max-h-[480px] bg-white">
                   <Image
                     src="/images/eugene.jpg"
@@ -71,10 +78,18 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                   </p>
                 </div>
               </div>
+              <div className="mt-6 w-full max-w-sm border-t-2 border-[var(--gold)] px-1 pt-5 sm:max-w-md">
+                <p className="font-serif text-base italic leading-relaxed text-[var(--red)] sm:text-lg">
+                  &ldquo;{dict.home.rectorQuote}&rdquo;
+                </p>
+                <p className="mt-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--gold-dk)]">
+                  &mdash; {dict.home.rectorName}
+                </p>
+              </div>
             </FadeUp>
 
             {/* RIGHT — article text */}
-            <FadeUp delay={0.15} className="lg:col-span-7 flex flex-col justify-between pt-4 lg:pt-0">
+            <FadeUp delay={0.15} className="lg:col-span-7 flex flex-col pt-4 lg:pt-0">
 
               {/* Article headline */}
               <div>
@@ -89,32 +104,6 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                     <p key={i} className="text-base leading-[1.9]" style={{ color: "var(--mid)", textAlign: "justify" }}>{p}</p>
                   ))}
                 </div>
-              </div>
-
-              {/* Pull quote */}
-              <div className="mt-10 py-6 px-6" style={{ borderTop: "3px solid var(--gold)", borderBottom: "1px solid var(--cream3)" }}>
-                <p className="font-serif italic leading-snug" style={{ fontSize: "clamp(1.1rem, 2vw, 1.4rem)", color: "var(--red)" }}>
-                  &ldquo;{dict.home.rectorQuote}&rdquo;
-                </p>
-                <p className="text-xs font-bold tracking-[0.2em] uppercase mt-3" style={{ color: "var(--gold)" }}>
-                  — {dict.home.rectorName}
-                </p>
-              </div>
-
-              {/* Byline */}
-              <div className="mt-6 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full overflow-hidden relative shrink-0 ring-2 ring-[var(--gold)]/50">
-                  <Image src="/images/eugene.jpg" alt="" fill className="object-cover object-top" />
-                </div>
-                <div>
-                  <p className="font-bold text-sm" style={{ fontFamily: "Georgia, serif", color: "var(--red)" }}>
-                    {dict.home.rectorName}
-                  </p>
-                  <p className="text-[11px] tracking-[0.12em] uppercase" style={{ color: "var(--gold)" }}>
-                    {dict.home.rectorTitle}
-                  </p>
-                </div>
-                <div className="ml-auto text-[10px] font-bold tracking-[0.3em] uppercase" style={{ color: "var(--gray)" }}>SAC</div>
               </div>
 
             </FadeUp>
@@ -150,11 +139,11 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
 
             {/* ── FEATURED CARD — photo on top, text below ── */}
             <FadeUp>
-              <article className="group cursor-pointer flex flex-col bg-white"
+              <Link href={`/${lang}/news/${news[0] ? getArticleSegment(news[0]) : ""}`} className="group flex flex-col bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--gold)]"
                 style={{ border: "1px solid var(--cream3)", boxShadow: "0 4px 24px rgba(58,31,10,0.08)" }}>
                 {/* Photo */}
                 <div className="relative overflow-hidden" style={{ height: "300px" }}>
-                  <Image src={news[0]?.image ?? "/images/p5.jpg"} alt={news[0]?.title} fill
+                  <Image src={news[0]?.image ?? "/images/p5.jpg"} alt={news[0]?.title} fill sizes="(max-width: 1024px) 100vw, 65vw"
                     className="object-cover transition-transform duration-[2s] ease-out group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                   {/* Date badge over photo */}
@@ -181,23 +170,23 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                     <span className="w-6 h-px bg-[var(--gold)] group-hover:w-10 transition-all duration-300" />
                   </div>
                 </div>
-              </article>
+              </Link>
             </FadeUp>
 
             {/* ── SIDE LIST — thumbnail left, text right ── */}
             <StaggerContainer className="flex flex-col gap-0 divide-y divide-[var(--cream3)]">
               {news.slice(1, 5).map((item, i) => (
                 <StaggerItem key={i}>
-                  <article className="group flex gap-4 py-5 first:pt-0 cursor-pointer">
+                  <Link href={`/${lang}/news/${getArticleSegment(item)}`} className="group flex gap-4 py-5 first:pt-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)]">
                     {/* Thumbnail */}
-                    <div className="relative shrink-0 overflow-hidden rounded-sm" style={{ width: 80, height: 80 }}>
-                      <Image src={item.image ?? "/images/p5.jpg"} alt={item.title} fill
+                    <div className="relative shrink-0 overflow-hidden " style={{ width: 80, height: 80 }}>
+                      <Image src={item.image ?? "/images/p5.jpg"} alt={item.title} fill sizes="80px"
                         className="object-cover transition-transform duration-700 group-hover:scale-110" />
                     </div>
                     {/* Text */}
                     <div className="flex flex-col justify-center min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <div className="w-1 h-1 rounded-full shrink-0" style={{ background: "var(--gold)" }} />
+                        <div className="w-1 h-1  shrink-0" style={{ background: "var(--gold)" }} />
                         <span className="text-[10px] font-bold tracking-[0.2em] uppercase" style={{ color: "var(--gold)" }}>
                           {item.date}
                         </span>
@@ -211,7 +200,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                         <span className="w-3 h-px bg-[var(--gold)] group-hover:w-6 transition-all duration-300" />
                       </div>
                     </div>
-                  </article>
+                  </Link>
                 </StaggerItem>
               ))}
             </StaggerContainer>
@@ -220,7 +209,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       </section>
 
       
-      <section className="relative py-8 md:py-10 overflow-hidden bg-gradient-to-br from-[#3e2009] via-[#5c3317] to-[#7a4520]">
+      <section className="relative py-8 md:py-10 overflow-hidden bg-gradient-to-br from-[var(--red-dk)] via-[var(--red)] to-[var(--red-lt)]">
 
        
         <div className="absolute right-16 top-1/2 -translate-y-1/2 opacity-[0.04] pointer-events-none hidden xl:block">
@@ -254,7 +243,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       
           <Link
             href={`/${lang}/identity`}
-            className="inline-flex items-center gap-2 px-6 py-2.5 border border-white/40 text-white text-xs font-bold uppercase tracking-[0.15em] rounded-full hover:bg-white hover:text-[var(--red-dk)] transition-all duration-300"
+            className="inline-flex items-center gap-2 px-6 py-2.5 border border-white/40 text-white text-xs font-bold uppercase tracking-[0.15em]  hover:bg-white hover:text-[var(--red-dk)] transition-all duration-300"
           >
             {dict.home.ctaPrimary}
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -272,7 +261,6 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         buttonText={dict.newsletter.button}
         successMessage={dict.newsletter.success}
       />
-      <Footer lang={lang} dict={dict.footer} navigation={dict.navigation} />
     </>
   );
 }
