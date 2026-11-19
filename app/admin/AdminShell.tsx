@@ -17,6 +17,7 @@ import {
   Video,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 const NAV: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -37,8 +38,8 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   const ActiveIcon = activeItem.icon;
 
   async function logout() {
-    await fetch("/api/admin/auth", { method: "DELETE" });
-    router.push("/admin/login");
+    await authClient.signOut();
+    router.replace("/admin/login");
   }
 
   return (

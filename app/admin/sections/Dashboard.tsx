@@ -130,9 +130,9 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-medium text-muted-foreground">{stat.label}</p>
-                <p className="mt-1.5 text-2xl font-semibold tabular-nums text-[#3e2009]">
+                <div className="mt-1.5 text-2xl font-semibold tabular-nums text-[#3e2009]">
                   {stat.value === undefined ? stat.loading ? <Skeleton className="mt-1 h-7 w-14 rounded-none" /> : "—" : stat.value}
-                </p>
+                </div>
               </div>
               <span className="grid size-8 place-items-center border border-[#eadfd2] bg-[#fbf7f1] text-[#9e711a]"><Icon aria-hidden="true" className="size-4" /></span>
             </div>

@@ -8,9 +8,11 @@ import type { DataGridFeatures } from "@/components/reui/data-grid/data-grid";
 import { Button } from "@/components/ui/button";
 import { useCmsCollection, useSaveCmsCollection } from "@/lib/useCmsCollection";
 import { newsArticleSchema } from "@/lib/cmsSchemas";
+import { createSeoMetadata } from "@/lib/seoMetadata";
 import CloudinaryMediaPicker from "./CloudinaryMediaPicker";
 import RichTextEditor from "./RichTextEditor";
 import DataTable from "../components/DataTable";
+import ConfirmDeleteAction from "../components/ConfirmDeleteAction";
 
 type Article = {
   id: number;
@@ -41,6 +43,7 @@ export default function NewsEditor() {
 
   const serverSnapshot = useRef<string | null>(null);
   const serverRevision = useRef<number | null>(null);
+  const deleteLock = useRef(false);
   const query = useCmsCollection<{ en: Article[]; fr: Article[] }>("news");
   const saveCollection = useSaveCmsCollection<{ en: Article[]; fr: Article[] }>("news", () => serverRevision.current);
   useEffect(() => {
@@ -56,14 +59,60 @@ export default function NewsEditor() {
 
   function saveEditing() {
     if (!editing) return;
-    if (!newsArticleSchema.safeParse(editing).success) return;
+    const generated = createSeoMetadata(editing.title, editing.summary);
+    const articleToSave = {
+      ...editing,
+      slug: editing.slug?.trim() || generated.slug,
+      seoTitle: editing.seoTitle?.trim() || generated.seoTitle,
+      seoDescription: editing.seoDescription?.trim() || generated.seoDescription,
+    };
+    if (!newsArticleSchema.safeParse(articleToSave).success) return;
     setArticles((prev) => {
-      const idx = prev.findIndex((a) => a.id === editing.id);
-      if (idx >= 0) { const copy = [...prev]; copy[idx] = editing; return copy; }
-      return [{ ...editing, id: Date.now() }, ...prev];
+      const idx = prev.findIndex((a) => a.id === articleToSave.id);
+      if (idx >= 0) { const copy = [...prev]; copy[idx] = articleToSave; return copy; }
+      return [{ ...articleToSave, id: Date.now() }, ...prev];
     });
     setEditing(null);
   }
+
+  function updateEditingTitle(title: string) {
+    setEditing((current) => {
+      if (!current) return current;
+      const previousGenerated = createSeoMetadata(current.title, current.summary);
+      const nextGenerated = createSeoMetadata(title, current.summary);
+      return {
+        ...current,
+        title,
+        slug: !current.slug || current.slug === previousGenerated.slug ? nextGenerated.slug : current.slug,
+        seoTitle: !current.seoTitle || current.seoTitle === previousGenerated.seoTitle ? nextGenerated.seoTitle : current.seoTitle,
+      };
+    });
+  }
+
+  function updateEditingSummary(summary: string) {
+    setEditing((current) => {
+      if (!current) return current;
+      const previousGenerated = createSeoMetadata(current.title, current.summary);
+      const nextGenerated = createSeoMetadata(current.title, summary);
+      return {
+        ...current,
+        summary,
+        seoDescription: !current.seoDescription || current.seoDescription === previousGenerated.seoDescription
+          ? nextGenerated.seoDescription
+          : current.seoDescription,
+      };
+    });
+  }
+
+  const editArticle = useCallback((article: Article) => {
+    const generated = createSeoMetadata(article.title, article.summary);
+    setEditing({
+      ...article,
+      slug: article.slug?.trim() || generated.slug,
+      seoTitle: article.seoTitle?.trim() || generated.seoTitle,
+      seoDescription: article.seoDescription?.trim() || generated.seoDescription,
+    });
+  }, []);
 
   async function publish() {
     setSaving(true); setMsg("");
@@ -73,10 +122,31 @@ export default function NewsEditor() {
     setSaving(false);
   }
 
-  const deleteArticle = useCallback((id: number) => {
-    if (!confirm("Delete this article?")) return;
-    setArticles((prev) => prev.filter((a) => a.id !== id));
-  }, [setArticles]);
+  const deleteArticle = useCallback(async (id: number) => {
+    if (deleteLock.current) return false;
+    deleteLock.current = true;
+    setSaving(true);
+    setMsg("");
+    const payload = {
+      en: lang === "en" ? enArticles.filter((article) => article.id !== id) : enArticles,
+      fr: lang === "fr" ? frArticles.filter((article) => article.id !== id) : frArticles,
+    };
+    try {
+      const saved = await saveCollection.mutateAsync(payload);
+      setEnArticles(payload.en);
+      setFrArticles(payload.fr);
+      serverSnapshot.current = JSON.stringify(payload);
+      serverRevision.current = saved.revision;
+      setMsg("Article deleted.");
+      return true;
+    } catch (error) {
+      setMsg(error instanceof Error ? error.message : "Could not delete this article.");
+      return false;
+    } finally {
+      deleteLock.current = false;
+      setSaving(false);
+    }
+  }, [lang, enArticles, frArticles, saveCollection]);
 
   const columns = useMemo<ColumnDef<DataGridFeatures, Article>[]>(() => [
     {
@@ -141,11 +211,16 @@ export default function NewsEditor() {
       minSize: 160,
       maxSize: 160,
       cell: ({ row }) => <div className="flex gap-2">
-        <Button type="button" variant="outline" size="sm" className="rounded-none" onClick={() => setEditing(row.original)}>Edit</Button>
-        <Button type="button" variant="destructive" size="sm" className="rounded-none" onClick={() => deleteArticle(row.original.id)}>Delete</Button>
+        <Button type="button" variant="outline" size="sm" onClick={() => editArticle(row.original)}>Edit</Button>
+        <ConfirmDeleteAction
+          title="Are you sure?"
+          description={`You are about to delete the article “${row.original.title}”. This action cannot be undone.`}
+          disabled={saving}
+          onConfirm={() => deleteArticle(row.original.id)}
+        >Delete</ConfirmDeleteAction>
       </div>,
     },
-  ], [deleteArticle]);
+  ], [deleteArticle, editArticle, saving]);
 
   const validation = editing ? newsArticleSchema.safeParse(editing) : null;
 
@@ -220,8 +295,13 @@ export default function NewsEditor() {
               <p className="text-xs leading-5 text-gray-500 line-clamp-3">{a.summary}</p>
             </div>
             <div className="flex gap-2 border-t border-[#eadfd2] px-4 py-3">
-              <Button type="button" variant="outline" size="sm" className="rounded-none" onClick={() => setEditing(a)}>Edit</Button>
-              <Button type="button" variant="destructive" size="sm" className="rounded-none" onClick={() => deleteArticle(a.id)}>Delete</Button>
+              <Button type="button" variant="outline" size="sm" onClick={() => editArticle(a)}>Edit</Button>
+              <ConfirmDeleteAction
+                title="Are you sure?"
+                description={`You are about to delete the article “${a.title}”. This action cannot be undone.`}
+                disabled={saving}
+                onConfirm={() => deleteArticle(a.id)}
+              >Delete</ConfirmDeleteAction>
             </div>
           </article>
         ))}
@@ -237,9 +317,9 @@ export default function NewsEditor() {
             </h2>
             {[
               { key: "title",    label: "Title",     type: "text" },
-              { key: "slug", label: "URL slug", type: "text", placeholder: "leave blank to generate from title" },
-              { key: "seoTitle", label: "SEO title", type: "text", placeholder: "Optional, up to 70 characters" },
-              { key: "seoDescription", label: "SEO description", type: "text", placeholder: "Optional, up to 160 characters" },
+              { key: "slug", label: "URL slug", type: "text", placeholder: "Generated from the title" },
+              { key: "seoTitle", label: "SEO title", type: "text", placeholder: "Generated from the title (70 characters max)" },
+              { key: "seoDescription", label: "SEO description", type: "text", placeholder: "Generated from the summary (160 characters max)" },
               { key: "date",     label: "Date",      type: "text", placeholder: "DD/MM/YYYY" },
               { key: "tags",     label: "Tags",      type: "text", placeholder: "Tag1 | Tag2" },
               { key: "imageUrl", label: "Image URL", type: "text", placeholder: "/images/p5.jpg" },
@@ -248,14 +328,18 @@ export default function NewsEditor() {
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">{label}</label>
                 <input type={type} placeholder={placeholder}
                   value={(editing as unknown as Record<string, string>)[key] ?? ""}
-                  onChange={(e) => setEditing({ ...editing, [key]: e.target.value })}
+                  onChange={(e) => {
+                    if (key === "title") updateEditingTitle(e.target.value);
+                    else if (key === "summary") updateEditingSummary(e.target.value);
+                    else setEditing({ ...editing, [key]: e.target.value });
+                  }}
                   className="w-full px-3 py-2  border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#C9952A]" />
               </div>
             ))}
             <div className="mb-4">
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Summary</label>
               <textarea value={editing.summary} rows={3}
-                onChange={(e) => setEditing({ ...editing, summary: e.target.value })}
+                onChange={(e) => updateEditingSummary(e.target.value)}
                 className="w-full px-3 py-2  border border-gray-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#C9952A]" />
             </div>
             <div className="mb-4">

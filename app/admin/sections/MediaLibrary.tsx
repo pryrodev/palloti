@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import CloudinaryMediaPicker, { type MediaAsset } from "./CloudinaryMediaPicker";
+import Image from "next/image";
+import { FileText, Images, Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cmsQueryKeys } from "@/lib/useCmsCollection";
 import PaginationControls from "@/components/ui/PaginationControls";
+import CloudinaryMediaPicker, { type MediaAsset } from "./CloudinaryMediaPicker";
 
 type MediaPage = {
   items: MediaAsset[];
@@ -12,14 +15,23 @@ type MediaPage = {
 };
 
 const PAGE_SIZE = 24;
+const MEDIA_FILTERS = [
+  { value: "all", label: "All files" },
+  { value: "image", label: "Images" },
+  { value: "video", label: "Videos" },
+  { value: "raw", label: "Documents" },
+] as const;
 
 export default function MediaLibrary() {
   const client = useQueryClient();
   const [page, setPage] = useState(1);
+  const [resourceType, setResourceType] = useState<(typeof MEDIA_FILTERS)[number]["value"]>("all");
   const query = useQuery<MediaPage>({
-    queryKey: cmsQueryKeys.mediaPage(page, PAGE_SIZE),
+    queryKey: cmsQueryKeys.mediaPage(page, PAGE_SIZE, resourceType),
     queryFn: async ({ signal }) => {
-      const response = await fetch(`/api/admin/media?page=${page}&pageSize=${PAGE_SIZE}`, {
+      const params = new URLSearchParams({ page: String(page), pageSize: String(PAGE_SIZE) });
+      if (resourceType !== "all") params.set("resourceType", resourceType);
+      const response = await fetch(`/api/admin/media?${params}`, {
         credentials: "include",
         cache: "no-store",
         signal,
@@ -33,21 +45,47 @@ export default function MediaLibrary() {
 
   return <section>
     <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-      <div><h2 className="text-xl font-black text-[#3e2009]">Media Library</h2><p className="text-sm text-gray-500">Images, videos, and documents available to the CMS.</p></div>
+      <div>
+        <h2 className="text-xl font-black text-[#3e2009]">Media Library</h2>
+        <p className="text-sm text-gray-500">Images, videos, and documents available to the CMS.</p>
+      </div>
       <CloudinaryMediaPicker label="Upload or select media" onSelect={() => client.invalidateQueries({ queryKey: cmsQueryKeys.media })} />
     </div>
+
+    <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label="Filter media by file type">
+      {MEDIA_FILTERS.map((filter) => <Button
+        key={filter.value}
+        type="button"
+        size="sm"
+        variant={resourceType === filter.value ? "default" : "outline"}
+        aria-pressed={resourceType === filter.value}
+        onClick={() => { setResourceType(filter.value); setPage(1); }}
+      >
+        {filter.label}
+      </Button>)}
+    </div>
+
     {query.isLoading && <p className="text-sm text-gray-500">Loading media…</p>}
     {query.error && <p role="alert" className="text-sm text-red-700">{query.error.message}</p>}
-    {!query.isLoading && !query.error && pagination.total === 0 && <div className="border border-dashed border-[#d8cbbb] bg-white p-10 text-center text-sm text-gray-500">No Cloudinary assets have been added yet.</div>}
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-      {items.map((asset, index) => <article key={asset.id ?? asset.publicId} className="relative overflow-hidden border border-gray-100 bg-white shadow-sm">
+    {!query.isLoading && !query.error && pagination.total === 0 && <div className="border border-dashed border-[#d8cbbb] bg-white p-10 text-center text-sm text-gray-500">No media in this file type yet.</div>}
+
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      {items.map((asset, index) => <a key={asset.id ?? asset.publicId} href={asset.secureUrl} target="_blank" rel="noreferrer" aria-label={`Open media asset ${asset.publicId}`} className="relative block overflow-hidden border border-gray-100 bg-white shadow-sm transition-colors hover:border-[#C9952A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9952A]">
         <span className="absolute left-2 top-2 z-10 grid size-6 place-items-center border border-white/70 bg-[#3e2009]/85 text-[10px] font-bold tabular-nums text-white">{pagination.offset + index + 1}</span>
-        {asset.resourceType === "image" ? <img src={asset.secureUrl} alt={asset.publicId} className="aspect-square w-full object-cover" /> :
-          <div className="flex aspect-square items-center justify-center bg-[#f8f4ef] text-4xl">{asset.resourceType === "video" ? "▶" : "▤"}</div>}
-        <div className="p-3"><p className="truncate text-xs font-bold text-gray-800" title={asset.publicId}>{asset.publicId}</p><p className="mt-1 text-[10px] uppercase text-gray-400">{asset.provider ?? "cloudinary"} · {asset.resourceType}{asset.format ? ` · ${asset.format}` : ""}</p>
-          <a href={asset.secureUrl} target="_blank" rel="noreferrer" className="mt-2 block truncate text-xs text-[#8b5b1e] underline">Open asset</a></div>
-      </article>)}
+        {asset.resourceType === "image" ? <div className="relative aspect-square w-full"><Image src={asset.secureUrl} alt="Media image" fill unoptimized sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw" className="object-cover" /></div> :
+          <div className="flex aspect-square items-center justify-center bg-[#f8f4ef] text-[#5C3317]">
+            {asset.resourceType === "video" ? <Play aria-hidden="true" className="size-8" /> : <FileText aria-hidden="true" className="size-8" />}
+          </div>}
+        <div className="flex items-center justify-between gap-2 border-t border-gray-100 px-2 py-1.5">
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500">
+            {asset.resourceType === "image" ? <Images aria-hidden="true" className="size-3.5" /> : asset.resourceType === "video" ? <Play aria-hidden="true" className="size-3.5" /> : <FileText aria-hidden="true" className="size-3.5" />}
+            {asset.resourceType === "raw" ? "Document" : asset.resourceType === "image" ? "Image" : "Video"}
+          </span>
+          <span className="text-xs font-medium text-[#5C3317] underline underline-offset-2">Open</span>
+        </div>
+      </a>)}
     </div>
+
     {!query.isLoading && !query.error && <PaginationControls
       page={page}
       totalPages={pagination.totalPages}

@@ -14,21 +14,24 @@ export const getDictionary = cache(async function getDictionary(lang: string) {
   dictionary.theme = { ...DEFAULT_SITE_THEME };
   if (!process.env.DATABASE_URL) return dictionary;
   const locale = lang === "fr" ? "fr" : "en";
-  const [siteContent, news, communities, direction] = await Promise.allSettled([
-    getCmsCollection("siteContent"), getCmsCollection("news"), getCmsCollection("communities"), getCmsCollection("direction"),
-  ]);
-  if (siteContent.status === "fulfilled") {
-    Object.assign(dictionary, siteContent.value[locale]);
-    dictionary.theme = siteContent.value.theme;
+  // Keep one database read in flight per server render to avoid exhausting the
+  // MySQL pool when several public pages render at the same time.
+  const siteContent = await getCmsCollection("siteContent").catch(() => null);
+  const news = await getCmsCollection("news").catch(() => null);
+  const communities = await getCmsCollection("communities").catch(() => null);
+  const direction = await getCmsCollection("direction").catch(() => null);
+  if (siteContent) {
+    Object.assign(dictionary, siteContent[locale]);
+    dictionary.theme = siteContent.theme;
   }
-  if (news.status === "fulfilled") {
-    const articles = news.value[locale];
+  if (news) {
+    const articles = news[locale];
     dictionary.newsSection.articles = articles as Dictionary["newsSection"]["articles"];
     dictionary.home.newsItems = articles.slice(0, 6).map((article) => ({
       date: article.date, tags: article.tags, title: article.title, excerpt: article.summary, image: article.imageUrl,
     })) as Dictionary["home"]["newsItems"];
   }
-  if (communities.status === "fulfilled") dictionary.communities.items = communities.value[locale] as Dictionary["communities"]["items"];
-  if (direction.status === "fulfilled") dictionary.direction.members = direction.value[locale] as Dictionary["direction"]["members"];
+  if (communities) dictionary.communities.items = communities[locale] as Dictionary["communities"]["items"];
+  if (direction) dictionary.direction.members = direction[locale] as Dictionary["direction"]["members"];
   return dictionary;
 });

@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useCmsCollection, useSaveCmsCollection } from "@/lib/useCmsCollection";
 import PaginationControls from "@/components/ui/PaginationControls";
 import CloudinaryMediaPicker from "./CloudinaryMediaPicker";
+import { Trash2 } from "lucide-react";
+import ConfirmDeleteAction from "../components/ConfirmDeleteAction";
 
 type GalleryItem = { src: string; title: string; sub: string };
 
@@ -14,6 +17,7 @@ export default function GalleryEditor() {
   const [saving, setSaving] = useState(false);
   const serverSnapshot = useRef<string | null>(null);
   const serverRevision = useRef<number | null>(null);
+  const deleteLock = useRef(false);
   const query = useCmsCollection<GalleryItem[]>("gallery");
   const saveCollection = useSaveCmsCollection<GalleryItem[]>("gallery", () => serverRevision.current);
   const pageSize = 24;
@@ -40,6 +44,27 @@ export default function GalleryEditor() {
     finally { setSaving(false); }
   }
 
+  async function deletePhoto(index: number) {
+    if (deleteLock.current) return false;
+    deleteLock.current = true;
+    const nextItems = items.filter((_, itemIndex) => itemIndex !== index);
+    setSaving(true); setMessage("");
+    try {
+      const saved = await saveCollection.mutateAsync(nextItems);
+      setItems(nextItems);
+      serverSnapshot.current = JSON.stringify(nextItems);
+      serverRevision.current = saved.revision;
+      setMessage("Photo deleted.");
+      return true;
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not delete this photo.");
+      return false;
+    } finally {
+      deleteLock.current = false;
+      setSaving(false);
+    }
+  }
+
   return <div>
     <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
       <p className="text-sm text-gray-500">{items.length} photos</p>
@@ -56,10 +81,23 @@ export default function GalleryEditor() {
         const index = offset + pageIndex;
         return <div key={`${item.src}-${index}`} className="group relative overflow-hidden border border-gray-100 bg-white shadow-sm">
         <span className="absolute left-2 top-2 z-10 grid size-6 place-items-center border border-white/70 bg-[#3e2009]/85 text-[10px] font-bold tabular-nums text-white">{index + 1}</span>
-        <img src={item.src} alt={item.title} className="aspect-square w-full object-cover" />
+        <div className="relative aspect-square w-full">
+          <Image src={item.src} alt={item.title} fill unoptimized sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw" loading={index === 0 ? "eager" : "lazy"} className="object-cover" />
+        </div>
         <div className="p-2"><input aria-label="Photo title" value={item.title} onChange={(event) => setItems((previous) => previous.map((entry, i) => i === index ? { ...entry, title: event.target.value } : entry))} className="w-full truncate border-none bg-transparent text-xs font-bold text-gray-700 outline-none" />
           <input aria-label="Photo subtitle" value={item.sub} onChange={(event) => setItems((previous) => previous.map((entry, i) => i === index ? { ...entry, sub: event.target.value } : entry))} className="w-full border-none bg-transparent text-[10px] text-gray-400 outline-none" /></div>
-        <button type="button" aria-label="Remove photo" onClick={() => setItems((previous) => previous.filter((_, i) => i !== index))} className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center  bg-red-600 text-white opacity-0 transition-opacity group-hover:opacity-100">×</button>
+        <ConfirmDeleteAction
+          title="Are you sure?"
+          description={`You are about to delete the photo “${item.title}”. This action cannot be undone.`}
+          confirmLabel="Delete"
+          triggerAriaLabel={`Remove photo ${item.title || index + 1}`}
+          triggerSize="icon-sm"
+          disabled={saving}
+          className="absolute right-1 top-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100"
+          onConfirm={() => deletePhoto(index)}
+        >
+          <Trash2 aria-hidden="true" />
+        </ConfirmDeleteAction>
       </div>;
       })}
     </div>
