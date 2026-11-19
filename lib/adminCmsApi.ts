@@ -4,8 +4,18 @@ import { isAuthenticated, unauthorized } from "@/lib/adminAuth";
 import { CmsRevisionConflictError, getCmsCollectionPage, saveCmsCollection } from "@/lib/cmsRepository";
 import type { CmsCollectionKey } from "@/lib/cmsSchemas";
 
+async function authorizeAdminRequest(req: NextRequest) {
+  try {
+    return await isAuthenticated(req) ? null : unauthorized();
+  } catch (error) {
+    console.error("CMS authentication check failed", error);
+    return NextResponse.json({ error: "CMS authentication is temporarily unavailable" }, { status: 503 });
+  }
+}
+
 export async function getAdminCollection(req: NextRequest, key: CmsCollectionKey) {
-  if (!isAuthenticated(req)) return unauthorized();
+  const authorizationError = await authorizeAdminRequest(req);
+  if (authorizationError) return authorizationError;
   const page = Number(req.nextUrl.searchParams.get("page") ?? "1");
   const pageSize = Number(req.nextUrl.searchParams.get("pageSize") ?? "100");
   if (!Number.isSafeInteger(page) || page < 1 || !Number.isSafeInteger(pageSize) || pageSize < 1 || pageSize > 500) {
@@ -32,7 +42,8 @@ export async function getAdminCollection(req: NextRequest, key: CmsCollectionKey
 }
 
 export async function putAdminCollection(req: NextRequest, key: CmsCollectionKey) {
-  if (!isAuthenticated(req)) return unauthorized();
+  const authorizationError = await authorizeAdminRequest(req);
+  if (authorizationError) return authorizationError;
   let payload: unknown;
   try {
     const revisionHeader = req.headers.get("if-match");

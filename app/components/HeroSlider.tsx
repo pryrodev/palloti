@@ -167,9 +167,9 @@ export default function HeroSlider({
           <div className="absolute bottom-5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-2 bg-[var(--red-dk)]/50 px-3 py-2 backdrop-blur-sm sm:bottom-7">
             {slides.map((slide, i) => (
               <button
-                key={`dot-${slide.image}`}
+                key={`slide-indicator-${slide.image}`}
                 onClick={() => goTo(i)}
-                className="h-2  transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold-lt)] motion-reduce:transition-none"
+                className="h-2 rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold-lt)] motion-reduce:transition-none"
                 style={{ width: i === current ? "1.75rem" : "0.5rem", background: i === current ? "var(--gold-lt)" : "rgba(255,255,255,0.65)" }}
                 aria-label={lang === "fr" ? `Aller à la diapositive ${i + 1}` : `Go to slide ${i + 1}`}
                 aria-current={i === current ? "true" : undefined}

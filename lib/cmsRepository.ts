@@ -48,10 +48,14 @@ export async function getCmsCollectionPage(
   pageSize: number,
   expectedRevision?: number,
 ): Promise<CmsCollectionPage> {
-  return prisma.$transaction(async (tx) => {
-    const collection = await tx.cmsCollection.findUnique({
+  // Reads must not hold an interactive transaction open while doing paginated
+  // queries. Prisma serializes queries on a transaction connection, and its
+  // default interactive transaction timeout is five seconds. The revision
+  // check below gives us a consistent view without that long-lived transaction.
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const collection = await prisma.cmsCollection.findUnique({
       where: { key },
-      select: { revision: true },
+      select: { revision: true, payload: true },
     });
     if (!collection) throw new Error(`CMS collection '${key}' has not been seeded`);
     if (expectedRevision !== undefined && collection.revision !== expectedRevision) {
@@ -59,49 +63,54 @@ export async function getCmsCollectionPage(
     }
 
     if (key === "siteContent") {
-      const siteContentCollection = await tx.cmsCollection.findUnique({ where: { key }, select: { payload: true } });
-      if (!siteContentCollection) throw new Error(`CMS collection '${key}' has not been seeded`);
       return {
-        data: cmsSchemas.siteContent.parse(siteContentCollection.payload),
+        data: cmsSchemas.siteContent.parse(collection.payload),
         pagination: pageInfo(1, 1, 1),
         revision: collection.revision,
       };
     }
 
-    const recordWhere = { collectionKey: key };
-    if (await tx.cmsRecord.count({ where: recordWhere }) === 0) {
-      const legacyCollection = await tx.cmsCollection.findUnique({ where: { key }, select: { payload: true } });
-      if (!legacyCollection) throw new Error(`CMS collection '${key}' has not been seeded`);
-      const legacyRecords = cmsRecordsFor(key, cmsSchemas[key].parse(legacyCollection.payload) as never);
-      for (let start = 0; start < legacyRecords.length; start += 250) {
-        await tx.cmsRecord.createMany({ data: legacyRecords.slice(start, start + 250) as never, skipDuplicates: true });
-      }
-    }
+    const legacyPayload = cmsSchemas[key].parse(collection.payload) as never;
 
     if (key === "news" || key === "communities" || key === "direction") {
-      const [enRows, frRows, enTotal, frTotal] = await Promise.all([
-        tx.cmsRecord.findMany({ where: { collectionKey: key, locale: "en" }, orderBy: [{ position: "asc" }, { id: "asc" }], skip: (page - 1) * pageSize, take: pageSize, select: { payload: true } }),
-        tx.cmsRecord.findMany({ where: { collectionKey: key, locale: "fr" }, orderBy: [{ position: "asc" }, { id: "asc" }], skip: (page - 1) * pageSize, take: pageSize, select: { payload: true } }),
-        tx.cmsRecord.count({ where: { collectionKey: key, locale: "en" } }),
-        tx.cmsRecord.count({ where: { collectionKey: key, locale: "fr" } }),
-      ]);
+      const legacyLists = legacyPayload as { en: unknown[]; fr: unknown[] };
+      const localized = {} as Record<"en" | "fr", { data: unknown[]; pagination: CmsPageInfo }>;
+      for (const locale of ["en", "fr"] as const) {
+        const where = { collectionKey: key, locale };
+        const total = await prisma.cmsRecord.count({ where });
+        const rows = total === 0 ? [] : await prisma.cmsRecord.findMany({ where, orderBy: [{ position: "asc" }, { id: "asc" }], skip: (page - 1) * pageSize, take: pageSize, select: { payload: true } });
+        const fallback = legacyLists[locale];
+        localized[locale] = {
+          data: total === 0 ? fallback.slice((page - 1) * pageSize, page * pageSize) : rows.map((row) => row.payload),
+          pagination: pageInfo(page, pageSize, total === 0 ? fallback.length : total),
+        };
+      }
+      const current = await prisma.cmsCollection.findUnique({ where: { key }, select: { revision: true } });
+      if (current?.revision !== collection.revision) continue;
       return {
-        data: {
-          en: enRows.map((row) => row.payload),
-          fr: frRows.map((row) => row.payload),
-        },
-        pagination: { en: pageInfo(page, pageSize, enTotal), fr: pageInfo(page, pageSize, frTotal) },
+        data: { en: localized.en.data, fr: localized.fr.data },
+        pagination: { en: localized.en.pagination, fr: localized.fr.pagination },
         revision: collection.revision,
       };
     }
 
     const where = { collectionKey: key, locale: "all" };
-    const [rows, total] = await Promise.all([
-      tx.cmsRecord.findMany({ where, orderBy: [{ position: "asc" }, { id: "asc" }], skip: (page - 1) * pageSize, take: pageSize, select: { payload: true } }),
-      tx.cmsRecord.count({ where }),
-    ]);
-    return { data: rows.map((row) => row.payload), pagination: pageInfo(page, pageSize, total), revision: collection.revision };
-  });
+    const total = await prisma.cmsRecord.count({ where });
+    const rows = total === 0 ? [] : await prisma.cmsRecord.findMany({ where, orderBy: [{ position: "asc" }, { id: "asc" }], skip: (page - 1) * pageSize, take: pageSize, select: { payload: true } });
+    const legacyList = legacyPayload as unknown[];
+    const current = await prisma.cmsCollection.findUnique({ where: { key }, select: { revision: true } });
+    if (current?.revision !== collection.revision) continue;
+    return {
+      data: total === 0 ? legacyList.slice((page - 1) * pageSize, page * pageSize) : rows.map((row) => row.payload),
+      pagination: pageInfo(page, pageSize, total === 0 ? legacyList.length : total),
+      revision: collection.revision,
+    };
+  }
+  const current = await prisma.cmsCollection.findUnique({ where: { key }, select: { revision: true } });
+  if (expectedRevision !== undefined && current && current.revision !== expectedRevision) {
+    throw new CmsRevisionConflictError(current.revision);
+  }
+  throw new Error(`CMS collection '${key}' changed repeatedly while it was being read`);
 }
 
 export async function saveCmsCollection<K extends CmsCollectionKey>(
@@ -134,5 +143,12 @@ export async function saveCmsCollection<K extends CmsCollectionKey>(
       where: { key },
       select: { revision: true, updatedAt: true },
     });
+  }, {
+    // Replacing the collection payload and its indexed records is one atomic
+    // write. The default 5s interactive-transaction timeout is too short when
+    // the local MySQL pool is busy, and Prisma then closes the transaction
+    // while the callback is still issuing queries.
+    maxWait: 10_000,
+    timeout: 20_000,
   });
 }

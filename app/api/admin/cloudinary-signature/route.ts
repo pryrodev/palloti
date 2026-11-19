@@ -3,7 +3,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { isAuthenticated, unauthorized } from "@/lib/adminAuth";
 
 export async function POST(req: NextRequest) {
-  if (!isAuthenticated(req)) return unauthorized();
+  if (!(await isAuthenticated(req))) return unauthorized();
   if (!process.env.CLOUDINARY_API_SECRET || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_CLOUD_NAME) {
     return NextResponse.json({ error: "Cloudinary is not configured" }, { status: 503 });
   }

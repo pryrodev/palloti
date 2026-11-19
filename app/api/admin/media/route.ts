@@ -15,7 +15,7 @@ const assetSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  if (!isAuthenticated(req)) return unauthorized();
+  if (!(await isAuthenticated(req))) return unauthorized();
   const page = Number(req.nextUrl.searchParams.get("page") ?? "1");
   const pageSize = Number(req.nextUrl.searchParams.get("pageSize") ?? "24");
   const resourceType = req.nextUrl.searchParams.get("resourceType");
@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  if (!isAuthenticated(req)) return unauthorized();
+  if (!(await isAuthenticated(req))) return unauthorized();
   const parsed = assetSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Invalid media metadata", issues: parsed.error.issues }, { status: 400 });
   try {
