@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import enDictionary from "@/dictionaries/en.json";
 import frDictionary from "@/dictionaries/fr.json";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ type Locale = "en" | "fr";
 type TextField = { path: (string | number)[]; label: string; value: string };
 type HeroSlide = { image: string; location: string; title: string; subtitle: string };
 type EditableDictionary = Record<string, unknown> & {
-  home: Record<string, unknown> & { heroSlides: HeroSlide[] };
+  home: Record<string, unknown> & { heroSlides: HeroSlide[]; rectorImage: string };
 };
 type SiteContent = Omit<CmsPayload<"siteContent">, "en" | "fr"> & { en: EditableDictionary; fr: EditableDictionary };
 
@@ -30,6 +31,7 @@ const DYNAMIC_CONTENT_PATHS = new Set([
   "direction.members",
   "home.newsItems",
   "home.heroSlides",
+  "home.rectorImage",
 ]);
 
 function collectTextFields(value: unknown, path: (string | number)[] = []): TextField[] {
@@ -124,6 +126,10 @@ export default function SiteContentEditor() {
         home: { ...current[locale].home, heroSlides: slides },
       },
     }));
+  }
+
+  function updateRectorImage(image: string) {
+    updateCopy(["home", "rectorImage"], image);
   }
 
   async function save() {
@@ -243,6 +249,22 @@ export default function SiteContentEditor() {
             </p>
 
             {!search && activeSection === "home" && <Frame spacing="sm" stacked className="[--frame-radius:0px] [--frame-panel-radius:0px]">
+              <FramePanel fit>
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="relative h-28 w-24 shrink-0 border border-border bg-muted">
+                    <Image src={draft[locale].home.rectorImage} alt="Provincial Rector" fill sizes="96px" unoptimized className="object-cover object-top" />
+                  </div>
+                  <div className="flex min-w-0 flex-1 flex-col gap-2">
+                    <div>
+                      <h3 className="text-sm font-semibold text-foreground">Rector portrait</h3>
+                      <p className="max-w-md break-all text-xs text-muted-foreground">{draft[locale].home.rectorImage}</p>
+                    </div>
+                    <div>
+                      <CloudinaryMediaPicker label="Choose portrait" resourceType="image" onSelect={(asset) => updateRectorImage(asset.secureUrl || asset.url)} />
+                    </div>
+                  </div>
+                </div>
+              </FramePanel>
               <FramePanel fit>
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
