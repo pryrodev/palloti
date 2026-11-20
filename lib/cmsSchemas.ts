@@ -100,7 +100,27 @@ const heroSlideSchema = z.object({
   title: nonEmptyText.max(500),
   subtitle: z.string().max(1000),
 });
-const siteContentSchema = z.object({
+const siteContentSchema = z.preprocess((input) => {
+  if (typeof input !== "object" || input === null || Array.isArray(input)) return input;
+  const content = input as Record<string, unknown>;
+  const withRectorImageDefault = { ...content };
+  for (const [locale, defaults] of [["en", enDictionary], ["fr", frDictionary]] as const) {
+    const localized = content[locale];
+    if (typeof localized !== "object" || localized === null || Array.isArray(localized)) continue;
+    const localizedRecord = localized as Record<string, unknown>;
+    const home = localizedRecord.home;
+    if (typeof home !== "object" || home === null || Array.isArray(home)) continue;
+    const homeRecord = home as Record<string, unknown>;
+    withRectorImageDefault[locale] = {
+      ...localizedRecord,
+      home: {
+        ...homeRecord,
+        rectorImage: homeRecord.rectorImage ?? defaults.home.rectorImage,
+      },
+    };
+  }
+  return withRectorImageDefault;
+}, z.object({
   en: dictionaryCopySchema,
   fr: z.record(z.string(), z.unknown()).refine((value) => hasSameShape(value, frDictionary), "French dictionary structure cannot be changed"),
   theme: siteThemeSchema,
@@ -113,7 +133,7 @@ const siteContentSchema = z.object({
     const result = z.array(heroSlideSchema).min(1).max(12).safeParse(slides);
     if (!result.success) context.addIssue({ code: "custom", path: [locale, "home", "heroSlides"], message: "Each language needs 1–12 complete hero slides" });
   }
-});
+}));
 
 export const cmsSchemas = {
   gallery: z.array(galleryItemSchema).max(5000),

@@ -60,7 +60,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
               <div className="w-full max-w-sm sm:max-w-md  overflow-hidden border-2 border-[var(--gold)]/50 shadow-xl bg-white">
                 <div className="relative w-full aspect-[4/5] max-h-[480px] bg-white">
                   <Image
-                    src="/images/eugene.jpg"
+                    src={dict.home.rectorImage}
                     alt={dict.home.rectorName}
                     fill
                     sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 450px"
