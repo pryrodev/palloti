@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import enDictionary from "@/dictionaries/en.json";
 import frDictionary from "@/dictionaries/fr.json";
+import itDictionary from "@/dictionaries/it.json";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Frame, FramePanel } from "@/components/reui/frame";
@@ -16,7 +17,7 @@ import { Award, BookOpen, Church, Globe, Heart, Landmark, MapPin, Plus, Trash2, 
 import ConfirmDeleteAction from "../components/ConfirmDeleteAction";
 import RichTextEditor from "./RichTextEditor";
 
-type Locale = "en" | "fr";
+type Locale = "en" | "fr" | "it";
 type TextField = { path: (string | number)[]; label: string; value: string };
 type HeroSlide = { image: string; location: string; title: string; subtitle: string };
 type RectorTextField = "welcomeBadge" | "welcomeTitle" | "rectorName" | "rectorTitle" | "rectorQuote";
@@ -71,11 +72,12 @@ type EditableDictionary = Record<string, unknown> & {
   home: HomeContent;
   founder?: FounderContent;
 };
-type SiteContent = Omit<CmsPayload<"siteContent">, "en" | "fr"> & { en: EditableDictionary; fr: EditableDictionary };
+type SiteContent = Omit<CmsPayload<"siteContent">, "en" | "fr"> & { en: EditableDictionary; fr: EditableDictionary; it: EditableDictionary };
 
 const DEFAULT_CONTENT: SiteContent = {
   en: enDictionary as unknown as EditableDictionary,
   fr: frDictionary as unknown as EditableDictionary,
+  it: itDictionary as unknown as EditableDictionary,
   theme: { ...DEFAULT_SITE_THEME },
 };
 const DYNAMIC_CONTENT_PATHS = new Set([
@@ -249,15 +251,19 @@ export default function SiteContentEditor() {
 
   useEffect(() => {
     if (!query.data) return;
-    const incoming = JSON.stringify(query.data);
+    const incomingData: SiteContent = {
+      ...query.data,
+      it: query.data.it ?? (itDictionary as unknown as EditableDictionary),
+    };
+    const incoming = JSON.stringify(incomingData);
     const currentDraft = JSON.stringify(draft);
     if (serverSnapshot.current === null) {
-      setDraft(query.data);
+      setDraft(incomingData);
       serverSnapshot.current = incoming;
       serverRevision.current = query.revision ?? null;
     } else if (currentDraft === serverSnapshot.current) {
       if (incoming !== serverSnapshot.current) {
-        setDraft(query.data);
+        setDraft(incomingData);
         serverSnapshot.current = incoming;
       }
       serverRevision.current = query.revision ?? serverRevision.current;
@@ -389,7 +395,7 @@ export default function SiteContentEditor() {
             </Button>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {(["en", "fr"] as const).map((item) => (
+            {(["en", "fr", "it"] as const).map((item) => (
               <Button key={item} type="button" size="sm" variant={locale === item ? "default" : "outline"} aria-pressed={locale === item} onClick={() => setLocale(item)}>
                 {item.toUpperCase()}
               </Button>
@@ -770,6 +776,48 @@ export default function SiteContentEditor() {
                 </div>
               </FramePanel>
             </Frame>}
+
+            {(activeSection === "contactPage" || activeSection === "footer") && !search.trim() && (
+              <Frame spacing="sm" stacked className="[--frame-radius:0px] [--frame-panel-radius:0px]">
+                <FramePanel fit>
+                  <div className="mb-3 border-b border-border pb-2">
+                    <h3 className="text-sm font-semibold text-foreground">Contact Email & Phone Numbers</h3>
+                    <p className="text-xs text-muted-foreground">
+                      Official email address, telephone numbers, and office location displayed on the Contact page and site footer.
+                    </p>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <label className="block text-xs font-medium text-muted-foreground">
+                      Contact Email
+                      <input
+                        value={String((draft[locale] as Record<string, any>)?.footer?.email ?? "")}
+                        onChange={(e) => updateCopy(["footer", "email"], e.target.value)}
+                        placeholder="e.g. contact@sac-psf.org"
+                        className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+                      />
+                    </label>
+                    <label className="block text-xs font-medium text-muted-foreground">
+                      Phone Number(s) (separate multiple with /)
+                      <input
+                        value={String((draft[locale] as Record<string, any>)?.footer?.phone ?? "")}
+                        onChange={(e) => updateCopy(["footer", "phone"], e.target.value)}
+                        placeholder="e.g. +250 788 307 271 / +250 788 381 737"
+                        className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+                      />
+                    </label>
+                    <label className="block text-xs font-medium text-muted-foreground sm:col-span-2">
+                      Office Physical Address
+                      <input
+                        value={String((draft[locale] as Record<string, any>)?.footer?.address ?? "")}
+                        onChange={(e) => updateCopy(["footer", "address"], e.target.value)}
+                        placeholder="e.g. Gikondo - 1083 Kigali, Rwanda"
+                        className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+                      />
+                    </label>
+                  </div>
+                </FramePanel>
+              </Frame>
+            )}
 
             {fieldGroups.size > 0 ? <Frame spacing="sm" stacked className="[--frame-radius:0px] [--frame-panel-radius:0px]">
               {[...fieldGroups.entries()].map(([group, fields]) => (

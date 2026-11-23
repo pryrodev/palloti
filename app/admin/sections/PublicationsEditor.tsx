@@ -9,9 +9,9 @@ import CloudinaryMediaPicker from "./CloudinaryMediaPicker";
 import PaginationControls from "@/components/ui/PaginationControls";
 import ConfirmDeleteAction from "../components/ConfirmDeleteAction";
 
-type Book = { id: number; slug?: string; number: string; title: string; seoTitle?: string; seoDescription?: string; subtitle: string; description: string; color: string; titleColor: string; subtitleColor: string; url: string };
+type Book = { id: number; slug?: string; number: string; title: string; seoTitle?: string; seoDescription?: string; subtitle: string; description: string; color?: string; titleColor?: string; subtitleColor?: string; url?: string; coverImage?: string; fileType?: "pdf" | "image" };
 const COLORS = ["#5C3317", "#3A1F0A", "#7A4520", "#C9952A", "#2C4A1E", "#1A3A5C", "#4A2060", "#1A4A3A"];
-const EMPTY: Omit<Book, "id" | "number" | "url"> = { slug: "", title: "", seoTitle: "", seoDescription: "", subtitle: "Document", description: "", color: COLORS[0], titleColor: "#ffffff", subtitleColor: "#C9952A" };
+const EMPTY: Omit<Book, "id" | "number"> = { slug: "", title: "", seoTitle: "", seoDescription: "", subtitle: "Document", description: "", color: COLORS[0], titleColor: "#ffffff", subtitleColor: "#C9952A", url: "", coverImage: "", fileType: "pdf" };
 
 function getDownloadUrl(value: string) {
   try {
@@ -156,12 +156,24 @@ export default function PublicationsEditor() {
     {query.error && <p role="alert" className="mb-4 text-sm text-red-700">{query.error.message}</p>}
     <div className="grid grid-cols-1 gap-4 min-[540px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 sm:gap-6">{visibleBooks.map((book, pageIndex) => <article key={book.id} className="relative overflow-hidden border border-gray-100 bg-white shadow-sm">
       <span className="absolute right-2 top-2 z-10 grid size-6 place-items-center border border-white/70 bg-[#3e2009]/85 text-[10px] font-bold tabular-nums text-white">{offset + pageIndex + 1}</span>
-      <div className="flex min-h-44 flex-col justify-between gap-3 p-4" style={{ background: book.color }}><p className="text-xs uppercase tracking-widest" style={{ color: book.subtitleColor }}>PSF / {book.number}</p><p className="line-clamp-3 text-sm font-bold leading-5" style={{ color: book.titleColor }}>{book.title}</p><p className="text-xs font-medium uppercase leading-5 tracking-wider" style={{ color: book.subtitleColor }}>{book.subtitle}</p></div>
+      {book.coverImage ? (
+        <div className="relative h-44 w-full bg-gray-100">
+          <img src={book.coverImage} alt={book.title} className="h-full w-full object-cover" />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-3">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-amber-300">PSF / {book.number}</p>
+            <p className="line-clamp-2 text-xs font-bold text-white">{book.title}</p>
+          </div>
+        </div>
+      ) : (
+        <div className="flex min-h-44 flex-col justify-between gap-3 p-4" style={{ background: book.color ?? COLORS[0] }}><p className="text-xs uppercase tracking-widest" style={{ color: book.subtitleColor ?? "#C9952A" }}>PSF / {book.number}</p><p className="line-clamp-3 text-sm font-bold leading-5" style={{ color: book.titleColor ?? "#ffffff" }}>{book.title}</p><p className="text-xs font-medium uppercase leading-5 tracking-wider" style={{ color: book.subtitleColor ?? "#C9952A" }}>{book.subtitle}</p></div>
+      )}
       <div className="flex flex-wrap items-center gap-2 p-3">
         <Button type="button" variant="outline" size="sm" onClick={() => editPublication(book)}>Edit</Button>
-        <Button nativeButton={false} render={<a href={getDownloadUrl(book.url)} download />} type="button" variant="outline" size="sm">
-          <Download data-icon="inline-start" />Download
-        </Button>
+        {book.url && (
+          <Button nativeButton={false} render={<a href={getDownloadUrl(book.url)} download target="_blank" rel="noopener noreferrer" />} type="button" variant="outline" size="sm">
+            <Download data-icon="inline-start" />Download
+          </Button>
+        )}
         <ConfirmDeleteAction
           title="Are you sure?"
           description={`You are about to delete the publication “${book.title}”. This action cannot be undone.`}
@@ -179,10 +191,81 @@ export default function PublicationsEditor() {
         if (field === "title") updatePublicationTitle(value);
         else if (field === "description") updatePublicationDescription(value);
         else setEditing({ ...editing, [field]: value });
-      }} className="mt-1 w-full  border border-gray-200 px-3 py-2 text-sm text-gray-800" /></label>)}
-      <div className="mb-4 flex items-center gap-3"><span className="text-xs font-bold text-gray-500">PDF/document</span><CloudinaryMediaPicker label="Choose from media" resourceType="raw" onSelect={(asset) => setEditing({ ...editing, url: asset.secureUrl })} /></div>
-      <div className="mb-4 flex flex-wrap gap-2">{COLORS.map((color) => <button key={color} onClick={() => setEditing({ ...editing, color })} aria-label={`Cover color ${color}`} className="h-8 w-8 cursor-pointer border-2 transition-all duration-150 ease-out hover:scale-110 active:scale-95" style={{ background: color, borderColor: editing.color === color ? "#C9952A" : "transparent" }} />)}</div>
-      <div className="flex justify-end gap-3">
+      }} className="mt-1 w-full border border-gray-200 px-3 py-2 text-sm text-gray-800" /></label>)}
+      
+      <div className="mb-4">
+        <label className="mb-1 block text-xs font-bold text-gray-500">Cover image (optional)</label>
+        <div className="flex items-center gap-3">
+          {editing.coverImage && (
+            <img src={editing.coverImage} alt="Cover preview" className="h-16 w-12 border border-gray-200 object-cover" />
+          )}
+          <CloudinaryMediaPicker
+            label={editing.coverImage ? "Change cover image" : "Choose cover image"}
+            resourceType="image"
+            onSelect={(asset) => setEditing({ ...editing, coverImage: asset.secureUrl || asset.url })}
+          />
+          {editing.coverImage && (
+            <button
+              type="button"
+              onClick={() => setEditing({ ...editing, coverImage: "" })}
+              className="text-xs text-red-600 underline hover:text-red-800"
+            >
+              Remove
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <div className="mb-1 flex items-center justify-between">
+          <label className="text-xs font-bold text-gray-500">Document attachment</label>
+          <div className="flex gap-2 text-xs">
+            <button
+              type="button"
+              onClick={() => setEditing({ ...editing, fileType: "pdf" })}
+              className={`px-2 py-0.5 font-bold cursor-pointer ${editing.fileType !== "image" ? "bg-[#5C3317] text-white" : "bg-gray-100 text-gray-600"}`}
+            >
+              PDF
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditing({ ...editing, fileType: "image" })}
+              className={`px-2 py-0.5 font-bold cursor-pointer ${editing.fileType === "image" ? "bg-[#5C3317] text-white" : "bg-gray-100 text-gray-600"}`}
+            >
+              Image
+            </button>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          {editing.fileType === "image" ? (
+            <CloudinaryMediaPicker
+              label={editing.url ? "Change document image" : "Upload document image"}
+              resourceType="image"
+              onSelect={(asset) => setEditing({ ...editing, url: asset.secureUrl || asset.url, fileType: "image" })}
+            />
+          ) : (
+            <CloudinaryMediaPicker
+              label={editing.url ? "Change PDF document" : "Select PDF document"}
+              resourceType="raw"
+              onSelect={(asset) => setEditing({ ...editing, url: asset.secureUrl || asset.url, fileType: "pdf" })}
+            />
+          )}
+          {editing.url && (
+            <span className="truncate text-xs text-gray-500 max-w-[160px]" title={editing.url}>
+              {editing.url.split("/").pop()}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {!editing.coverImage && (
+        <div className="mb-4">
+          <span className="mb-1 block text-xs font-bold text-gray-500">Fallback cover color</span>
+          <div className="flex flex-wrap gap-2">{COLORS.map((color) => <button key={color} type="button" onClick={() => setEditing({ ...editing, color })} aria-label={`Cover color ${color}`} className="h-8 w-8 cursor-pointer border-2 transition-all duration-150 ease-out hover:scale-110 active:scale-95" style={{ background: color, borderColor: editing.color === color ? "#C9952A" : "transparent" }} />)}</div>
+        </div>
+      )}
+
+      <div className="flex justify-end gap-3 mt-4">
         <button onClick={() => setEditing(null)} className="cursor-pointer bg-gray-100 px-4 py-2 text-sm font-bold text-gray-700 transition-all duration-150 ease-out hover:bg-gray-200 active:scale-95">Cancel</button>
         <button onClick={applyPublication} className="cursor-pointer bg-[#5C3317] px-4 py-2 text-sm font-black text-white shadow-xs transition-all duration-150 ease-out hover:bg-[#482812] hover:shadow-md active:scale-95">Apply</button>
       </div>

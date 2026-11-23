@@ -36,47 +36,50 @@ export default function CommunitiesEditor() {
   const [page, setPage] = useState(1);
   const [enItems, setEnItems] = useState<Community[]>([]);
   const [frItems, setFrItems] = useState<Community[]>([]);
-  const [lang, setLang] = useState<"en" | "fr">("en");
+  const [itItems, setItItems] = useState<Community[]>([]);
+  const [lang, setLang] = useState<"en" | "fr" | "it">("en");
   const [editing, setEditing] = useState<Community | null>(null);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const serverSnapshot = useRef<string | null>(null);
   const serverRevision = useRef<number | null>(null);
 
-  const items = lang === "en" ? enItems : frItems;
-  const setItems = lang === "en" ? setEnItems : setFrItems;
+  const items = lang === "en" ? enItems : lang === "fr" ? frItems : itItems;
+  const setItems = lang === "en" ? setEnItems : lang === "fr" ? setFrItems : setItItems;
   const pageSize = 12;
   const totalPages = Math.max(1, Math.ceil(items.length / pageSize));
   const activePage = Math.min(page, totalPages);
   const offset = (activePage - 1) * pageSize;
   const visibleItems = items.slice(offset, offset + pageSize);
 
-  const query = useCmsCollection<{ en: Community[]; fr: Community[] }>("communities");
-  const saveCollection = useSaveCmsCollection<{ en: Community[]; fr: Community[] }>("communities", () => serverRevision.current);
+  const query = useCmsCollection<{ en: Community[]; fr: Community[]; it?: Community[] }>("communities");
+  const saveCollection = useSaveCmsCollection<{ en: Community[]; fr: Community[]; it?: Community[] }>("communities", () => serverRevision.current);
 
   useEffect(() => {
     if (!query.data) return;
     const incoming = JSON.stringify(query.data);
-    const draft = JSON.stringify({ en: enItems, fr: frItems });
+    const draft = JSON.stringify({ en: enItems, fr: frItems, it: itItems });
     if (serverSnapshot.current === null) {
-      setEnItems(query.data.en);
-      setFrItems(query.data.fr);
+      setEnItems(query.data.en ?? []);
+      setFrItems(query.data.fr ?? []);
+      setItItems(query.data.it ?? query.data.en ?? []);
       serverSnapshot.current = incoming;
       serverRevision.current = query.revision ?? null;
     } else if (draft === serverSnapshot.current) {
       if (incoming !== serverSnapshot.current) {
-        setEnItems(query.data.en);
-        setFrItems(query.data.fr);
+        setEnItems(query.data.en ?? []);
+        setFrItems(query.data.fr ?? []);
+        setItItems(query.data.it ?? query.data.en ?? []);
         serverSnapshot.current = incoming;
       }
       serverRevision.current = query.revision ?? serverRevision.current;
     }
-  }, [query.data, query.revision, enItems, frItems]);
+  }, [query.data, query.revision, enItems, frItems, itItems]);
 
   async function save() {
     setSaving(true);
     setMsg("");
-    const payload = { en: enItems, fr: frItems };
+    const payload = { en: enItems, fr: frItems, it: itItems };
     const error = await saveCollection
       .mutateAsync(payload)
       .then((saved) => {
@@ -122,7 +125,7 @@ export default function CommunitiesEditor() {
 
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
-          {(["en", "fr"] as const).map((l) => (
+          {(["en", "fr", "it"] as const).map((l) => (
             <button
               key={l}
               type="button"

@@ -2,7 +2,7 @@ import type { CmsCollectionKey, CmsPayload } from "./cmsSchemas";
 
 export type CmsRecordInput = {
   collectionKey: CmsCollectionKey;
-  locale: "all" | "en" | "fr";
+  locale: "all" | "en" | "fr" | "it";
   itemKey: string;
   position: number;
   payload: unknown;
@@ -15,15 +15,18 @@ export function cmsRecordsFor<K extends CmsCollectionKey>(key: K, payload: CmsPa
 
   const records: CmsRecordInput[] = [];
   if (BILINGUAL_LISTS.has(key)) {
-    const localized = payload as Record<"en" | "fr", unknown[]>;
-    for (const locale of ["en", "fr"] as const) {
-      localized[locale].forEach((item, position) => records.push({
-        collectionKey: key,
-        locale,
-        itemKey: String(position),
-        position,
-        payload: item,
-      }));
+    const localized = payload as Record<string, unknown[] | undefined>;
+    for (const locale of ["en", "fr", "it"] as const) {
+      const items = localized[locale];
+      if (Array.isArray(items)) {
+        items.forEach((item, position) => records.push({
+          collectionKey: key,
+          locale,
+          itemKey: String(position),
+          position,
+          payload: item,
+        }));
+      }
     }
     return records;
   }

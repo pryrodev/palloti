@@ -12,13 +12,14 @@ import CloudinaryMediaPicker from "./CloudinaryMediaPicker";
 import DataTable from "../components/DataTable";
 import ConfirmDeleteAction from "../components/ConfirmDeleteAction";
 
-type Member = { name: string; role: string; image?: string };
-type DirectionPayload = { en: Member[]; fr: Member[] };
-type Locale = "en" | "fr";
+type Member = { name: string; role: string; image?: string; biography?: string };
+type DirectionPayload = { en: Member[]; fr: Member[]; it?: Member[] };
+type Locale = "en" | "fr" | "it";
 
 export default function DirectionEditor() {
   const [enMembers, setEnMembers] = useState<Member[]>([]);
   const [frMembers, setFrMembers] = useState<Member[]>([]);
+  const [itMembers, setItMembers] = useState<Member[]>([]);
   const [lang, setLang] = useState<Locale>("en");
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingMember, setEditingMember] = useState<Member | null>(null);
@@ -28,28 +29,30 @@ export default function DirectionEditor() {
   const serverSnapshot = useRef<string | null>(null);
   const serverRevision = useRef<number | null>(null);
 
-  const members = lang === "en" ? enMembers : frMembers;
+  const members = lang === "en" ? enMembers : lang === "fr" ? frMembers : itMembers;
   const query = useCmsCollection<DirectionPayload>("direction");
   const saveCollection = useSaveCmsCollection<DirectionPayload>("direction", () => serverRevision.current);
 
   useEffect(() => {
     if (!query.data) return;
     const incoming = JSON.stringify(query.data);
-    const currentDraft = JSON.stringify({ en: enMembers, fr: frMembers });
+    const currentDraft = JSON.stringify({ en: enMembers, fr: frMembers, it: itMembers });
     if (serverSnapshot.current === null) {
-      setEnMembers(query.data.en);
-      setFrMembers(query.data.fr);
+      setEnMembers(query.data.en ?? []);
+      setFrMembers(query.data.fr ?? []);
+      setItMembers(query.data.it ?? query.data.en ?? []);
       serverSnapshot.current = incoming;
       serverRevision.current = query.revision ?? null;
     } else if (currentDraft === serverSnapshot.current) {
       if (incoming !== serverSnapshot.current) {
-        setEnMembers(query.data.en);
-        setFrMembers(query.data.fr);
+        setEnMembers(query.data.en ?? []);
+        setFrMembers(query.data.fr ?? []);
+        setItMembers(query.data.it ?? query.data.en ?? []);
         serverSnapshot.current = incoming;
       }
       serverRevision.current = query.revision ?? serverRevision.current;
     }
-  }, [query.data, query.revision, enMembers, frMembers]);
+  }, [query.data, query.revision, enMembers, frMembers, itMembers]);
 
   const editRow = useCallback((index: number, member: Member) => {
     setMessage("");
@@ -72,12 +75,14 @@ export default function DirectionEditor() {
     const payload: DirectionPayload = {
       en: lang === "en" ? enMembers.map((member, rowIndex) => rowIndex === index ? editingMember : member) : enMembers,
       fr: lang === "fr" ? frMembers.map((member, rowIndex) => rowIndex === index ? editingMember : member) : frMembers,
+      it: lang === "it" ? itMembers.map((member, rowIndex) => rowIndex === index ? editingMember : member) : itMembers,
     };
 
     try {
       const saved = await saveCollection.mutateAsync(payload);
       setEnMembers(payload.en);
       setFrMembers(payload.fr);
+      setItMembers(payload.it ?? []);
       serverSnapshot.current = JSON.stringify(payload);
       serverRevision.current = saved.revision;
       setEditingIndex(null);
@@ -90,19 +95,21 @@ export default function DirectionEditor() {
       savingLock.current = false;
       setSavingIndex(null);
     }
-  }, [editingMember, savingIndex, lang, enMembers, frMembers, saveCollection, query]);
+  }, [editingMember, savingIndex, lang, enMembers, frMembers, itMembers, saveCollection, query]);
 
   const addMember = useCallback(async () => {
-    const newMember: Member = { name: "New Member", role: "Role", image: "" };
+    const newMember: Member = { name: "New Member", role: "Role", image: "", biography: "" };
     const updated = [...members, newMember];
     const payload: DirectionPayload = {
       en: lang === "en" ? updated : enMembers,
       fr: lang === "fr" ? updated : frMembers,
+      it: lang === "it" ? updated : itMembers,
     };
     try {
       const saved = await saveCollection.mutateAsync(payload);
       setEnMembers(payload.en);
       setFrMembers(payload.fr);
+      setItMembers(payload.it ?? []);
       serverSnapshot.current = JSON.stringify(payload);
       serverRevision.current = saved.revision;
       const newIndex = updated.length - 1;
@@ -112,7 +119,7 @@ export default function DirectionEditor() {
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Could not add member.");
     }
-  }, [members, lang, enMembers, frMembers, saveCollection]);
+  }, [members, lang, enMembers, frMembers, itMembers, saveCollection]);
 
   const deleteMember = useCallback(async (index: number) => {
     const target = members[index];
@@ -121,11 +128,13 @@ export default function DirectionEditor() {
     const payload: DirectionPayload = {
       en: lang === "en" ? updated : enMembers,
       fr: lang === "fr" ? updated : frMembers,
+      it: lang === "it" ? updated : itMembers,
     };
     try {
       const saved = await saveCollection.mutateAsync(payload);
       setEnMembers(payload.en);
       setFrMembers(payload.fr);
+      setItMembers(payload.it ?? []);
       serverSnapshot.current = JSON.stringify(payload);
       serverRevision.current = saved.revision;
       if (editingIndex === index) {
@@ -136,7 +145,7 @@ export default function DirectionEditor() {
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Could not delete member.");
     }
-  }, [members, lang, enMembers, frMembers, saveCollection, editingIndex]);
+  }, [members, lang, enMembers, frMembers, itMembers, saveCollection, editingIndex]);
 
   const columns = useMemo<ColumnDef<DataGridFeatures, Member>[]>(() => [
     {
@@ -183,8 +192,8 @@ export default function DirectionEditor() {
     },
     {
       accessorKey: "role",
-      size: 300,
-      minSize: 240,
+      size: 260,
+      minSize: 200,
       header: ({ column }) => <DataGridColumnHeader title="Role" column={column} />,
       cell: ({ row }) => {
         const index = members.indexOf(row.original);
@@ -193,6 +202,20 @@ export default function DirectionEditor() {
           <span className="sr-only">Role</span>
           <input value={editingMember.role} disabled={savingIndex !== null} onChange={(event) => setEditingMember((current) => current ? { ...current, role: event.target.value } : current)} className="w-full min-w-0 border border-input bg-background px-2 py-1.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30" />
         </label> : <span className="break-words text-sm text-foreground">{row.original.role}</span>;
+      },
+    },
+    {
+      accessorKey: "biography",
+      size: 340,
+      minSize: 260,
+      header: ({ column }) => <DataGridColumnHeader title="Biography" column={column} />,
+      cell: ({ row }) => {
+        const index = members.indexOf(row.original);
+        const isEditing = editingIndex === index && editingMember !== null;
+        return isEditing ? <label className="block">
+          <span className="sr-only">Biography</span>
+          <textarea rows={2} value={editingMember.biography ?? ""} disabled={savingIndex !== null} placeholder="Short bio..." onChange={(event) => setEditingMember((current) => current ? { ...current, biography: event.target.value } : current)} className="w-full min-w-0 resize-y border border-input bg-background px-2 py-1 text-xs text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30" />
+        </label> : <p className="line-clamp-2 text-xs text-muted-foreground">{row.original.biography || "—"}</p>;
       },
     },
     {
@@ -237,7 +260,7 @@ export default function DirectionEditor() {
 
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div className="flex gap-2" role="group" aria-label="Direction language">
-        {(["en", "fr"] as const).map((locale) => <Button
+        {(["en", "fr", "it"] as const).map((locale) => <Button
           key={locale}
           type="button"
           size="sm"
@@ -266,7 +289,7 @@ export default function DirectionEditor() {
       data={members}
       getRowId={(member) => String(members.indexOf(member))}
       isLoading={query.isLoading}
-      emptyMessage={`No ${lang === "en" ? "English" : "French"} direction members.`}
+      emptyMessage={`No ${lang === "en" ? "English" : lang === "fr" ? "French" : "Italian"} direction members.`}
       pageSize={10}
       pageSizes={[10, 20, 50]}
     />

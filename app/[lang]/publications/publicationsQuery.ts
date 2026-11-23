@@ -9,10 +9,12 @@ export type Publication = {
   seoDescription?: string;
   subtitle: string;
   description: string;
-  color: string;
-  titleColor: string;
-  subtitleColor: string;
+  color?: string;
+  titleColor?: string;
+  subtitleColor?: string;
   url?: string;
+  coverImage?: string;
+  fileType?: "pdf" | "image";
 };
 
 export type PublicationPage = {

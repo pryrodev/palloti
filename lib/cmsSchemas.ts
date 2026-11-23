@@ -1,6 +1,7 @@
 import { z } from "zod";
 import enDictionary from "../dictionaries/en.json";
 import frDictionary from "../dictionaries/fr.json";
+import itDictionary from "../dictionaries/it.json";
 import { DEFAULT_SITE_THEME } from "./siteTheme";
 
 const nonEmptyText = z.string().trim().min(1).max(5000);
@@ -27,10 +28,12 @@ export const publicationSchema = z.object({
   seoDescription: z.string().max(160).optional(),
   subtitle: z.string().max(500),
   description: z.string().max(5000),
-  color: z.string().max(32),
-  titleColor: z.string().max(32),
-  subtitleColor: z.string().max(32),
-  url: mediaUrl,
+  color: z.string().max(32).optional(),
+  titleColor: z.string().max(32).optional(),
+  subtitleColor: z.string().max(32).optional(),
+  coverImage: mediaUrl.optional(),
+  fileType: z.enum(["pdf", "image"]).optional(),
+  url: z.string().max(2048).optional(),
 });
 
 export const newsArticleSchema = z.object({
@@ -47,7 +50,11 @@ export const newsArticleSchema = z.object({
   images: z.array(mediaUrl).max(50).optional(),
 });
 
-const bilingualNews = z.object({ en: z.array(newsArticleSchema).max(1000), fr: z.array(newsArticleSchema).max(1000) });
+const bilingualNews = z.object({
+  en: z.array(newsArticleSchema).max(1000),
+  fr: z.array(newsArticleSchema).max(1000),
+  it: z.array(newsArticleSchema).max(1000).optional(),
+});
 const communitySchema = z.object({
   id: nonEmptyText.max(191),
   name: nonEmptyText.max(500),
@@ -63,9 +70,18 @@ const directionMemberSchema = z.object({
   name: nonEmptyText.max(500),
   role: nonEmptyText.max(1000),
   image: mediaUrl.optional(),
+  biography: z.string().max(10000).optional(),
 }).passthrough();
-const bilingualCommunities = z.object({ en: z.array(communitySchema).max(1000), fr: z.array(communitySchema).max(1000) });
-const bilingualDirection = z.object({ en: z.array(directionMemberSchema).max(100), fr: z.array(directionMemberSchema).max(100) });
+const bilingualCommunities = z.object({
+  en: z.array(communitySchema).max(1000),
+  fr: z.array(communitySchema).max(1000),
+  it: z.array(communitySchema).max(1000).optional(),
+});
+const bilingualDirection = z.object({
+  en: z.array(directionMemberSchema).max(100),
+  fr: z.array(directionMemberSchema).max(100),
+  it: z.array(directionMemberSchema).max(100).optional(),
+});
 
 function hasSameShape(value: unknown, baseline: unknown, keyName = ""): boolean {
   if (keyName === "welcomeBody" || keyName === "biography") {
@@ -124,7 +140,7 @@ const siteContentSchema = z.preprocess((input) => {
   if (typeof input !== "object" || input === null || Array.isArray(input)) return input;
   const content = input as Record<string, unknown>;
   const withRectorImageDefault = { ...content };
-  for (const [locale, defaults] of [["en", enDictionary], ["fr", frDictionary]] as const) {
+  for (const [locale, defaults] of [["en", enDictionary], ["fr", frDictionary], ["it", itDictionary]] as const) {
     const localized = content[locale];
     if (typeof localized !== "object" || localized === null || Array.isArray(localized)) continue;
     const localizedRecord = localized as Record<string, unknown>;
@@ -143,6 +159,7 @@ const siteContentSchema = z.preprocess((input) => {
 }, z.object({
   en: dictionaryCopySchema,
   fr: z.record(z.string(), z.unknown()).refine((value) => hasSameShape(value, frDictionary), "French dictionary structure cannot be changed"),
+  it: z.record(z.string(), z.unknown()).refine((value) => hasSameShape(value, itDictionary), "Italian dictionary structure cannot be changed").optional(),
   theme: siteThemeSchema,
 }).superRefine((value, context) => {
   for (const locale of ["en", "fr"] as const) {

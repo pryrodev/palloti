@@ -20,7 +20,8 @@
     "media": "Media",
     "gallery": "Gallery",
     "videos": "Videos",
-    "publications": "Publications"
+    "publications": "Publications",
+    "catalog": "Catalog"
   },
   "contactPage": {
     "badge": "We are here to help",
@@ -55,21 +56,73 @@
     "heroTitle": "Welcome to the Official Website of the Holy Family Province",
     "heroSubtitle": "Inspired by Saint Vincent Pallotti, we are a community of priests and brothers united in the mission of spreading God's love through charity, apostolate, and service.",
     "heroSlides": [
-      { "image": "/images/gikondo.jpg", "location": "Kigali — Gikondo, Rwanda", "title": "Holy Family Provincial House", "subtitle": "Seat of the Holy Family Province · Mother House" },
-      { "image": "/images/hero.jpg", "location": "Kigali — Rwanda", "title": "Sanctuary of Divine Mercy", "subtitle": "A place of prayer and welcome" },
-      { "image": "/images/hero2.jpg", "location": "Kibeho — Rwanda", "title": "The New Community of Kibeho", "subtitle": "Serving the faithful in a place of pilgrimage" },
-      { "image": "/images/home2.jpeg", "location": "Holy Family Province", "title": "Formation & Apostolate", "subtitle": "Community life and pastoral service" },
-      { "image": "/images/home3.jpg", "location": "Union of Catholic Apostolate", "title": "Youth & Vocations", "subtitle": "Union of Catholic Apostolate" },
-      { "image": "/images/hero3.jpeg", "location": "Montereau — France", "title": "The New Pallottine Community of Montereau", "subtitle": "A mission beyond borders" },
-      { "image": "/images/hero4.jpg", "location": "Holy Family Province", "title": "Pallottines of the Holy Family Province", "subtitle": "Come, let us rebuild the walls of Jerusalem." },
-      { "image": "/images/hero5.jpg", "location": "Kabuga — Rwanda", "title": "Genezareth Pallottine Formation Centre", "subtitle": "Formation and service across our communities" }
+      {
+        "image": "/images/gikondo.jpg",
+        "location": "Kigali — Gikondo, Rwanda",
+        "title": "Holy Family Provincial House",
+        "subtitle": "Seat of the Holy Family Province · Mother House"
+      },
+      {
+        "image": "/images/hero.jpg",
+        "location": "Kigali — Rwanda",
+        "title": "Sanctuary of Divine Mercy",
+        "subtitle": "A place of prayer and welcome"
+      },
+      {
+        "image": "/images/hero2.jpg",
+        "location": "Kibeho — Rwanda",
+        "title": "The New Community of Kibeho",
+        "subtitle": "Serving the faithful in a place of pilgrimage"
+      },
+      {
+        "image": "/images/home2.jpeg",
+        "location": "Holy Family Province",
+        "title": "Formation & Apostolate",
+        "subtitle": "Community life and pastoral service"
+      },
+      {
+        "image": "/images/home3.jpg",
+        "location": "Union of Catholic Apostolate",
+        "title": "Youth & Vocations",
+        "subtitle": "Union of Catholic Apostolate"
+      },
+      {
+        "image": "/images/hero3.jpeg",
+        "location": "Montereau — France",
+        "title": "The New Pallottine Community of Montereau",
+        "subtitle": "A mission beyond borders"
+      },
+      {
+        "image": "/images/hero4.jpg",
+        "location": "Holy Family Province",
+        "title": "Pallottines of the Holy Family Province",
+        "subtitle": "Come, let us rebuild the walls of Jerusalem."
+      },
+      {
+        "image": "/images/hero5.jpg",
+        "location": "Kabuga — Rwanda",
+        "title": "Genezareth Pallottine Formation Centre",
+        "subtitle": "Formation and service across our communities"
+      }
     ],
     "ctaPrimary": "Discover Our Mission",
     "ctaSecondary": "Our Communities",
     "stats": [
-      { "value": "1890", "label": "Founded", "icon": "landmark" },
-      { "value": "111+", "label": "Members", "icon": "users" },
-      { "value": "3", "label": "Countries", "icon": "globe" }
+      {
+        "value": "1890",
+        "label": "Founded",
+        "icon": "landmark"
+      },
+      {
+        "value": "111+",
+        "label": "Members",
+        "icon": "users"
+      },
+      {
+        "value": "3",
+        "label": "Countries",
+        "icon": "globe"
+      }
     ],
     "statFounded": "Founded",
     "statFoundedNum": "1890",
@@ -200,11 +253,31 @@
     "title": "Provincial Government",
     "subtitle": "Holy Family Province · SAC",
     "members": [
-      { "name": "Fr. Eugène NIYONZIMA", "role": "Provincial Rector", "image": "/images/eugene.jpg" },
-      { "name": "Fr. Jean Pierre NSABIMANA", "role": "First Consultor", "image": "/images/pierre.jpg" },
-      { "name": "Fr. Ildéphonse BIZIMUNGU", "role": "Consultor", "image": "/images/bizimungu.jpg" },
-      { "name": "Fr. Jean de Dieu KAMBALE MATHE", "role": "Consultor", "image": "/images/kambale.jpeg" },
-      { "name": "Fr. Simon SAFARI BURHUNGANE", "role": "Consultor", "image": "/images/simon.jpg" }
+      {
+        "name": "Fr. Eugène NIYONZIMA",
+        "role": "Provincial Rector",
+        "image": "/images/eugene.jpg"
+      },
+      {
+        "name": "Fr. Jean Pierre NSABIMANA",
+        "role": "First Consultor",
+        "image": "/images/pierre.jpg"
+      },
+      {
+        "name": "Fr. Ildéphonse BIZIMUNGU",
+        "role": "Consultor",
+        "image": "/images/bizimungu.jpg"
+      },
+      {
+        "name": "Fr. Jean de Dieu KAMBALE MATHE",
+        "role": "Consultor",
+        "image": "/images/kambale.jpeg"
+      },
+      {
+        "name": "Fr. Simon SAFARI BURHUNGANE",
+        "role": "Consultor",
+        "image": "/images/simon.jpg"
+      }
     ]
   },
   "communities": {
@@ -237,21 +310,63 @@
         "region": "rwanda",
         "image": "/images/gikondo.jpg",
         "description": "The Provincial House and Mother House of the Holy Family Province. Seat of provincial government and administration, hosting the Parish of Saint Vincent Pallotti, the Saint Vincent Pallotti Centre, the Caritas Pallottine office, and the Pallottine Foundation for the Family.",
-        "works": ["Provincial Government", "Parish of St. Vincent Pallotti", "St. Vincent Pallotti Centre Ltd", "Caritas Pallottine", "Pallottine Foundation for the Family"],
+        "works": [
+          "Provincial Government",
+          "Parish of St. Vincent Pallotti",
+          "St. Vincent Pallotti Centre Ltd",
+          "Caritas Pallottine",
+          "Pallottine Foundation for the Family"
+        ],
         "memberSummary": "The Communauté Sainte Famille de Gikondo is named after the Holy Family because it is the seat of the Holy Family Missionary Province, which extends over Rwanda, DR Congo and Belgium. It is often called the 'Mother House' or 'Provincial House'. It serves three main works: the general services of provincial government and administration, the Parish of Saint Vincent Pallotti de Gikondo, and the Saint Vincent Pallotti Centre/Gikondo. It also hosts the Caritas Pallottine office and the Pallottine Foundation for the Family. It is composed of 10 priests, 2 brothers, 1 deacon and 1 seminarian on internship.",
         "members": [
-          { "name": "Fr. Eugène NIYONZIMA", "role": "Provincial Rector" },
-          { "name": "Fr. Jean de Dieu KASEREKA KANEFU", "role": "Community Rector, Director of St. Vincent Pallotti Centre Ltd, Internal Audit Officer" },
-          { "name": "Fr. Jean Pierre NSABIMANA", "role": "Vice-Rector, Parish Priest of Gikondo, Provincial Secretary for Missions, Coordinator of the Socio-Charitable Dept. of FPF" },
-          { "name": "Fr. Jackson NIYONSENGA BANZUBAZE", "role": "Provincial Administrator" },
-          { "name": "Fr. Patrick NSANZAMAHORO", "role": "Provincial Secretary, Secretary to the Provincial Rector, Deputy Provincial Master of Ceremonies, Sunday Vicar" },
-          { "name": "Br. Jean-Marie Vianney NGENDAHIMANA", "role": "Notary, Archivist, Director of the FPF" },
-          { "name": "Fr. Patient KATEMBO KIOMA", "role": "Community Bursar, Sunday Vicar at the Parish, Webmaster, 2nd Deputy ACR Officer" },
-          { "name": "Fr. Gaspard AYABAGABO", "role": "DAF at St. Vincent Pallotti Centre Ltd, 2nd Deputy Provincial Administrator" },
-          { "name": "Fr. Andrzej JAKACKI", "role": "Editor of 'Communion' Review in Rwanda, Sunday Vicar" },
-          { "name": "Fr. Patient POLEPOLE", "role": "1st Deputy Provincial Administrator" },
-          { "name": "Fr. Pascal HABINEZA", "role": "Resident" },
-          { "name": "Br. Emmanuel NIYIZURUGERO", "role": "Annual Internship Seminarian" }
+          {
+            "name": "Fr. Eugène NIYONZIMA",
+            "role": "Provincial Rector"
+          },
+          {
+            "name": "Fr. Jean de Dieu KASEREKA KANEFU",
+            "role": "Community Rector, Director of St. Vincent Pallotti Centre Ltd, Internal Audit Officer"
+          },
+          {
+            "name": "Fr. Jean Pierre NSABIMANA",
+            "role": "Vice-Rector, Parish Priest of Gikondo, Provincial Secretary for Missions, Coordinator of the Socio-Charitable Dept. of FPF"
+          },
+          {
+            "name": "Fr. Jackson NIYONSENGA BANZUBAZE",
+            "role": "Provincial Administrator"
+          },
+          {
+            "name": "Fr. Patrick NSANZAMAHORO",
+            "role": "Provincial Secretary, Secretary to the Provincial Rector, Deputy Provincial Master of Ceremonies, Sunday Vicar"
+          },
+          {
+            "name": "Br. Jean-Marie Vianney NGENDAHIMANA",
+            "role": "Notary, Archivist, Director of the FPF"
+          },
+          {
+            "name": "Fr. Patient KATEMBO KIOMA",
+            "role": "Community Bursar, Sunday Vicar at the Parish, Webmaster, 2nd Deputy ACR Officer"
+          },
+          {
+            "name": "Fr. Gaspard AYABAGABO",
+            "role": "DAF at St. Vincent Pallotti Centre Ltd, 2nd Deputy Provincial Administrator"
+          },
+          {
+            "name": "Fr. Andrzej JAKACKI",
+            "role": "Editor of 'Communion' Review in Rwanda, Sunday Vicar"
+          },
+          {
+            "name": "Fr. Patient POLEPOLE",
+            "role": "1st Deputy Provincial Administrator"
+          },
+          {
+            "name": "Fr. Pascal HABINEZA",
+            "role": "Resident"
+          },
+          {
+            "name": "Br. Emmanuel NIYIZURUGERO",
+            "role": "Annual Internship Seminarian"
+          }
         ]
       },
       {
@@ -260,14 +375,35 @@
         "location": "Kabuga, Kigali — Archdiocese of Kigali",
         "region": "rwanda",
         "description": "Named after the Immaculate Conception, this community serves the Parish of Kabuga and hosts the Saint John Paul II Centre. It is also home to the Shrine of Divine Mercy of Kabuga and supports the Pallottine Foundation for the Family.",
-        "works": ["Parish of Kabuga", "St. John Paul II Centre", "Shrine of Divine Mercy", "Pallottine Foundation for the Family", "Vocational Animation"],
+        "works": [
+          "Parish of Kabuga",
+          "St. John Paul II Centre",
+          "Shrine of Divine Mercy",
+          "Pallottine Foundation for the Family",
+          "Vocational Animation"
+        ],
         "memberSummary": "The Communauté Immaculée Conception de Kabuga serves the Parish of Kabuga in the Archdiocese of Kigali. It hosts the Saint John Paul II Centre and the Shrine of Divine Mercy of Kabuga, and supports the Pallottine Foundation for the Family (FPF).",
         "members": [
-          { "name": "Fr. Ildéphonse BIZIMUNGU", "role": "Community Rector and Parish Priest" },
-          { "name": "Fr. Alphonse NDAGIJIMANA", "role": "Vice-Rector of the Community and Rector of the Shrine of Divine Mercy of Kabuga" },
-          { "name": "Fr. Gilbert KAZINGUFU SEMASAKA", "role": "Chaplain at the Shrine, Vice-Director of the FPF, Coordinator of the Family & Life Dept. of the FPF, Sunday Vicar at the Parish" },
-          { "name": "Fr. Germain BOSENIKO KAMARA", "role": "DAF of the FPF, 2nd Vicar at the Parish, Vocational Animation Officer at Kabuga" },
-          { "name": "Fr. Jean-Delphin NYONGERA", "role": "Community Bursar and 1st Vicar at the Parish" }
+          {
+            "name": "Fr. Ildéphonse BIZIMUNGU",
+            "role": "Community Rector and Parish Priest"
+          },
+          {
+            "name": "Fr. Alphonse NDAGIJIMANA",
+            "role": "Vice-Rector of the Community and Rector of the Shrine of Divine Mercy of Kabuga"
+          },
+          {
+            "name": "Fr. Gilbert KAZINGUFU SEMASAKA",
+            "role": "Chaplain at the Shrine, Vice-Director of the FPF, Coordinator of the Family & Life Dept. of the FPF, Sunday Vicar at the Parish"
+          },
+          {
+            "name": "Fr. Germain BOSENIKO KAMARA",
+            "role": "DAF of the FPF, 2nd Vicar at the Parish, Vocational Animation Officer at Kabuga"
+          },
+          {
+            "name": "Fr. Jean-Delphin NYONGERA",
+            "role": "Community Bursar and 1st Vicar at the Parish"
+          }
         ]
       },
       {
@@ -276,13 +412,32 @@
         "location": "Ruhango — Diocese of Kabgayi",
         "region": "rwanda",
         "description": "Serving the Diocese of Kabgayi, this community runs the Parish of Ruhango and hosts the Shrine of Jesus the Merciful, which includes a chapel of perpetual adoration and healing prayer gatherings.",
-        "works": ["Parish of Ruhango", "Shrine of Jesus the Merciful", "Perpetual Adoration Chapel", "Healing Prayer", "ACR Animation", "Vocational Animation"],
+        "works": [
+          "Parish of Ruhango",
+          "Shrine of Jesus the Merciful",
+          "Perpetual Adoration Chapel",
+          "Healing Prayer",
+          "ACR Animation",
+          "Vocational Animation"
+        ],
         "memberSummary": "The Community of Ruhango serves the Parish of Ruhango in the Diocese of Kabgayi. It is also home to the Shrine of Jesus the Merciful, with a chapel of perpetual adoration.",
         "members": [
-          { "name": "Fr. Jean Marie Vianney NIZEYIMANA", "role": "Community Rector and Rector of the Shrine of Jesus the Merciful" },
-          { "name": "Fr. Janvier GASORE", "role": "Vice-Rector of the Community and Chaplain at the Shrine of Jesus the Merciful" },
-          { "name": "Fr. Dominique NGENDAHAYO TUMAINI", "role": "Parish Priest of Ruhango and ACR Officer" },
-          { "name": "Fr. Vincent NDUWAYO BIMENYIMANA", "role": "Community Bursar, Parish Vicar, Parish Bursar, and Vocational Animation Officer at Ruhango" }
+          {
+            "name": "Fr. Jean Marie Vianney NIZEYIMANA",
+            "role": "Community Rector and Rector of the Shrine of Jesus the Merciful"
+          },
+          {
+            "name": "Fr. Janvier GASORE",
+            "role": "Vice-Rector of the Community and Chaplain at the Shrine of Jesus the Merciful"
+          },
+          {
+            "name": "Fr. Dominique NGENDAHAYO TUMAINI",
+            "role": "Parish Priest of Ruhango and ACR Officer"
+          },
+          {
+            "name": "Fr. Vincent NDUWAYO BIMENYIMANA",
+            "role": "Community Bursar, Parish Vicar, Parish Bursar, and Vocational Animation Officer at Ruhango"
+          }
         ]
       },
       {
@@ -291,7 +446,12 @@
         "location": "Butare (Huye), Rwanda",
         "region": "rwanda",
         "description": "A vibrant community in the Diocese of Butare dedicated to the formation of young men in the introductory period of religious life, known as the Novitiate. It is an international community that welcomes novices from different African Pallottine entities.",
-        "works": ["Novitiate Formation", "Introductory Period", "International Formation House", "Spiritual Direction"]
+        "works": [
+          "Novitiate Formation",
+          "Introductory Period",
+          "International Formation House",
+          "Spiritual Direction"
+        ]
       },
       {
         "id": "kibeho",
@@ -299,7 +459,11 @@
         "location": "Kibeho, Rwanda",
         "region": "rwanda",
         "description": "Serving at the renowned Marian shrine of Kibeho, accompanying pilgrims and the local faithful in their spiritual journey.",
-        "works": ["Shrine Ministry", "Pilgrim Accompaniment", "Pastoral Work"]
+        "works": [
+          "Shrine Ministry",
+          "Pilgrim Accompaniment",
+          "Pastoral Work"
+        ]
       },
       {
         "id": "kinoni",
@@ -307,7 +471,11 @@
         "location": "Kinoni, Rwanda",
         "region": "rwanda",
         "description": "Pallottine community engaged in parish ministry and apostolic service in the Kinoni area.",
-        "works": ["Parish Ministry", "Apostolic Service", "Community Outreach"]
+        "works": [
+          "Parish Ministry",
+          "Apostolic Service",
+          "Community Outreach"
+        ]
       },
       {
         "id": "muyumbu",
@@ -315,7 +483,11 @@
         "location": "Muyumbu, Rwanda",
         "region": "rwanda",
         "description": "A Pallottine community serving the faithful of Muyumbu through parish ministry and apostolic works in Rwanda.",
-        "works": ["Parish Ministry", "Apostolic Service", "Pastoral Care"]
+        "works": [
+          "Parish Ministry",
+          "Apostolic Service",
+          "Pastoral Care"
+        ]
       },
       {
         "id": "kibirizi",
@@ -323,7 +495,11 @@
         "location": "Kibirizi, Rwanda",
         "region": "rwanda",
         "description": "A Pallottine community engaged in parish ministry and apostolic service in the Kibirizi area of Rwanda.",
-        "works": ["Parish Ministry", "Apostolic Service", "Community Outreach"]
+        "works": [
+          "Parish Ministry",
+          "Apostolic Service",
+          "Community Outreach"
+        ]
       },
       {
         "id": "pallotipress",
@@ -331,7 +507,11 @@
         "location": "Rwanda",
         "region": "rwanda",
         "description": "The Pallottine publishing and media apostolate, producing Catholic literature, the 'Communion' review, and other evangelization materials.",
-        "works": ["Catholic Publishing", "Media Apostolate", "'Communion' Review"]
+        "works": [
+          "Catholic Publishing",
+          "Media Apostolate",
+          "'Communion' Review"
+        ]
       },
       {
         "id": "keshero",
@@ -339,7 +519,12 @@
         "location": "Goma-Keshero, DR Congo",
         "region": "drc",
         "description": "Pallottine community in the Diocese of Goma serving the faithful of Keshero and Goma at large through religious retreats, Christian formation, and apostolic works.",
-        "works": ["Religious Retreats", "Christian Formation", "Apostolic Works", "Pastoral Care"]
+        "works": [
+          "Religious Retreats",
+          "Christian Formation",
+          "Apostolic Works",
+          "Pastoral Care"
+        ]
       },
       {
         "id": "buturande",
@@ -347,7 +532,11 @@
         "location": "Goma-Buturande, DR Congo",
         "region": "drc",
         "description": "Serving the Christian community of Buturande in the Goma Diocese with pastoral care and community apostolate. Home to the Divine Mercy Shrine.",
-        "works": ["Parish Ministry", "Community Apostolate", "Divine Mercy Shrine"]
+        "works": [
+          "Parish Ministry",
+          "Community Apostolate",
+          "Divine Mercy Shrine"
+        ]
       },
       {
         "id": "karhale",
@@ -355,7 +544,11 @@
         "location": "Bukavu-Karhale, DR Congo",
         "region": "drc",
         "description": "Pallottine community in the Archdiocese of Bukavu, serving the Karhale area through parish ministry and social works.",
-        "works": ["Parish Ministry", "Social Works", "Pastoral Service"]
+        "works": [
+          "Parish Ministry",
+          "Social Works",
+          "Pastoral Service"
+        ]
       },
       {
         "id": "formation-drc",
@@ -363,7 +556,11 @@
         "location": "DR Congo",
         "region": "drc",
         "description": "The Pallottine formation house in DR Congo, accompanying candidates and seminarians in their spiritual and intellectual formation.",
-        "works": ["Priestly Formation", "Spiritual Direction", "Academic Studies"]
+        "works": [
+          "Priestly Formation",
+          "Spiritual Direction",
+          "Academic Studies"
+        ]
       },
       {
         "id": "brussels",
@@ -371,7 +568,11 @@
         "location": "Brussels, Belgium",
         "region": "belgium",
         "description": "The first Pallottine community established in Belgium in 1986, serving the local Church and the African diaspora community. It initially served as a procure for those preparing for the French-speaking African missions.",
-        "works": ["Parish Ministry", "Diaspora Pastoral Care", "Apostolic Works"]
+        "works": [
+          "Parish Ministry",
+          "Diaspora Pastoral Care",
+          "Apostolic Works"
+        ]
       },
       {
         "id": "namur",
@@ -379,7 +580,11 @@
         "location": "Namur, Belgium",
         "region": "belgium",
         "description": "Pallottine community in Namur serving the local Church through pastoral ministry and apostolic engagement.",
-        "works": ["Parish Ministry", "Pastoral Work", "Apostolic Service"]
+        "works": [
+          "Parish Ministry",
+          "Pastoral Work",
+          "Apostolic Service"
+        ]
       },
       {
         "id": "italy",
@@ -387,7 +592,10 @@
         "location": "Italy",
         "region": "mission",
         "description": "Pallottine confreres from the Holy Family Province serving in Italy, the homeland of Saint Vincent Pallotti, taking care of the Latin mission in the parish of Blessed Elisabeta Sanna.",
-        "works": ["Parish Ministry", "Apostolic Service"]
+        "works": [
+          "Parish Ministry",
+          "Apostolic Service"
+        ]
       },
       {
         "id": "france",
@@ -395,7 +603,10 @@
         "location": "Montereau, France",
         "region": "mission",
         "description": "Confreres of the Holy Family Province engaged in pastoral and apostolic ministry in France, namely in Montereau.",
-        "works": ["Parish Ministry", "Pastoral Work"]
+        "works": [
+          "Parish Ministry",
+          "Pastoral Work"
+        ]
       },
       {
         "id": "poland",
@@ -403,7 +614,10 @@
         "location": "Poland",
         "region": "mission",
         "description": "Confreres serving in Poland, the province of origin of the first Pallottine missionaries to Rwanda.",
-        "works": ["Parish Ministry", "Formation Support"]
+        "works": [
+          "Parish Ministry",
+          "Formation Support"
+        ]
       },
       {
         "id": "nairobi",
@@ -411,7 +625,10 @@
         "location": "Nairobi, Kenya",
         "region": "mission",
         "description": "Pallottine confreres from the Holy Family Province serving in Nairobi, Kenya.",
-        "works": ["Parish Ministry", "Apostolic Service"]
+        "works": [
+          "Parish Ministry",
+          "Apostolic Service"
+        ]
       },
       {
         "id": "ivory-coast",
@@ -419,7 +636,10 @@
         "location": "Ivory Coast",
         "region": "mission",
         "description": "Confreres of the Holy Family Province engaged in apostolic ministry in Ivory Coast.",
-        "works": ["Parish Ministry", "Apostolic Work"]
+        "works": [
+          "Parish Ministry",
+          "Apostolic Work"
+        ]
       },
       {
         "id": "cameroon",
@@ -427,7 +647,10 @@
         "location": "Cameroon",
         "region": "mission",
         "description": "Serving in Cameroon, the land where the Pallottine mission in Africa first began in 1890.",
-        "works": ["Parish Ministry", "Historical Mission"]
+        "works": [
+          "Parish Ministry",
+          "Historical Mission"
+        ]
       }
     ]
   },
@@ -436,18 +659,102 @@
     "title": "Latest News & Publications",
     "readMore": "Read More",
     "articles": [
-      { "id": 1, "title": "Official Publication of the Appointments of Confreres 2026-2027", "date": "29/06/2026", "tags": "Pallottines' Newspaper | Announcements | Generalate | Holy Family Province", "summary": "Official Publication of the Appointments of the Confreres 2026-2027 for the Holy Family Province.", "imageUrl": "/images/p5.jpg" },
-      { "id": 2, "title": "International Meeting of Pallottine Trainers — Kigali, Rwanda", "date": "17/05/2026", "tags": "Pallottines' Newspaper | Generalate | Holy Family Province | Union of the Catholic Apostolate", "summary": "The work of this meeting, which brings together trainers and formation directors from across the Pallottine world, held in Kigali from 16...", "imageUrl": "/images/p6.jpg" },
-      { "id": 3, "title": "Info PSF No 25 — March 2026", "date": "12/03/2026", "tags": "Pallottines' Newspaper | Announcements | Holy Family Province", "summary": "Through this information, we wish to strengthen the sense of belonging and fraternal communion within our Province.", "imageUrl": "/images/p7.jpg" },
-      { "id": 4, "title": "Handover within the Provincial Commissary", "date": "17/02/2026", "tags": "Pallottines' Newspaper | Generalate | Holy Family Province", "summary": "'If the Lord does not build the house, the builders work in vain.' Handover and resumption between the outgoing and incoming Provincial Councils.", "imageUrl": "/images/p8.jpg" },
-      { "id": 5, "title": "Handover between the Outgoing and Incoming Provincial Councils", "date": "07/02/2026", "tags": "Pallottines' Newspaper | Generalate | Holy Family Province | Union of the Catholic Apostolate", "summary": "A solemn ceremony marking the transition of leadership within the Holy Family Province.", "imageUrl": "/images/pic1.jpeg" },
-      { "id": 6, "title": "Provincial Assembly — Summary and Resolutions", "date": "30/01/2026", "tags": "Pallottines' Newspaper | Generalate | Holy Family Province | Union of the Catholic Apostolate", "summary": "Key decisions and resolutions adopted during the Provincial Assembly held in Kigali.", "imageUrl": "/images/p2.jpg" },
-      { "id": 7, "title": "PÈRE CHRYSANTE RWASA WITH GOD", "date": "30/12/2025", "tags": "Pallottines' Newspaper | Generalate | Holy Family Province | Union of the Catholic Apostolate", "summary": "Fr. Chrysante lived and died as a true witness of Christ. May Jesus Christ say to him: 'Well done, good and faithful servant, enter into the joy of your Master.' (Matthew 25:23)", "imageUrl": "/images/p5.jpg" },
-      { "id": 8, "title": "The Catholic Press in Rwanda Celebrates the Jubilee of the Church", "date": "24/11/2025", "tags": "Pallottines' Newspaper | Holy Family Province", "summary": "Province Sainte Famille. Hobe intellectually formed us and since there was neither...", "imageUrl": "/images/p6.jpg" },
-      { "id": 9, "title": "Blessing and Inauguration of the Extension of the Saint Vincent Pallotti Centre", "date": "22/11/2025", "tags": "Pallottines' Newspaper | Holy Family Province | Union of the Catholic Apostolate", "summary": "May the Lord build our house and grow our apostolic works for the glory of God and the service of His people.", "imageUrl": "/images/p7.jpg" },
-      { "id": 10, "title": "Mater Populi Fidelis — Doctrinal Note on Certain Marian Titles", "date": "07/11/2025", "tags": "Pallottines' Newspaper | Holy Family Province | Union of the Catholic Apostolate", "summary": "Province Sainte Famille. A doctrinal reflection on certain titles of Our Lady in the Pallottine tradition.", "imageUrl": "/images/p8.jpg" },
-      { "id": 11, "title": "Commemoration of All the Faithful Departed at Gikondo", "date": "03/11/2025", "tags": "Pallottines' Newspaper | Holy Family Province | Union of the Catholic Apostolate", "summary": "A solemn commemoration gathering the Pallottine community at Gikondo to pray for all the faithful departed.", "imageUrl": "/images/pic1.jpeg" },
-      { "id": 12, "title": "Diaconal Ordination at Kibilizi", "date": "11/10/2025", "tags": "Pallottines' Newspaper | Generalate | Holy Family Province | Union of the Catholic Apostolate", "summary": "A joyful celebration of diaconal ordination at Kibilizi, marking a new step in the apostolic mission of the Holy Family Province.", "imageUrl": "/images/p2.jpg" }
+      {
+        "id": 1,
+        "title": "Official Publication of the Appointments of Confreres 2026-2027",
+        "date": "29/06/2026",
+        "tags": "Pallottines' Newspaper | Announcements | Generalate | Holy Family Province",
+        "summary": "Official Publication of the Appointments of the Confreres 2026-2027 for the Holy Family Province.",
+        "imageUrl": "/images/p5.jpg"
+      },
+      {
+        "id": 2,
+        "title": "International Meeting of Pallottine Trainers — Kigali, Rwanda",
+        "date": "17/05/2026",
+        "tags": "Pallottines' Newspaper | Generalate | Holy Family Province | Union of the Catholic Apostolate",
+        "summary": "The work of this meeting, which brings together trainers and formation directors from across the Pallottine world, held in Kigali from 16...",
+        "imageUrl": "/images/p6.jpg"
+      },
+      {
+        "id": 3,
+        "title": "Info PSF No 25 — March 2026",
+        "date": "12/03/2026",
+        "tags": "Pallottines' Newspaper | Announcements | Holy Family Province",
+        "summary": "Through this information, we wish to strengthen the sense of belonging and fraternal communion within our Province.",
+        "imageUrl": "/images/p7.jpg"
+      },
+      {
+        "id": 4,
+        "title": "Handover within the Provincial Commissary",
+        "date": "17/02/2026",
+        "tags": "Pallottines' Newspaper | Generalate | Holy Family Province",
+        "summary": "'If the Lord does not build the house, the builders work in vain.' Handover and resumption between the outgoing and incoming Provincial Councils.",
+        "imageUrl": "/images/p8.jpg"
+      },
+      {
+        "id": 5,
+        "title": "Handover between the Outgoing and Incoming Provincial Councils",
+        "date": "07/02/2026",
+        "tags": "Pallottines' Newspaper | Generalate | Holy Family Province | Union of the Catholic Apostolate",
+        "summary": "A solemn ceremony marking the transition of leadership within the Holy Family Province.",
+        "imageUrl": "/images/pic1.jpeg"
+      },
+      {
+        "id": 6,
+        "title": "Provincial Assembly — Summary and Resolutions",
+        "date": "30/01/2026",
+        "tags": "Pallottines' Newspaper | Generalate | Holy Family Province | Union of the Catholic Apostolate",
+        "summary": "Key decisions and resolutions adopted during the Provincial Assembly held in Kigali.",
+        "imageUrl": "/images/p2.jpg"
+      },
+      {
+        "id": 7,
+        "title": "PÈRE CHRYSANTE RWASA WITH GOD",
+        "date": "30/12/2025",
+        "tags": "Pallottines' Newspaper | Generalate | Holy Family Province | Union of the Catholic Apostolate",
+        "summary": "Fr. Chrysante lived and died as a true witness of Christ. May Jesus Christ say to him: 'Well done, good and faithful servant, enter into the joy of your Master.' (Matthew 25:23)",
+        "imageUrl": "/images/p5.jpg"
+      },
+      {
+        "id": 8,
+        "title": "The Catholic Press in Rwanda Celebrates the Jubilee of the Church",
+        "date": "24/11/2025",
+        "tags": "Pallottines' Newspaper | Holy Family Province",
+        "summary": "Province Sainte Famille. Hobe intellectually formed us and since there was neither...",
+        "imageUrl": "/images/p6.jpg"
+      },
+      {
+        "id": 9,
+        "title": "Blessing and Inauguration of the Extension of the Saint Vincent Pallotti Centre",
+        "date": "22/11/2025",
+        "tags": "Pallottines' Newspaper | Holy Family Province | Union of the Catholic Apostolate",
+        "summary": "May the Lord build our house and grow our apostolic works for the glory of God and the service of His people.",
+        "imageUrl": "/images/p7.jpg"
+      },
+      {
+        "id": 10,
+        "title": "Mater Populi Fidelis — Doctrinal Note on Certain Marian Titles",
+        "date": "07/11/2025",
+        "tags": "Pallottines' Newspaper | Holy Family Province | Union of the Catholic Apostolate",
+        "summary": "Province Sainte Famille. A doctrinal reflection on certain titles of Our Lady in the Pallottine tradition.",
+        "imageUrl": "/images/p8.jpg"
+      },
+      {
+        "id": 11,
+        "title": "Commemoration of All the Faithful Departed at Gikondo",
+        "date": "03/11/2025",
+        "tags": "Pallottines' Newspaper | Holy Family Province | Union of the Catholic Apostolate",
+        "summary": "A solemn commemoration gathering the Pallottine community at Gikondo to pray for all the faithful departed.",
+        "imageUrl": "/images/pic1.jpeg"
+      },
+      {
+        "id": 12,
+        "title": "Diaconal Ordination at Kibilizi",
+        "date": "11/10/2025",
+        "tags": "Pallottines' Newspaper | Generalate | Holy Family Province | Union of the Catholic Apostolate",
+        "summary": "A joyful celebration of diaconal ordination at Kibilizi, marking a new step in the apostolic mission of the Holy Family Province.",
+        "imageUrl": "/images/p2.jpg"
+      }
     ]
   },
   "galleries": {
@@ -461,7 +768,7 @@
     "contact": "Contact Us",
     "address": "Gikondo - 1083 Kigali, Rwanda",
     "phone": "+250 788 307 271 / +250 788 381 737",
-    "email": "@sac-psf",
+    "email": "contact@sac-psf.org",
     "rights": "© 2026 SAC Holy Family Province. All rights reserved.",
     "vocationalAnimation": "Vocation Animator",
     "publications": "Publications"

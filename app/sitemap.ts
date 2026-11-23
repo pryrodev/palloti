@@ -4,10 +4,10 @@ import { readPublishedData } from "@/lib/getData";
 import { absoluteUrl, getArticleSegment, getPublicationSegment } from "@/lib/seoPaths";
 import type { Publication } from "./[lang]/publications/publicationsQuery";
 
-const PUBLIC_ROUTES = ["", "identity", "direction", "communities", "news", "galleries", "videos", "publications", "contact"];
+const PUBLIC_ROUTES = ["", "identity", "direction", "communities", "news", "galleries", "videos", "publications", "catalog", "contact"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const languages = ["en", "fr"];
+  const languages = ["en", "fr", "it"];
   const [dictionaries, publications] = await Promise.all([
     Promise.all(languages.map((lang) => getDictionary(lang))),
     readPublishedData<Publication[]>("publications", "publications.json"),

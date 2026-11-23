@@ -25,6 +25,7 @@ type DataTableProps<TData extends object> = {
   isLoading?: boolean;
   pageSize?: number;
   pageSizes?: number[];
+  onRowClick?: (row: TData) => void;
 };
 
 export default function DataTable<TData extends object>({
@@ -35,6 +36,7 @@ export default function DataTable<TData extends object>({
   isLoading = false,
   pageSize = 10,
   pageSizes = [10, 20, 50],
+  onRowClick,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize });
@@ -54,6 +56,7 @@ export default function DataTable<TData extends object>({
       recordCount={data.length}
       isLoading={isLoading}
       emptyMessage={emptyMessage}
+      onRowClick={onRowClick}
       tableLayout={{ dense: true, rowBorder: true, headerBorder: true }}
       tableClassNames={{ base: "min-w-[1240px]", headerRow: "bg-[#fbf7f1]" }}
     >

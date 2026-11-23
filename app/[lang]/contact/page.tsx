@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ArrowUpRight, MapPin, Phone } from "lucide-react";
+import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
 import { getDictionary } from "@/lib/getDictionary";
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
 import ContactForm from "../../components/ContactForm";
@@ -67,6 +67,19 @@ export default async function ContactPage({ params }: { params: Promise<{ lang: 
                   </ul>
                 </div>
               </section>
+              {dict.footer.email && (
+                <section className="flex gap-4 py-5">
+                  <span className="flex size-10 shrink-0 items-center justify-center border border-[var(--cream3)] text-[var(--gold-dk)]">
+                    <Mail aria-hidden="true" className="size-5" />
+                  </span>
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--dark)]">{dict.contactPage.email || "Email"}</h3>
+                    <p className="mt-1">
+                      <a href={`mailto:${dict.footer.email}`} className="text-sm text-[var(--mid)] underline decoration-[var(--cream3)] underline-offset-4 hover:text-[var(--red)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)]">{dict.footer.email}</a>
+                    </p>
+                  </div>
+                </section>
+              )}
             </div>
 
             <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-[var(--red)] hover:text-[var(--gold-dk)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--gold)]">

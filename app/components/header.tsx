@@ -22,6 +22,7 @@ type Navigation = {
   gallery: string;
   videos: string;
   publications: string;
+  catalog?: string;
 };
 
 interface HeaderProps {
@@ -53,10 +54,15 @@ export const Header = ({ lang, navigation }: HeaderProps) => {
   const navLinks = [
     { href: `/${lang}`,             label: navigation.home },
     { href: `/${lang}/identity`,    label: navigation.identity },
-    { href: `/${lang}/direction`,   label: navigation.provincialDirection },
     { href: `/${lang}/communities`, label: navigation.communitiesAndWorks },
     { href: `/${lang}/news`,        label: navigation.news },
     { href: `/${lang}/contact`,     label: navigation.contact },
+  ];
+
+  const directionLabel = navigation.provincialDirection;
+  const directionItems = [
+    { href: `/${lang}/direction`, label: navigation.provincialDirection },
+    { href: `/${lang}/catalog`,   label: navigation.catalog || (lang === "fr" ? "Catalogue" : lang === "it" ? "Catalogo" : "Catalog") },
   ];
 
   const mediaLabel = navigation.media;
@@ -79,7 +85,14 @@ export const Header = ({ lang, navigation }: HeaderProps) => {
         <div className="container mx-auto px-4 md:px-6 h-full">
           <nav className="flex items-center justify-between h-full">
             <Logo lang={lang} />
-            <DesktopNav navLinks={navLinks} pathname={pathname} mediaLabel={mediaLabel} mediaItems={mediaItems} />
+            <DesktopNav
+              navLinks={navLinks}
+              pathname={pathname}
+              directionLabel={directionLabel}
+              directionItems={directionItems}
+              mediaLabel={mediaLabel}
+              mediaItems={mediaItems}
+            />
             <div className="flex items-center gap-2 md:gap-3">
               <div className="hidden sm:block">
                 <LanguageSwitcher />
@@ -90,7 +103,15 @@ export const Header = ({ lang, navigation }: HeaderProps) => {
         </div>
       </header>
 
-      <MobileMenu isOpen={isMenuOpen} navLinks={navLinks} pathname={pathname} mediaLabel={mediaLabel} mediaItems={mediaItems} />
+      <MobileMenu
+        isOpen={isMenuOpen}
+        navLinks={navLinks}
+        pathname={pathname}
+        directionLabel={directionLabel}
+        directionItems={directionItems}
+        mediaLabel={mediaLabel}
+        mediaItems={mediaItems}
+      />
     </>
   );
 };

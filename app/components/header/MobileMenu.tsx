@@ -9,15 +9,22 @@ export function MobileMenu({
   isOpen,
   navLinks,
   pathname,
+  directionLabel,
+  directionItems,
   mediaLabel,
   mediaItems,
 }: {
   isOpen: boolean;
   navLinks: NavLink[];
   pathname: string;
+  directionLabel?: string;
+  directionItems?: MediaItem[];
   mediaLabel: string;
   mediaItems: MediaItem[];
 }) {
+  const firstLinks = navLinks.slice(0, 2);
+  const remainingLinks = navLinks.slice(2);
+
   return (
     <div
       id="mobile-site-menu"
@@ -30,8 +37,43 @@ export function MobileMenu({
     >
       <div className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto px-5 pb-6 pt-20 sm:gap-6 sm:px-8 sm:pt-24">
 
-        {/* Regular links */}
-        {navLinks.map((link) => (
+        {/* First links (Home, Identity) */}
+        {firstLinks.map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className={cn(
+              "min-h-11 break-words border-b border-white/20 pb-3 font-serif text-xl font-bold transition-all sm:pb-4 sm:text-2xl",
+              pathname === link.href ? "text-yellow-400 translate-x-2" : "text-white"
+            )}
+          >
+            {link.label}
+          </Link>
+        ))}
+
+        {/* Direction group (Government + Confreres Catalog) */}
+        {directionLabel && directionItems && directionItems.length > 0 && (
+          <div className="border-b border-white/20 pb-4">
+            <p className="mb-3 text-xl font-serif font-bold text-white sm:text-2xl">{directionLabel}</p>
+            <div className="flex flex-col gap-2 pl-4">
+              {directionItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "min-h-11 break-words py-2 text-sm font-bold uppercase tracking-wide transition-colors sm:text-base",
+                    pathname === item.href ? "text-yellow-400" : "text-white/80 hover:text-yellow-400"
+                  )}
+                >
+                  → {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Remaining links (Communities, News, Contact) */}
+        {remainingLinks.map((link) => (
           <Link
             key={link.href}
             href={link.href}
