@@ -144,10 +144,10 @@ export default function CommunitiesEditor() {
           <button
             type="button"
             onClick={() => setEditing(createEmptyCommunity())}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold bg-[#C9952A] text-white hover:bg-[#b08020] transition-all duration-150 hover:-translate-y-0.5 active:scale-95"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold bg-[#C9952A] text-white hover:bg-[#b08020] transition-all duration-150 hover:-translate-y-0.5 active:scale-95 cursor-pointer"
           >
             <Plus className="size-4" />
-            + New Community
+            New Community
           </button>
 
           <button

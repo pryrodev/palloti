@@ -280,7 +280,7 @@ export default function DirectionEditor() {
         style={{ backgroundColor: "#5C3317", color: "#fff" }}
         onClick={() => void addMember()}
       >
-        <Plus data-icon="inline-start" />+ Add Member
+        <Plus data-icon="inline-start" />Add Member
       </Button>
     </div>
 
