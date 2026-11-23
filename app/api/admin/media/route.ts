@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 const assetSchema = z.object({
   publicId: z.string().min(1).max(191),
+  name: z.string().max(255).optional(),
   url: z.string().url().max(2048),
   secureUrl: z.string().url().max(2048),
   resourceType: z.enum(["image", "video", "raw"]),
@@ -56,10 +57,11 @@ export async function POST(req: NextRequest) {
   const parsed = assetSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Invalid media metadata", issues: parsed.error.issues }, { status: 400 });
   try {
+    const { name, ...rest } = parsed.data;
     const asset = await prisma.mediaAsset.upsert({
-      where: { publicId: parsed.data.publicId },
-      create: parsed.data,
-      update: parsed.data,
+      where: { publicId: rest.publicId },
+      create: { ...rest, ...(name ? { name } : {}) },
+      update: { ...rest, ...(name ? { name } : {}) },
     });
     return NextResponse.json(asset);
   } catch {
