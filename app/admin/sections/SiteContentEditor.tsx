@@ -433,7 +433,7 @@ export default function SiteContentEditor() {
       </Frame>
 
       {message && <p role="status" aria-live="polite" className="border border-border bg-card px-3 py-2 text-sm text-foreground">{message}</p>}
-      {query.error && <p role="alert" className="border border-warning/30 bg-warning/5 px-3 py-2 text-sm text-foreground">Could not load saved copy. The committed English and French text is open; saving creates its CMS record when the database is available.</p>}
+      {query.error && <p role="alert" className="border border-warning/30 bg-warning/5 px-3 py-2 text-sm text-foreground">Could not load saved copy from database. The committed English, French, and Italian files are currently loaded as fallback. Saving will store them in the CMS database once it is available.</p>}
 
       <div className="grid min-w-0 gap-4 xl:grid-cols-[13rem_minmax(0,1fr)]">
         <nav aria-label="Site content sections" className="hidden min-w-0 gap-3 xl:flex xl:flex-col xl:overflow-visible">
