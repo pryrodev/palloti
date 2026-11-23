@@ -35,16 +35,24 @@ export async function POST(req: NextRequest) {
 
   // 1. Find all assets that still have no name — use raw SQL so this works
   //    even before the migration adds the column (the column defaults to NULL).
-  let assets: { id: string; publicId: string | null; resourceType: string }[];
+  await ensureMediaNameColumn();
+  let assets: { id: string; publicId: string | null; resourceType: string }[] = [];
   try {
-    await ensureMediaNameColumn();
     assets = await prisma.$queryRaw<{ id: string; publicId: string | null; resourceType: string }[]>`
       SELECT id, publicId, resourceType FROM media_assets
       WHERE (name IS NULL OR name = '') AND publicId IS NOT NULL
     `;
   } catch (err) {
-    console.error("backfill-names query error:", err);
-    return NextResponse.json({ error: err instanceof Error ? err.message : "Database is unavailable." }, { status: 503 });
+    console.warn("Could not filter by name column, falling back to all assets:", err);
+    try {
+      assets = await prisma.$queryRaw<{ id: string; publicId: string | null; resourceType: string }[]>`
+        SELECT id, publicId, resourceType FROM media_assets
+        WHERE publicId IS NOT NULL
+      `;
+    } catch (fallbackErr) {
+      console.error("backfill-names fallback error:", fallbackErr);
+      return NextResponse.json({ error: fallbackErr instanceof Error ? fallbackErr.message : "Database is unavailable." }, { status: 503 });
+    }
   }
 
   if (assets.length === 0) {
