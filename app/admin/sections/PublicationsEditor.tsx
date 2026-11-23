@@ -133,18 +133,23 @@ export default function PublicationsEditor() {
     setEditing(null);
   }
 
-  function addPublication(url: string, name: string) {
-    const book: Book = { ...EMPTY, id: Date.now(), number: String(books.length + 1).padStart(2, "0"), title: name, url };
-    setBooks((previous) => [...previous, book]); setEditing(book);
-  }
-
   return <div>
     <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
       <p className="text-sm text-gray-500">{books.length} publications</p>
       <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 sm:gap-3">{message && <span role="status" className="text-sm font-bold">{message}</span>}
-        <CloudinaryMediaPicker label="+ Add document" resourceType="raw" onSelect={(asset) => addPublication(asset.secureUrl, asset.publicId.split("/").pop() ?? "New document")} />
-        <button onClick={() => setEditing({ ...EMPTY, id: Date.now(), number: String(books.length + 1).padStart(2, "0"), url: "" })} className=" bg-[#f2e9da] px-4 py-2 text-sm font-bold text-[#5C3317]">New publication</button>
-        <button onClick={save} disabled={saving} className=" bg-[#5C3317] px-4 py-2 text-sm font-black text-white disabled:opacity-50">{saving ? "Saving…" : "Save"}</button>
+        <button
+          onClick={() => setEditing({ ...EMPTY, id: Date.now(), number: String(books.length + 1).padStart(2, "0"), url: "" })}
+          className="cursor-pointer bg-[#f2e9da] px-4 py-2 text-sm font-bold text-[#5C3317] shadow-xs transition-all duration-150 ease-out hover:bg-[#ebdcc7] hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
+        >
+          New publication
+        </button>
+        <button
+          onClick={save}
+          disabled={saving}
+          className="cursor-pointer bg-[#5C3317] px-4 py-2 text-sm font-black text-white shadow-xs transition-all duration-150 ease-out hover:bg-[#482812] hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
+        >
+          {saving ? "Saving…" : "Save"}
+        </button>
       </div>
     </div>
     {query.isLoading && <p className="mb-4 text-sm text-gray-500">Loading publications…</p>}
@@ -169,15 +174,18 @@ export default function PublicationsEditor() {
     <PaginationControls page={activePage} totalPages={totalPages} totalItems={books.length} pageSize={pageSize} itemLabel="publications" lang="en" onPageChange={setPage} />
     {editing && <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-3 sm:p-4"><div className="max-h-[90dvh] w-full max-w-md overflow-y-auto overscroll-contain bg-white p-4 shadow-2xl sm:p-6">
       <h2 className="mb-4 text-lg font-black">Publication details</h2>
-      {(["number", "title", "slug", "seoTitle", "seoDescription", "subtitle", "description"] as const).map((field) => <label key={field} className="mb-3 block text-xs font-bold capitalize text-gray-500">{field}<input value={editing[field] ?? ""} onChange={(event) => {
+      {(["number", "title", "subtitle", "description"] as const).map((field) => <label key={field} className="mb-3 block text-xs font-bold capitalize text-gray-500">{field}<input value={editing[field] ?? ""} onChange={(event) => {
         const value = event.target.value;
         if (field === "title") updatePublicationTitle(value);
         else if (field === "description") updatePublicationDescription(value);
         else setEditing({ ...editing, [field]: value });
       }} className="mt-1 w-full  border border-gray-200 px-3 py-2 text-sm text-gray-800" /></label>)}
       <div className="mb-4 flex items-center gap-3"><span className="text-xs font-bold text-gray-500">PDF/document</span><CloudinaryMediaPicker label="Choose from media" resourceType="raw" onSelect={(asset) => setEditing({ ...editing, url: asset.secureUrl })} /></div>
-      <div className="mb-4 flex flex-wrap gap-2">{COLORS.map((color) => <button key={color} onClick={() => setEditing({ ...editing, color })} aria-label={`Cover color ${color}`} className="h-8 w-8  border-2" style={{ background: color, borderColor: editing.color === color ? "#C9952A" : "transparent" }} />)}</div>
-      <div className="flex justify-end gap-3"><button onClick={() => setEditing(null)} className=" bg-gray-100 px-4 py-2 text-sm font-bold">Cancel</button><button onClick={applyPublication} className=" bg-[#5C3317] px-4 py-2 text-sm font-black text-white">Apply</button></div>
+      <div className="mb-4 flex flex-wrap gap-2">{COLORS.map((color) => <button key={color} onClick={() => setEditing({ ...editing, color })} aria-label={`Cover color ${color}`} className="h-8 w-8 cursor-pointer border-2 transition-all duration-150 ease-out hover:scale-110 active:scale-95" style={{ background: color, borderColor: editing.color === color ? "#C9952A" : "transparent" }} />)}</div>
+      <div className="flex justify-end gap-3">
+        <button onClick={() => setEditing(null)} className="cursor-pointer bg-gray-100 px-4 py-2 text-sm font-bold text-gray-700 transition-all duration-150 ease-out hover:bg-gray-200 active:scale-95">Cancel</button>
+        <button onClick={applyPublication} className="cursor-pointer bg-[#5C3317] px-4 py-2 text-sm font-black text-white shadow-xs transition-all duration-150 ease-out hover:bg-[#482812] hover:shadow-md active:scale-95">Apply</button>
+      </div>
     </div></div>}
   </div>;
 }

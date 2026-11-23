@@ -34,6 +34,7 @@ model CmsRecord {
 model MediaAsset {
   id           String   @id @default(cuid()) @db.VarChar(30)
   publicId     String?  @unique @db.VarChar(191)
+  name         String?  @db.VarChar(255)
   url          String   @db.Text
   secureUrl    String   @db.Text
   provider     String   @default("cloudinary") @db.VarChar(16)

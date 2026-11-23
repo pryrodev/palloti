@@ -18,6 +18,7 @@ import { cmsQueryKeys } from "@/lib/useCmsCollection";
 export type MediaAsset = {
   id?: string;
   publicId: string;
+  name?: string;
   url: string;
   secureUrl: string;
   provider?: "cloudinary" | "local";
@@ -78,6 +79,28 @@ const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 const GOOGLE_APP_ID = process.env.NEXT_PUBLIC_GOOGLE_APP_ID;
 const GOOGLE_DRIVE_READY = Boolean(GOOGLE_API_KEY && GOOGLE_CLIENT_ID && GOOGLE_APP_ID);
 
+/** Returns a human-readable display name for a media asset.
+ *  Priority: stored name → last segment of publicId → secureUrl basename.
+ */
+function assetDisplayName(asset: MediaAsset): string {
+  if (asset.name?.trim()) return asset.name.trim();
+  const fromPublicId = asset.publicId?.split("/").pop() ?? "";
+  if (fromPublicId) return fromPublicId;
+  try {
+    return new URL(asset.secureUrl).pathname.split("/").pop() ?? asset.secureUrl;
+  } catch {
+    return asset.secureUrl;
+  }
+}
+
+/** Format bytes as KB / MB */
+function formatBytes(bytes?: number): string {
+  if (!bytes || bytes === 0) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1_048_576) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / 1_048_576).toFixed(1)} MB`;
+}
+
 export default function CloudinaryMediaPicker({
   onSelect,
   label = "Choose from media",
@@ -120,8 +143,17 @@ export default function CloudinaryMediaPicker({
   const assets = mediaQuery.data?.items ?? [];
 
   async function saveAsset(info: Record<string, unknown>) {
+    // Derive a human-readable name: prefer original_filename, fall back to the last segment of publicId
+    const rawName = typeof info.original_filename === "string" && info.original_filename.trim()
+      ? info.original_filename.trim()
+      : typeof info.public_id === "string"
+        ? (info.public_id as string).split("/").pop() ?? ""
+        : "";
+    const name = rawName.slice(0, 255) || undefined;
+
     const asset: MediaAsset = {
       publicId: String(info.public_id ?? ""),
+      name,
       url: String(info.url ?? info.secure_url ?? ""),
       secureUrl: String(info.secure_url ?? info.url ?? ""),
       resourceType: String(info.resource_type) === "video" ? "video" : String(info.resource_type) === "raw" ? "raw" : "image",
@@ -338,17 +370,33 @@ export default function CloudinaryMediaPicker({
               </div>
             </div>}
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-              {assets.map((asset) => <button
-                key={asset.publicId}
-                type="button"
-                onClick={() => choose(asset)}
-                className="overflow-hidden border border-border text-left transition-colors hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-              >
-                {asset.resourceType === "image" ? <div className="relative aspect-square w-full"><Image src={asset.secureUrl} alt="" fill unoptimized sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw" className="object-cover" /></div> :
-                  <span className="grid aspect-square place-items-center bg-muted text-4xl text-primary">{asset.resourceType === "video" ? "▶" : "▤"}</span>}
-                <span className="block truncate p-2 text-xs font-semibold text-foreground" title={asset.publicId}>{asset.publicId.split("/").pop()}</span>
-                <span className="block px-2 pb-2 text-xs uppercase text-muted-foreground">{asset.resourceType}{asset.format ? ` · ${asset.format}` : ""}</span>
-              </button>)}
+              {assets.map((asset) => {
+                const displayName = assetDisplayName(asset);
+                const sizeLabel = formatBytes(asset.bytes);
+                const typeIcon = asset.resourceType === "video" ? "▶" : asset.format?.toLowerCase() === "pdf" ? "📄" : "📎";
+                return <button
+                  key={asset.publicId}
+                  type="button"
+                  onClick={() => choose(asset)}
+                  title={displayName}
+                  className="group overflow-hidden border border-border text-left transition-all duration-150 hover:border-primary hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                >
+                  {asset.resourceType === "image" ? (
+                    <div className="relative aspect-square w-full"><Image src={asset.secureUrl} alt="" fill unoptimized sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw" className="object-cover" /></div>
+                  ) : (
+                    <span className="grid aspect-square place-items-center bg-muted text-4xl text-primary transition-transform duration-150 group-hover:scale-110">
+                      {typeIcon}
+                    </span>
+                  )}
+                  <div className="p-2">
+                    <span className="block truncate text-xs font-semibold text-foreground leading-snug">{displayName}</span>
+                    <span className="mt-0.5 flex items-center gap-1.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                      <span>{asset.format ?? asset.resourceType}</span>
+                      {sizeLabel && <><span className="opacity-40">·</span><span>{sizeLabel}</span></>}
+                    </span>
+                  </div>
+                </button>;
+              })}
             </div>
             {!mediaQuery.isLoading && !mediaQuery.error && mediaQuery.data && mediaQuery.data.pagination.total > 0 && <PaginationControls
               page={mediaPage}
