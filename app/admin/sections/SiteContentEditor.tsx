@@ -12,6 +12,7 @@ import { DEFAULT_SITE_THEME, SITE_THEME_LABELS, type SiteTheme } from "@/lib/sit
 import { useCmsCollection, useSaveCmsCollection } from "@/lib/useCmsCollection";
 import type { CmsPayload } from "@/lib/cmsSchemas";
 import CloudinaryMediaPicker from "./CloudinaryMediaPicker";
+import { Globe, Landmark, Users } from "lucide-react";
 import ConfirmDeleteAction from "../components/ConfirmDeleteAction";
 import RichTextEditor from "./RichTextEditor";
 
@@ -28,6 +29,12 @@ type HomeContent = Record<string, unknown> & {
   rectorTitle: string;
   rectorQuote: string;
   welcomeBody: string[] | string;
+  statFounded?: string;
+  statFoundedNum?: string;
+  statMembers?: string;
+  statMembersNum?: string;
+  statCountries?: string;
+  statCountriesNum?: string;
 };
 type FounderContent = Record<string, unknown> & {
   badge?: string;
@@ -61,6 +68,12 @@ const DYNAMIC_CONTENT_PATHS = new Set([
   "home.rectorTitle",
   "home.rectorQuote",
   "home.welcomeBody",
+  "home.statFounded",
+  "home.statFoundedNum",
+  "home.statMembers",
+  "home.statMembersNum",
+  "home.statCountries",
+  "home.statCountriesNum",
   "founder.biography",
 ]);
 const SECTION_LABELS: Record<string, string> = {
@@ -243,6 +256,8 @@ export default function SiteContentEditor() {
     "provincial rector portrait quote message paragraphs",
   ].join(" ").toLocaleLowerCase();
   const showRectorEditor = (activeSection === "home" && !search.trim()) || (Boolean(search.trim()) && rectorSearchText.includes(search.trim().toLocaleLowerCase()));
+  const statsSearchText = "key statistics stats founded members countries bar 1890 111".toLocaleLowerCase();
+  const showStatsEditor = (activeSection === "home" && !search.trim()) || (Boolean(search.trim()) && statsSearchText.includes(search.trim().toLocaleLowerCase()));
   const founderSearchText = [
     content.founder && typeof content.founder === "object" ? JSON.stringify(content.founder) : "",
     "founder saint vincent pallotti biography",
@@ -499,6 +514,105 @@ export default function SiteContentEditor() {
                           onChange={updateRectorBody}
                         />
                       </div>
+                    </div>
+                  </div>
+                </div>
+              </FramePanel>
+              <FramePanel fit>
+                <div className="mb-3 border-b border-border pb-3">
+                  <div className="flex flex-wrap items-center justify-between gap-1">
+                    <div>
+                      <h3 className="text-sm font-semibold text-foreground">Key Statistics (Stats Bar)</h3>
+                      <p className="text-xs text-muted-foreground">The 3 stats displayed in the gold-accented bar on the Home page (and History banner).</p>
+                    </div>
+                    <span className="text-[11px] font-medium text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5">
+                      Banner below Hero
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {/* Founded Stat */}
+                  <div className="border border-border bg-card p-3.5 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-3 text-xs font-bold text-[#3e2009]">
+                        <Landmark className="size-4 text-[#C9952A]" />
+                        <span>Stat 1: Founded</span>
+                      </div>
+                      <label className="block text-xs font-medium text-muted-foreground mb-2">
+                        Number / Year
+                        <input
+                          value={String(draft[locale].home.statFoundedNum ?? "1890")}
+                          onChange={(event) => updateCopy(["home", "statFoundedNum"], event.target.value)}
+                          placeholder="1890"
+                          className="mt-1 w-full border border-input bg-background px-3 py-2 text-base font-bold text-[#3e2009] outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 sm:text-sm"
+                        />
+                      </label>
+                      <label className="block text-xs font-medium text-muted-foreground">
+                        Label
+                        <input
+                          value={String(draft[locale].home.statFounded ?? (locale === "fr" ? "Année de Fondation" : "Founded"))}
+                          onChange={(event) => updateCopy(["home", "statFounded"], event.target.value)}
+                          placeholder={locale === "fr" ? "Année de Fondation" : "Founded"}
+                          className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Members Stat */}
+                  <div className="border border-border bg-card p-3.5 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-3 text-xs font-bold text-[#3e2009]">
+                        <Users className="size-4 text-[#C9952A]" />
+                        <span>Stat 2: Members</span>
+                      </div>
+                      <label className="block text-xs font-medium text-muted-foreground mb-2">
+                        Number / Count
+                        <input
+                          value={String(draft[locale].home.statMembersNum ?? "111+")}
+                          onChange={(event) => updateCopy(["home", "statMembersNum"], event.target.value)}
+                          placeholder="111+"
+                          className="mt-1 w-full border border-input bg-background px-3 py-2 text-base font-bold text-[#3e2009] outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 sm:text-sm"
+                        />
+                      </label>
+                      <label className="block text-xs font-medium text-muted-foreground">
+                        Label
+                        <input
+                          value={String(draft[locale].home.statMembers ?? (locale === "fr" ? "Membres" : "Members"))}
+                          onChange={(event) => updateCopy(["home", "statMembers"], event.target.value)}
+                          placeholder={locale === "fr" ? "Membres" : "Members"}
+                          className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Countries Stat */}
+                  <div className="border border-border bg-card p-3.5 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-3 text-xs font-bold text-[#3e2009]">
+                        <Globe className="size-4 text-[#C9952A]" />
+                        <span>Stat 3: Countries</span>
+                      </div>
+                      <label className="block text-xs font-medium text-muted-foreground mb-2">
+                        Number / Count
+                        <input
+                          value={String(draft[locale].home.statCountriesNum ?? "3")}
+                          onChange={(event) => updateCopy(["home", "statCountriesNum"], event.target.value)}
+                          placeholder="3"
+                          className="mt-1 w-full border border-input bg-background px-3 py-2 text-base font-bold text-[#3e2009] outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 sm:text-sm"
+                        />
+                      </label>
+                      <label className="block text-xs font-medium text-muted-foreground">
+                        Label
+                        <input
+                          value={String(draft[locale].home.statCountries ?? (locale === "fr" ? "Pays" : "Countries"))}
+                          onChange={(event) => updateCopy(["home", "statCountries"], event.target.value)}
+                          placeholder={locale === "fr" ? "Pays" : "Countries"}
+                          className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+                        />
+                      </label>
                     </div>
                   </div>
                 </div>

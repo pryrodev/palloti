@@ -83,9 +83,9 @@ export default async function HistoryPage({ params }: { params: Promise<{ lang: 
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-6 ">
               {[
-                { number: "1890", label: lang === "fr" ? "Début de la mission" : "Mission began" },
-                { number: "111",  label: lang === "fr" ? "Membres" : "Members" },
-                { number: "3",    label: lang === "fr" ? "Pays" : "Countries" },
+                { number: (dict.home as Record<string, unknown>).statFoundedNum as string || "1890", label: lang === "fr" ? "Début de la mission" : "Mission began" },
+                { number: (dict.home as Record<string, unknown>).statMembersNum as string || "111+",  label: lang === "fr" ? "Membres" : "Members" },
+                { number: (dict.home as Record<string, unknown>).statCountriesNum as string || "3",    label: lang === "fr" ? "Pays" : "Countries" },
               ].map((stat, i) => (
                 <div key={i}>
                   <p className="font-bold mb-1"
