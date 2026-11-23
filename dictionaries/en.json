@@ -66,6 +66,11 @@
     ],
     "ctaPrimary": "Discover Our Mission",
     "ctaSecondary": "Our Communities",
+    "stats": [
+      { "value": "1890", "label": "Founded", "icon": "landmark" },
+      { "value": "111+", "label": "Members", "icon": "users" },
+      { "value": "3", "label": "Countries", "icon": "globe" }
+    ],
     "statFounded": "Founded",
     "statFoundedNum": "1890",
     "statMembers": "Members",

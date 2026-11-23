@@ -41,6 +41,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         statFoundedNum={(dict.home as Record<string, unknown>).statFoundedNum as string | undefined}
         statMembersNum={(dict.home as Record<string, unknown>).statMembersNum as string | undefined}
         statCountriesNum={(dict.home as Record<string, unknown>).statCountriesNum as string | undefined}
+        stats={(dict.home as Record<string, unknown>).stats as import("../components/HeroSlider").StatItem[] | undefined}
       />
 
       {/* ═══════════════════════════════════════

@@ -15,7 +15,7 @@ export type ArticleDocument = { type: "doc"; content: ArticleNode[] };
 
 const nodeTypes = new Set([
   "doc", "paragraph", "heading", "blockquote", "bulletList", "orderedList", "listItem",
-  "codeBlock", "horizontalRule", "hardBreak", "text",
+  "codeBlock", "horizontalRule", "hardBreak", "text", "image",
 ]);
 const markTypes = new Set(["bold", "italic", "underline", "strike", "code", "link"]);
 const safeHrefPattern = /^(https?:\/\/|mailto:|tel:|\/(?!\/)|#)/i;
@@ -59,6 +59,13 @@ function sanitizeNode(value: unknown, depth = 0): ArticleNode | undefined {
     const attrs = node.attrs && typeof node.attrs === "object" ? node.attrs as Record<string, unknown> : {};
     const start = typeof attrs.start === "number" && Number.isInteger(attrs.start) && attrs.start > 0 ? attrs.start : 1;
     result.attrs = { start };
+  } else if (node.type === "image") {
+    const attrs = node.attrs && typeof node.attrs === "object" ? node.attrs as Record<string, unknown> : {};
+    const src = typeof attrs.src === "string" ? attrs.src : "";
+    const alt = typeof attrs.alt === "string" ? attrs.alt : "";
+    const title = typeof attrs.title === "string" ? attrs.title : undefined;
+    if (!src) return undefined;
+    result.attrs = { src, alt, ...(title ? { title } : {}) };
   }
 
   if (Array.isArray(node.content)) {

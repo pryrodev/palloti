@@ -3,7 +3,30 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
-import { Landmark, Users, Globe } from "lucide-react";
+import { Award, BookOpen, Church, Globe, Heart, Landmark, MapPin, Users, type LucideIcon } from "lucide-react";
+
+export type StatItem = {
+  value: string;
+  label: string;
+  icon?: string;
+};
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  landmark: Landmark,
+  users: Users,
+  globe: Globe,
+  church: Church,
+  heart: Heart,
+  book: BookOpen,
+  award: Award,
+  "map-pin": MapPin,
+};
+
+function getStatIcon(name?: string, index = 0): LucideIcon {
+  if (name && ICON_MAP[name.toLowerCase()]) return ICON_MAP[name.toLowerCase()];
+  const fallbackIcons = [Landmark, Users, Globe, Church, Heart];
+  return fallbackIcons[index % fallbackIcons.length];
+}
 
 type Slide = {
   image: string;
@@ -23,6 +46,7 @@ interface HeroSliderProps {
   statFoundedNum?: string;
   statMembersNum?: string;
   statCountriesNum?: string;
+  stats?: StatItem[];
 }
 
 export default function HeroSlider({
@@ -36,6 +60,7 @@ export default function HeroSlider({
   statFoundedNum,
   statMembersNum,
   statCountriesNum,
+  stats,
 }: HeroSliderProps) {
   const [current, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(false);
@@ -185,23 +210,45 @@ export default function HeroSlider({
         </div>
       </div>
 
-      <div className="mx-auto mt-5 max-w-[1400px] border-t border-[var(--gold)]/70 bg-[var(--red-dk)] sm:mt-7 lg:mt-8">
-        <div className="grid grid-cols-3 divide-x divide-white/15">
-          {[
-            { num: statFoundedNum || "1890", label: statFounded, Icon: Landmark, color: "var(--gold-lt)" },
-            { num: statMembersNum || "111+", label: statMembers, Icon: Users, color: "var(--gold-lt)" },
-            { num: statCountriesNum || "3", label: statCountries, Icon: Globe, color: "var(--gold-lt)" },
-          ].map(({ num, label, Icon, color }) => (
-            <div key={label} className="flex items-center justify-center gap-2 px-2 py-4 sm:gap-4 sm:py-5">
-              <Icon className="hidden h-5 w-5 shrink-0 text-[var(--gold)] sm:block" strokeWidth={1.7} aria-hidden="true" />
-              <div>
-                <span className="block text-center font-bold leading-none sm:text-left" style={{ fontFamily: "Georgia, serif", fontSize: "clamp(1.1rem, 2.5vw, 1.5rem)", color }}>{num}</span>
-                <span className="mt-1 block text-center text-[9px] font-semibold uppercase tracking-[0.12em] text-white/80 sm:text-left sm:text-[10px]">{label}</span>
-              </div>
+      {(() => {
+        const effectiveStats: StatItem[] = (stats && stats.length > 0)
+          ? stats.slice(0, 5)
+          : [
+              { value: statFoundedNum || "1890", label: statFounded, icon: "landmark" },
+              { value: statMembersNum || "111+", label: statMembers, icon: "users" },
+              { value: statCountriesNum || "3", label: statCountries, icon: "globe" },
+            ];
+
+        const gridCols =
+          effectiveStats.length === 1 ? "grid-cols-1"
+          : effectiveStats.length === 2 ? "grid-cols-2"
+          : effectiveStats.length === 4 ? "grid-cols-2 sm:grid-cols-4"
+          : effectiveStats.length === 5 ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"
+          : "grid-cols-3";
+
+        return (
+          <div className="mx-auto mt-5 max-w-[1400px] border-t border-[var(--gold)]/70 bg-[var(--red-dk)] sm:mt-7 lg:mt-8">
+            <div className={`grid ${gridCols} divide-x divide-white/15`}>
+              {effectiveStats.map((item, idx) => {
+                const Icon = getStatIcon(item.icon, idx);
+                return (
+                  <div key={`${item.label}-${idx}`} className="flex items-center justify-center gap-2 px-2 py-4 sm:gap-4 sm:py-5">
+                    <Icon className="hidden h-5 w-5 shrink-0 text-[var(--gold)] sm:block" strokeWidth={1.7} aria-hidden="true" />
+                    <div>
+                      <span className="block text-center font-bold leading-none sm:text-left" style={{ fontFamily: "Georgia, serif", fontSize: "clamp(1.1rem, 2.5vw, 1.5rem)", color: "var(--gold-lt)" }}>
+                        {item.value}
+                      </span>
+                      <span className="mt-1 block text-center text-[9px] font-semibold uppercase tracking-[0.12em] text-white/80 sm:text-left sm:text-[10px]">
+                        {item.label}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
+        );
+      })()}
 
       <style>{`@keyframes hero-kenburns { from { transform: scale(1.06); } to { transform: scale(1); } }`}</style>
     </section>
