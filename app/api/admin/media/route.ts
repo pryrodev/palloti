@@ -58,12 +58,17 @@ export async function POST(req: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: "Invalid media metadata", issues: parsed.error.issues }, { status: 400 });
   try {
     const { name, ...rest } = parsed.data;
+    // Upsert without `name` — Prisma client on main may not have this field yet.
     const asset = await prisma.mediaAsset.upsert({
       where: { publicId: rest.publicId },
-      create: { ...rest, ...(name ? { name } : {}) },
-      update: { ...rest, ...(name ? { name } : {}) },
+      create: { ...rest },
+      update: { ...rest },
     });
-    return NextResponse.json(asset);
+    // Patch name via raw SQL so it works regardless of generated client version.
+    if (name) {
+      await prisma.$executeRaw`UPDATE media_assets SET name = ${name.slice(0, 255)} WHERE id = ${asset.id}`;
+    }
+    return NextResponse.json({ ...asset, name: name ?? null });
   } catch {
     return NextResponse.json({ error: "Could not save media metadata" }, { status: 503 });
   }

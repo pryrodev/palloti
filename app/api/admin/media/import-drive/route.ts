@@ -161,11 +161,12 @@ export async function POST(req: NextRequest) {
 
   try {
     const uploaded = await uploadDriveStream(downloadResponse.body, { resourceType: mediaType, publicId });
+    const driveName = metadata.data.name.slice(0, 255);
+    // Upsert without `name` — Prisma client on main may not have this field yet.
     const asset = await prisma.mediaAsset.upsert({
       where: { publicId: uploaded.public_id },
       create: {
         publicId: uploaded.public_id,
-        name: metadata.data.name.slice(0, 255),
         url: uploaded.url,
         secureUrl: uploaded.secure_url,
         resourceType: mediaType,
@@ -175,7 +176,6 @@ export async function POST(req: NextRequest) {
         height: uploaded.height,
       },
       update: {
-        name: metadata.data.name.slice(0, 255),
         url: uploaded.url,
         secureUrl: uploaded.secure_url,
         resourceType: mediaType,
@@ -185,7 +185,9 @@ export async function POST(req: NextRequest) {
         height: uploaded.height,
       },
     });
-    return NextResponse.json(asset, { status: 201, headers: { "Cache-Control": "no-store" } });
+    // Patch name via raw SQL so it works regardless of generated client version.
+    await prisma.$executeRaw`UPDATE media_assets SET name = ${driveName} WHERE id = ${asset.id}`;
+    return NextResponse.json({ ...asset, name: driveName }, { status: 201, headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     const message = error instanceof Error && error.message.includes("100 MB")
       ? error.message
