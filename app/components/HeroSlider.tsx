@@ -20,6 +20,9 @@ interface HeroSliderProps {
   statFounded: string;
   statMembers: string;
   statCountries: string;
+  statFoundedNum?: string;
+  statMembersNum?: string;
+  statCountriesNum?: string;
 }
 
 export default function HeroSlider({
@@ -30,6 +33,9 @@ export default function HeroSlider({
   statFounded,
   statMembers,
   statCountries,
+  statFoundedNum,
+  statMembersNum,
+  statCountriesNum,
 }: HeroSliderProps) {
   const [current, setCurrent] = useState(0);
   const [animating, setAnimating] = useState(false);
@@ -182,9 +188,9 @@ export default function HeroSlider({
       <div className="mx-auto mt-5 max-w-[1400px] border-t border-[var(--gold)]/70 bg-[var(--red-dk)] sm:mt-7 lg:mt-8">
         <div className="grid grid-cols-3 divide-x divide-white/15">
           {[
-            { num: "1890", label: statFounded, Icon: Landmark, color: "var(--gold-lt)" },
-            { num: "111+", label: statMembers, Icon: Users, color: "var(--gold-lt)" },
-            { num: "3", label: statCountries, Icon: Globe, color: "var(--gold-lt)" },
+            { num: statFoundedNum || "1890", label: statFounded, Icon: Landmark, color: "var(--gold-lt)" },
+            { num: statMembersNum || "111+", label: statMembers, Icon: Users, color: "var(--gold-lt)" },
+            { num: statCountriesNum || "3", label: statCountries, Icon: Globe, color: "var(--gold-lt)" },
           ].map(({ num, label, Icon, color }) => (
             <div key={label} className="flex items-center justify-center gap-2 px-2 py-4 sm:gap-4 sm:py-5">
               <Icon className="hidden h-5 w-5 shrink-0 text-[var(--gold)] sm:block" strokeWidth={1.7} aria-hidden="true" />
