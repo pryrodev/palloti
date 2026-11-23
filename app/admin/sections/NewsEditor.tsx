@@ -311,7 +311,7 @@ export default function NewsEditor() {
       {/* Edit modal */}
       {editing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white  p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+          <div className="max-h-[90dvh] w-full max-w-lg overflow-y-auto overscroll-contain bg-white p-4 shadow-2xl sm:p-6">
             <h2 className="font-black text-lg mb-4 text-gray-800">
               {editing.id === EMPTY.id ? "New Article" : "Edit Article"}
             </h2>
@@ -352,7 +352,7 @@ export default function NewsEditor() {
               <CloudinaryMediaPicker label="Choose image" resourceType="image" onSelect={(asset) => setEditing({ ...editing, imageUrl: asset.secureUrl })} />
             </div>
             {validation && !validation.success && <p role="alert" className="mb-3 text-xs text-red-700">{validation.error.issues[0]?.message}</p>}
-            <div className="flex gap-3 justify-end">
+            <div className="flex flex-wrap justify-end gap-2 sm:gap-3">
               <button onClick={() => setEditing(null)}
                 className="px-4 py-2 text-sm font-bold  bg-gray-100 hover:bg-gray-200">Cancel</button>
               <button onClick={saveEditing} disabled={!validation?.success}

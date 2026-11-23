@@ -66,7 +66,12 @@ const directionMemberSchema = z.object({
 const bilingualCommunities = z.object({ en: z.array(communitySchema).max(1000), fr: z.array(communitySchema).max(1000) });
 const bilingualDirection = z.object({ en: z.array(directionMemberSchema).max(100), fr: z.array(directionMemberSchema).max(100) });
 
-function hasSameShape(value: unknown, baseline: unknown): boolean {
+function hasSameShape(value: unknown, baseline: unknown, keyName = ""): boolean {
+  if (keyName === "welcomeBody" || keyName === "biography") {
+    if (typeof value === "string") return value.length <= 50000;
+    if (Array.isArray(value)) return value.every((entry) => typeof entry === "string" && entry.length <= 20000);
+    return false;
+  }
   if (typeof baseline === "string") return typeof value === "string" && value.length <= 20000;
   if (typeof baseline === "number") return typeof value === "number";
   if (typeof baseline === "boolean") return typeof value === "boolean";
@@ -81,7 +86,7 @@ function hasSameShape(value: unknown, baseline: unknown): boolean {
     const expectedKeys = Object.keys(baseline);
     const actualKeys = Object.keys(value);
     return expectedKeys.length === actualKeys.length && expectedKeys.every((key) =>
-      Object.hasOwn(value, key) && hasSameShape((value as Record<string, unknown>)[key], (baseline as Record<string, unknown>)[key]),
+      Object.hasOwn(value, key) && hasSameShape((value as Record<string, unknown>)[key], (baseline as Record<string, unknown>)[key], key),
     );
   }
   return false;

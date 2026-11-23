@@ -53,7 +53,7 @@ export default async function PublicationPage({ params }: { params: Promise<{ la
   return (
     <>
       <DecorativeDivider />
-      <main className="min-h-screen bg-[var(--cream)] pb-16">
+      <main className="min-h-dvh bg-[var(--cream)] pb-16">
         <div className="container mx-auto px-4 pt-6 sm:px-6 md:pt-10">
           <Link href={`/${lang}/publications`} className="mb-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-[var(--red)] hover:text-[var(--gold-dk)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--gold)]">
             <ArrowLeft aria-hidden="true" className="size-4" />{lang === "fr" ? "Toutes les publications" : "All publications"}
@@ -62,7 +62,7 @@ export default async function PublicationPage({ params }: { params: Promise<{ la
           <article className="mx-auto max-w-5xl">
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredPublication).replace(/</g, "\\u003c") }} />
             <div className="grid gap-8 border-y border-[var(--cream3)] py-8 sm:gap-12 sm:py-12 lg:grid-cols-[0.65fr_1.35fr] lg:items-center">
-              <div className="mx-auto flex h-[360px] w-[240px] flex-col justify-between p-7 shadow-[5px_8px_20px_rgba(0,0,0,0.18)] sm:h-[420px] sm:w-[280px]" style={{ background: publication.color }}>
+              <div className="mx-auto flex h-[340px] w-[min(240px,100%)] flex-col justify-between p-6 shadow-[5px_8px_20px_rgba(0,0,0,0.18)] sm:h-[420px] sm:w-[280px] sm:p-7" style={{ background: publication.color }}>
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-75" style={{ color: publication.titleColor }}>PSF / {publication.number}</span>
                 <BookOpen aria-hidden="true" className="size-16 opacity-20" style={{ color: publication.titleColor }} />
                 <h1 className="font-serif text-2xl font-black leading-tight sm:text-3xl" style={{ color: publication.titleColor }}>{publication.title}</h1>

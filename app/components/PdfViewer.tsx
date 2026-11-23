@@ -31,29 +31,30 @@ export default function PdfViewer({ url, title, number, onClose }: PdfViewerProp
 
   return (
     <div
-      className="fixed inset-0 z-[300] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[300] flex items-center justify-center p-2 sm:p-4"
       style={{ background: "rgba(26,20,16,0.9)", backdropFilter: "blur(6px)" }}
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-4xl  overflow-hidden flex flex-col"
-        style={{ height: "92vh", background: "#1a1410", boxShadow: "0 24px 80px rgba(0,0,0,0.6)" }}
+        className="relative flex h-[92dvh] max-h-[92dvh] w-full max-w-4xl flex-col overflow-hidden"
+        style={{ background: "#1a1410", boxShadow: "0 24px 80px rgba(0,0,0,0.6)" }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-white/10 shrink-0">
-          <div>
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-white/10 px-3 py-2 sm:px-5 sm:py-3">
+          <div className="min-w-0 flex-1">
             <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-[var(--gold)]">{number}</p>
-            <p className="text-sm font-bold text-white" style={{ fontFamily: "Georgia, serif" }}>{title}</p>
+            <p className="truncate text-sm font-bold text-white" style={{ fontFamily: "Georgia, serif" }}>{title}</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
             {/* Page controls */}
             {numPages > 0 && (
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="w-7 h-7 flex items-center justify-center  bg-white/10 text-white hover:bg-white/20 disabled:opacity-30 transition-colors"
+                  aria-label="Previous page"
+                  className="flex size-11 items-center justify-center bg-white/10 text-white transition-colors hover:bg-white/20 disabled:opacity-30"
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M15 18l-6-6 6-6"/></svg>
                 </button>
@@ -63,7 +64,8 @@ export default function PdfViewer({ url, title, number, onClose }: PdfViewerProp
                 <button
                   onClick={() => setCurrentPage((p) => Math.min(numPages, p + 1))}
                   disabled={currentPage === numPages}
-                  className="w-7 h-7 flex items-center justify-center  bg-white/10 text-white hover:bg-white/20 disabled:opacity-30 transition-colors"
+                  aria-label="Next page"
+                  className="flex size-11 items-center justify-center bg-white/10 text-white transition-colors hover:bg-white/20 disabled:opacity-30"
                 >
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 18l6-6-6-6"/></svg>
                 </button>
@@ -73,7 +75,7 @@ export default function PdfViewer({ url, title, number, onClose }: PdfViewerProp
             <a
               href={url}
               download
-              className="w-7 h-7 flex items-center justify-center  bg-white/10 text-white hover:bg-[var(--gold)] transition-colors"
+              className="flex size-11 items-center justify-center bg-white/10 text-white transition-colors hover:bg-[var(--gold)]"
               title="Download"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -81,7 +83,8 @@ export default function PdfViewer({ url, title, number, onClose }: PdfViewerProp
             {/* Close */}
             <button
               onClick={onClose}
-              className="w-7 h-7 flex items-center justify-center  bg-white/10 text-white hover:bg-red-500/60 transition-colors"
+              aria-label="Close PDF viewer"
+              className="flex size-11 items-center justify-center bg-white/10 text-white transition-colors hover:bg-red-500/60"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>

@@ -84,7 +84,7 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ la
   return (
     <>
       <DecorativeDivider />
-      <main className="min-h-screen bg-[var(--cream)] pb-16">
+      <main className="min-h-dvh bg-[var(--cream)] pb-16">
         <div className="container mx-auto px-4 pt-6 sm:px-6 md:pt-10">
           <Link href={`/${lang}/news`} className="mb-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-[var(--red)] hover:text-[var(--gold-dk)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--gold)]">
             <ArrowLeft aria-hidden="true" className="size-4" />{backLabel}

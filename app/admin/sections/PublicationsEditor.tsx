@@ -139,9 +139,9 @@ export default function PublicationsEditor() {
   }
 
   return <div>
-    <div className="mb-6 flex items-center justify-between gap-3">
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
       <p className="text-sm text-gray-500">{books.length} publications</p>
-      <div className="flex items-center gap-3">{message && <span role="status" className="text-sm font-bold">{message}</span>}
+      <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 sm:gap-3">{message && <span role="status" className="text-sm font-bold">{message}</span>}
         <CloudinaryMediaPicker label="+ Add document" resourceType="raw" onSelect={(asset) => addPublication(asset.secureUrl, asset.publicId.split("/").pop() ?? "New document")} />
         <button onClick={() => setEditing({ ...EMPTY, id: Date.now(), number: String(books.length + 1).padStart(2, "0"), url: "" })} className=" bg-[#f2e9da] px-4 py-2 text-sm font-bold text-[#5C3317]">New publication</button>
         <button onClick={save} disabled={saving} className=" bg-[#5C3317] px-4 py-2 text-sm font-black text-white disabled:opacity-50">{saving ? "Saving…" : "Save"}</button>
@@ -149,7 +149,7 @@ export default function PublicationsEditor() {
     </div>
     {query.isLoading && <p className="mb-4 text-sm text-gray-500">Loading publications…</p>}
     {query.error && <p role="alert" className="mb-4 text-sm text-red-700">{query.error.message}</p>}
-    <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">{visibleBooks.map((book, pageIndex) => <article key={book.id} className="relative overflow-hidden border border-gray-100 bg-white shadow-sm">
+    <div className="grid grid-cols-1 gap-4 min-[540px]:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 sm:gap-6">{visibleBooks.map((book, pageIndex) => <article key={book.id} className="relative overflow-hidden border border-gray-100 bg-white shadow-sm">
       <span className="absolute right-2 top-2 z-10 grid size-6 place-items-center border border-white/70 bg-[#3e2009]/85 text-[10px] font-bold tabular-nums text-white">{offset + pageIndex + 1}</span>
       <div className="flex min-h-44 flex-col justify-between gap-3 p-4" style={{ background: book.color }}><p className="text-xs uppercase tracking-widest" style={{ color: book.subtitleColor }}>PSF / {book.number}</p><p className="line-clamp-3 text-sm font-bold leading-5" style={{ color: book.titleColor }}>{book.title}</p><p className="text-xs font-medium uppercase leading-5 tracking-wider" style={{ color: book.subtitleColor }}>{book.subtitle}</p></div>
       <div className="flex flex-wrap items-center gap-2 p-3">
@@ -167,7 +167,7 @@ export default function PublicationsEditor() {
       </div>
     </article>)}</div>
     <PaginationControls page={activePage} totalPages={totalPages} totalItems={books.length} pageSize={pageSize} itemLabel="publications" lang="en" onPageChange={setPage} />
-    {editing && <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4"><div className="max-h-[90vh] w-full max-w-md overflow-y-auto  bg-white p-6 shadow-2xl">
+    {editing && <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-3 sm:p-4"><div className="max-h-[90dvh] w-full max-w-md overflow-y-auto overscroll-contain bg-white p-4 shadow-2xl sm:p-6">
       <h2 className="mb-4 text-lg font-black">Publication details</h2>
       {(["number", "title", "slug", "seoTitle", "seoDescription", "subtitle", "description"] as const).map((field) => <label key={field} className="mb-3 block text-xs font-bold capitalize text-gray-500">{field}<input value={editing[field] ?? ""} onChange={(event) => {
         const value = event.target.value;

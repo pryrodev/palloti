@@ -53,16 +53,15 @@ export async function getCmsCollectionPage(
   // default interactive transaction timeout is five seconds. The revision
   // check below gives us a consistent view without that long-lived transaction.
   for (let attempt = 0; attempt < 3; attempt += 1) {
-    const collection = await prisma.cmsCollection.findUnique({
-      where: { key },
-      select: { revision: true, payload: true },
-    });
-    if (!collection) throw new Error(`CMS collection '${key}' has not been seeded`);
-    if (expectedRevision !== undefined && collection.revision !== expectedRevision) {
-      throw new CmsRevisionConflictError(collection.revision);
-    }
-
     if (key === "siteContent") {
+      const collection = await prisma.cmsCollection.findUnique({
+        where: { key },
+        select: { revision: true, payload: true },
+      });
+      if (!collection) throw new Error(`CMS collection '${key}' has not been seeded`);
+      if (expectedRevision !== undefined && collection.revision !== expectedRevision) {
+        throw new CmsRevisionConflictError(collection.revision);
+      }
       return {
         data: cmsSchemas.siteContent.parse(collection.payload),
         pagination: pageInfo(1, 1, 1),
@@ -70,20 +69,43 @@ export async function getCmsCollectionPage(
       };
     }
 
-    const legacyPayload = cmsSchemas[key].parse(collection.payload) as never;
+    // For paginated collections, only fetch revision to avoid downloading the heavy payload
+    const collection = await prisma.cmsCollection.findUnique({
+      where: { key },
+      select: { revision: true },
+    });
+    if (!collection) throw new Error(`CMS collection '${key}' has not been seeded`);
+    if (expectedRevision !== undefined && collection.revision !== expectedRevision) {
+      throw new CmsRevisionConflictError(collection.revision);
+    }
 
     if (key === "news" || key === "communities" || key === "direction") {
-      const legacyLists = legacyPayload as { en: unknown[]; fr: unknown[] };
       const localized = {} as Record<"en" | "fr", { data: unknown[]; pagination: CmsPageInfo }>;
       for (const locale of ["en", "fr"] as const) {
         const where = { collectionKey: key, locale };
         const total = await prisma.cmsRecord.count({ where });
-        const rows = total === 0 ? [] : await prisma.cmsRecord.findMany({ where, orderBy: [{ position: "asc" }, { id: "asc" }], skip: (page - 1) * pageSize, take: pageSize, select: { payload: true } });
-        const fallback = legacyLists[locale];
-        localized[locale] = {
-          data: total === 0 ? fallback.slice((page - 1) * pageSize, page * pageSize) : rows.map((row) => row.payload),
-          pagination: pageInfo(page, pageSize, total === 0 ? fallback.length : total),
-        };
+        if (total > 0) {
+          const rows = await prisma.cmsRecord.findMany({
+            where,
+            orderBy: [{ position: "asc" }, { id: "asc" }],
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+            select: { payload: true },
+          });
+          localized[locale] = {
+            data: rows.map((row) => row.payload),
+            pagination: pageInfo(page, pageSize, total),
+          };
+        } else {
+          // Fallback to legacy payload only if no cms_records exist
+          const legacy = await prisma.cmsCollection.findUnique({ where: { key }, select: { payload: true } });
+          const legacyLists = cmsSchemas[key].parse(legacy?.payload) as { en: unknown[]; fr: unknown[] };
+          const fallback = legacyLists[locale] ?? [];
+          localized[locale] = {
+            data: fallback.slice((page - 1) * pageSize, page * pageSize),
+            pagination: pageInfo(page, pageSize, fallback.length),
+          };
+        }
       }
       const current = await prisma.cmsCollection.findUnique({ where: { key }, select: { revision: true } });
       if (current?.revision !== collection.revision) continue;
@@ -96,15 +118,32 @@ export async function getCmsCollectionPage(
 
     const where = { collectionKey: key, locale: "all" };
     const total = await prisma.cmsRecord.count({ where });
-    const rows = total === 0 ? [] : await prisma.cmsRecord.findMany({ where, orderBy: [{ position: "asc" }, { id: "asc" }], skip: (page - 1) * pageSize, take: pageSize, select: { payload: true } });
-    const legacyList = legacyPayload as unknown[];
-    const current = await prisma.cmsCollection.findUnique({ where: { key }, select: { revision: true } });
-    if (current?.revision !== collection.revision) continue;
-    return {
-      data: total === 0 ? legacyList.slice((page - 1) * pageSize, page * pageSize) : rows.map((row) => row.payload),
-      pagination: pageInfo(page, pageSize, total === 0 ? legacyList.length : total),
-      revision: collection.revision,
-    };
+    if (total > 0) {
+      const rows = await prisma.cmsRecord.findMany({
+        where,
+        orderBy: [{ position: "asc" }, { id: "asc" }],
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        select: { payload: true },
+      });
+      const current = await prisma.cmsCollection.findUnique({ where: { key }, select: { revision: true } });
+      if (current?.revision !== collection.revision) continue;
+      return {
+        data: rows.map((row) => row.payload),
+        pagination: pageInfo(page, pageSize, total),
+        revision: collection.revision,
+      };
+    } else {
+      const legacy = await prisma.cmsCollection.findUnique({ where: { key }, select: { payload: true } });
+      const legacyList = (cmsSchemas[key].parse(legacy?.payload) as unknown[]) ?? [];
+      const current = await prisma.cmsCollection.findUnique({ where: { key }, select: { revision: true } });
+      if (current?.revision !== collection.revision) continue;
+      return {
+        data: legacyList.slice((page - 1) * pageSize, page * pageSize),
+        pagination: pageInfo(page, pageSize, legacyList.length),
+        revision: collection.revision,
+      };
+    }
   }
   const current = await prisma.cmsCollection.findUnique({ where: { key }, select: { revision: true } });
   if (expectedRevision !== undefined && current && current.revision !== expectedRevision) {

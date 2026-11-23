@@ -73,7 +73,7 @@ export default function ContactForm({ labels }: { labels: Labels }) {
     }
   }
 
-  const fieldClass = "mt-2 w-full border border-[var(--cream3)] bg-white px-3 py-3 text-sm text-[var(--dark)] outline-none transition-colors placeholder:text-[var(--gray)]/70 focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)]";
+  const fieldClass = "mt-2 w-full min-w-0 border border-[var(--cream3)] bg-white px-3 py-3 text-base text-[var(--dark)] outline-none transition-colors placeholder:text-[var(--gray)]/70 focus:border-[var(--gold)] focus:ring-1 focus:ring-[var(--gold)] sm:text-sm";
 
   return (
     <section aria-labelledby="contact-form-title" className="border-t-2 border-[var(--red)] bg-white p-5 sm:p-7 lg:p-8">

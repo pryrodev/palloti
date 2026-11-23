@@ -36,7 +36,7 @@ export default async function LangLayout({
   const dictionary = await getDictionary(lang);
 
   return (
-    <div lang={lang} className="flex min-h-screen flex-col" style={{
+    <div lang={lang} className="flex min-h-dvh flex-col" style={{
       "--red": dictionary.theme.red,
       "--red-dk": dictionary.theme.redDk,
       "--red-lt": dictionary.theme.redLt,

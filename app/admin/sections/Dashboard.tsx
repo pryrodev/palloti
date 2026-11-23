@@ -14,12 +14,18 @@ import { Frame, FrameDescription, FrameHeader, FramePanel, FrameTitle } from "@/
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getArticleSegment } from "@/lib/seoPaths";
-import { useCmsCollection } from "@/lib/useCmsCollection";
+import { useQuery } from "@tanstack/react-query";
 
 type Article = { id: number; slug?: string; title: string; date: string; tags: string; summary: string };
-type Publication = { id: number; title: string };
-type GalleryItem = { src: string; title: string };
-type VideoItem = { src: string; title: string };
+type DashboardSummary = {
+  stats: {
+    news: { en: number; fr: number };
+    publications: number;
+    gallery: number;
+    videos: number;
+  };
+  recentNews: Article[];
+};
 type ArticleRow = { id: string; date: string; sortDate: number; title: string; tags: string; href: string };
 type DashboardProps = { onNavigate: (section: string) => void };
 
@@ -39,14 +45,19 @@ function formatDate(value: string) {
 }
 
 export default function Dashboard({ onNavigate }: DashboardProps) {
-  const newsQuery = useCmsCollection<{ en: Article[]; fr: Article[] }>("news");
-  const publicationsQuery = useCmsCollection<Publication[]>("publications");
-  const galleryQuery = useCmsCollection<GalleryItem[]>("gallery");
-  const videosQuery = useCmsCollection<VideoItem[]>("videos");
+  const dashboardQuery = useQuery({
+    queryKey: ["cms", "dashboard-summary"],
+    queryFn: async ({ signal }) => {
+      const res = await fetch("/api/admin/dashboard", { signal, credentials: "include" });
+      if (!res.ok) throw new Error("Failed to load dashboard overview");
+      return (await res.json()) as DashboardSummary;
+    },
+    staleTime: 30_000,
+  });
   const [sorting, setSorting] = useState<SortingState>([{ id: "sortDate", desc: true }]);
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 5 });
 
-  const articles = newsQuery.data?.en;
+  const articles = dashboardQuery.data?.recentNews;
   const rows = useMemo<ArticleRow[]>(() => (articles ?? [])
     .map((article) => ({
       id: String(article.id),
@@ -92,17 +103,43 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   });
 
   const stats = [
-    { label: "News articles", value: newsQuery.data?.en.length, loading: newsQuery.isLoading, detail: newsQuery.data ? `${newsQuery.data.fr.length} in French` : "English content", icon: Newspaper, section: "news" },
-    { label: "Publications", value: publicationsQuery.data?.length, loading: publicationsQuery.isLoading, detail: "Documents and resources", icon: FileText, section: "publications" },
-    { label: "Gallery images", value: galleryQuery.data?.length, loading: galleryQuery.isLoading, detail: "Items in the media gallery", icon: Images, section: "gallery" },
-    { label: "Videos", value: videosQuery.data?.length, loading: videosQuery.isLoading, detail: "Published video items", icon: Video, section: "videos" },
+    {
+      label: "News articles",
+      value: dashboardQuery.data?.stats.news.en,
+      loading: dashboardQuery.isLoading,
+      detail: dashboardQuery.data ? `${dashboardQuery.data.stats.news.fr} in French` : "English content",
+      icon: Newspaper,
+      section: "news",
+    },
+    {
+      label: "Publications",
+      value: dashboardQuery.data?.stats.publications,
+      loading: dashboardQuery.isLoading,
+      detail: "Documents and resources",
+      icon: FileText,
+      section: "publications",
+    },
+    {
+      label: "Gallery images",
+      value: dashboardQuery.data?.stats.gallery,
+      loading: dashboardQuery.isLoading,
+      detail: "Items in the media gallery",
+      icon: Images,
+      section: "gallery",
+    },
+    {
+      label: "Videos",
+      value: dashboardQuery.data?.stats.videos,
+      loading: dashboardQuery.isLoading,
+      detail: "Published video items",
+      icon: Video,
+      section: "videos",
+    },
   ];
-  const queries = [newsQuery, publicationsQuery, galleryQuery, videosQuery];
-  const failed = queries.filter((query) => query.isError);
-  const isRetrying = queries.some((query) => query.isFetching);
+  const isRetrying = dashboardQuery.isFetching;
 
   async function retryFailedQueries() {
-    await Promise.all(failed.map((query) => query.refetch()));
+    await dashboardQuery.refetch();
   }
 
   const quickLinks = [
@@ -112,7 +149,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   ];
 
   return <div className="space-y-6">
-    {failed.length > 0 && <Alert variant="destructive" className="rounded-none border-red-200 bg-red-50 text-red-950">
+    {dashboardQuery.isError && <Alert variant="destructive" className="rounded-none border-red-200 bg-red-50 text-red-950">
       <AlertTitle>Some dashboard data could not be loaded</AlertTitle>
       <AlertDescription className="text-red-800">
         Check the database connection, then retry. Content editors remain available from the sidebar.
@@ -126,26 +163,26 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       {stats.map((stat) => {
         const Icon = stat.icon;
         return <Frame key={stat.label} spacing="xs" className="[--frame-radius:0px] [--frame-panel-radius:0px] border-[#e8d8c5] bg-white">
-          <FramePanel className="flex min-h-24 flex-col justify-between border-[#eadfd2] bg-white p-3">
+          <FramePanel className="flex min-h-28 flex-col justify-between border-[#eadfd2] bg-white p-4 sm:p-5">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-medium text-muted-foreground">{stat.label}</p>
-                <div className="mt-1.5 text-2xl font-semibold tabular-nums text-[#3e2009]">
+                <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
+                <div className="mt-1.5 text-2xl sm:text-3xl font-bold tabular-nums text-[#3e2009]">
                   {stat.value === undefined ? stat.loading ? <Skeleton className="mt-1 h-7 w-14 rounded-none" /> : "—" : stat.value}
                 </div>
               </div>
-              <span className="grid size-8 place-items-center border border-[#eadfd2] bg-[#fbf7f1] text-[#9e711a]"><Icon aria-hidden="true" className="size-4" /></span>
+              <span className="grid size-9 place-items-center border border-[#eadfd2] bg-[#fbf7f1] text-[#9e711a]"><Icon aria-hidden="true" className="size-4.5" /></span>
             </div>
             <div className="mt-3 flex items-end justify-between gap-2">
-              <p className="min-w-0 whitespace-nowrap text-[5px] leading-[7px] text-muted-foreground">{stat.detail}</p>
+              <p className="min-w-0 break-words text-xs text-muted-foreground leading-relaxed">{stat.detail}</p>
               <button
                 type="button"
                 aria-label={`Manage ${stat.label}`}
                 title={`Manage ${stat.label}`}
                 onClick={() => onNavigate(stat.section)}
-                className="grid size-6 shrink-0 place-items-center text-[#70411e] hover:bg-[#fbf7f1] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9952A]"
+                className="grid min-h-10 min-w-10 shrink-0 place-items-center text-[#70411e] hover:bg-[#fbf7f1] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9952A]"
               >
-                <ArrowUpRight aria-hidden="true" className="size-3.5" />
+                <ArrowUpRight aria-hidden="true" className="size-4" />
               </button>
             </div>
           </FramePanel>
@@ -158,7 +195,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         <h2 id="quick-actions-title" className="text-base font-semibold text-[#3e2009]">Quick actions</h2>
         <p className="mt-1 text-sm text-muted-foreground">Jump directly to a content workspace.</p>
       </div>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {quickLinks.map((item) => {
           const Icon = item.icon;
           return <Frame key={item.key} spacing="xs" className="[--frame-radius:0px] [--frame-panel-radius:0px] border-[#e8d8c5] bg-white">
@@ -181,7 +218,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           <Button type="button" variant="outline" size="sm" className="rounded-none border-[#dfcdb6] text-[#70411e]" onClick={() => onNavigate("news")}>All news <ArrowUpRight aria-hidden="true" /></Button>
         </FrameHeader>
         <FramePanel className="p-0">
-          <DataGrid table={table} recordCount={rows.length} isLoading={newsQuery.isLoading}
+          <DataGrid table={table} recordCount={rows.length} isLoading={dashboardQuery.isLoading}
             emptyMessage={<div className="space-y-2 py-4 text-center"><p>No news articles are available yet.</p><Button type="button" variant="outline" size="sm" className="rounded-none" onClick={() => onNavigate("news")}>Create an article</Button></div>}
             tableLayout={{ dense: true, rowBorder: true, headerBorder: true }}
             tableClassNames={{ base: "min-w-[680px]", headerRow: "bg-[#fbf7f1]" }}>
