@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import { z } from "zod";
 import { isAuthenticated, unauthorized } from "@/lib/adminAuth";
-import { prisma } from "@/lib/prisma";
+import { prisma, ensureMediaNameColumn } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
@@ -160,6 +160,7 @@ export async function POST(req: NextRequest) {
   const publicId = `drive-${safeName}-${randomUUID()}${mediaType === "raw" && extension ? `.${extension}` : ""}`;
 
   try {
+    await ensureMediaNameColumn();
     const uploaded = await uploadDriveStream(downloadResponse.body, { resourceType: mediaType, publicId });
     const driveName = metadata.data.name.slice(0, 255);
     // Upsert without `name` — Prisma client on main may not have this field yet.

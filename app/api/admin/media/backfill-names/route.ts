@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 import { isAuthenticated, unauthorized } from "@/lib/adminAuth";
-import { prisma } from "@/lib/prisma";
+import { prisma, ensureMediaNameColumn } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 export const maxDuration = 60; // allow up to 60s for large libraries
@@ -37,12 +37,14 @@ export async function POST(req: NextRequest) {
   //    even before the migration adds the column (the column defaults to NULL).
   let assets: { id: string; publicId: string | null; resourceType: string }[];
   try {
+    await ensureMediaNameColumn();
     assets = await prisma.$queryRaw<{ id: string; publicId: string | null; resourceType: string }[]>`
       SELECT id, publicId, resourceType FROM media_assets
       WHERE (name IS NULL OR name = '') AND publicId IS NOT NULL
     `;
-  } catch {
-    return NextResponse.json({ error: "Database is unavailable." }, { status: 503 });
+  } catch (err) {
+    console.error("backfill-names query error:", err);
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Database is unavailable." }, { status: 503 });
   }
 
   if (assets.length === 0) {
