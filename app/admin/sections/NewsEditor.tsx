@@ -233,7 +233,7 @@ export default function NewsEditor() {
         <div className="flex gap-2">
           {(["en", "fr"] as const).map((l) => (
             <button key={l} onClick={() => setLang(l)}
-              className="px-4 py-1.5  text-sm font-bold transition-all"
+              className="cursor-pointer px-4 py-1.5 text-sm font-bold transition-all duration-150 ease-out hover:opacity-90 active:scale-95"
               style={{ background: lang === l ? "#5C3317" : "#e8e2d9", color: lang === l ? "#C9952A" : "#5C3317" }}>
               {l.toUpperCase()}
             </button>
@@ -250,12 +250,12 @@ export default function NewsEditor() {
           </div>
           {msg && <span className="text-sm font-bold">{msg}</span>}
           <button onClick={() => setEditing({ ...EMPTY })}
-            className="px-4 py-2  text-sm font-black"
+            className="cursor-pointer px-4 py-2 text-sm font-black shadow-xs transition-all duration-150 ease-out hover:brightness-105 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
             style={{ background: "#C9952A", color: "#3e2009" }}>
             + New Article
           </button>
           <button onClick={publish} disabled={saving}
-            className="px-4 py-2  text-sm font-black disabled:opacity-50"
+            className="cursor-pointer px-4 py-2 text-sm font-black shadow-xs transition-all duration-150 ease-out hover:brightness-110 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 active:scale-95 disabled:pointer-events-none disabled:opacity-50"
             style={{ background: "#5C3317", color: "#fff" }}>
             {saving ? "Publishing…" : "Publish"}
           </button>
@@ -317,9 +317,6 @@ export default function NewsEditor() {
             </h2>
             {[
               { key: "title",    label: "Title",     type: "text" },
-              { key: "slug", label: "URL slug", type: "text", placeholder: "Generated from the title" },
-              { key: "seoTitle", label: "SEO title", type: "text", placeholder: "Generated from the title (70 characters max)" },
-              { key: "seoDescription", label: "SEO description", type: "text", placeholder: "Generated from the summary (160 characters max)" },
               { key: "date",     label: "Date",      type: "text", placeholder: "DD/MM/YYYY" },
               { key: "tags",     label: "Tags",      type: "text", placeholder: "Tag1 | Tag2" },
               { key: "imageUrl", label: "Image URL", type: "text", placeholder: "/images/p5.jpg" },
@@ -354,9 +351,9 @@ export default function NewsEditor() {
             {validation && !validation.success && <p role="alert" className="mb-3 text-xs text-red-700">{validation.error.issues[0]?.message}</p>}
             <div className="flex flex-wrap justify-end gap-2 sm:gap-3">
               <button onClick={() => setEditing(null)}
-                className="px-4 py-2 text-sm font-bold  bg-gray-100 hover:bg-gray-200">Cancel</button>
+                className="cursor-pointer px-4 py-2 text-sm font-bold bg-gray-100 text-gray-700 transition-all duration-150 ease-out hover:bg-gray-200 active:scale-95">Cancel</button>
               <button onClick={saveEditing} disabled={!validation?.success}
-                className="px-4 py-2 text-sm font-black  text-white"
+                className="cursor-pointer px-4 py-2 text-sm font-black text-white shadow-xs transition-all duration-150 ease-out hover:brightness-110 hover:shadow-md active:scale-95 disabled:pointer-events-none"
                 style={{ background: "#5C3317", opacity: validation?.success ? 1 : 0.5 }}>Save</button>
             </div>
           </div>

@@ -63,24 +63,23 @@ function AdminNavigation({
           prefetch={false}
           onClick={onNavigate}
           aria-current={isActive ? "page" : undefined}
-          className="mb-1 flex min-h-11 w-full items-center gap-3 px-3 py-2.5 text-left text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#C9952A]"
-          style={{
-            background: isActive ? "rgba(201,149,42,0.2)" : "transparent",
-            color: isActive ? "#C9952A" : "rgba(255,255,255,0.82)",
-            borderLeft: isActive ? "3px solid #C9952A" : "3px solid transparent",
-          }}
+          className={`group mb-1.5 flex min-h-11 w-full items-center gap-3 px-3 py-2.5 text-left text-sm font-bold rounded-sm transition-all duration-200 ease-out focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#C9952A] ${
+            isActive
+              ? "bg-[#C9952A]/20 text-[#C9952A] border-l-[3px] border-[#C9952A] shadow-xs"
+              : "text-white/80 border-l-[3px] border-transparent hover:bg-white/10 hover:text-white hover:translate-x-1 hover:border-[#C9952A]/50 active:scale-[0.98]"
+          }`}
         >
-          <Icon aria-hidden="true" className="size-4 shrink-0" />
+          <Icon aria-hidden="true" className={`size-4 shrink-0 transition-transform duration-200 ${isActive ? "text-[#C9952A]" : "text-white/70 group-hover:text-white group-hover:scale-110"}`} />
           <span className="min-w-0 flex-1 break-words">{item.label}</span>
         </Link>;
       })}
     </nav>
 
     <div className="shrink-0 space-y-1 border-t border-white/10 p-3 sm:p-4">
-      <a href="/en" target="_blank" rel="noreferrer" onClick={onNavigate} className="flex min-h-11 w-full items-center gap-2 px-3 py-2 text-xs text-white/75 transition-colors hover:text-white">
+      <a href="/en" target="_blank" rel="noreferrer" onClick={onNavigate} className="flex min-h-11 w-full items-center gap-2 px-3 py-2 text-xs text-white/75 transition-all duration-150 hover:bg-white/10 hover:text-white hover:translate-x-1 rounded-sm">
         <Globe aria-hidden="true" className="size-4" /> View Site
       </a>
-      <button type="button" onClick={onLogout} className="flex min-h-11 w-full items-center gap-2 px-3 py-2 text-left text-xs text-white/75 transition-colors hover:text-white">
+      <button type="button" onClick={onLogout} className="flex min-h-11 w-full items-center gap-2 px-3 py-2 text-left text-xs text-white/75 transition-all duration-150 hover:bg-white/10 hover:text-white hover:translate-x-1 rounded-sm">
         <LogOut aria-hidden="true" className="size-4" /> Sign Out
       </button>
     </div>
