@@ -49,8 +49,31 @@ export async function GET(req: NextRequest) {
       },
     }, { headers: { "Cache-Control": "no-store" } });
   } catch (err) {
-    console.error("GET /api/admin/media error:", err);
-    return NextResponse.json({ error: err instanceof Error ? err.message : "Media database is unavailable" }, { status: 503 });
+    console.error("GET /api/admin/media error, attempting fallback query:", err);
+    try {
+      const offset = (page - 1) * pageSize;
+      const typeFilter = resourceType ? `WHERE resourceType = '${resourceType}'` : "";
+      const items = await prisma.$queryRawUnsafe<Record<string, unknown>[]>(
+        `SELECT id, publicId, url, secureUrl, resourceType, format, bytes, width, height, createdAt FROM media_assets ${typeFilter} ORDER BY createdAt DESC, id DESC LIMIT ${pageSize} OFFSET ${offset}`
+      );
+      const countResult = await prisma.$queryRawUnsafe<{ count: number | bigint }[]>(
+        `SELECT COUNT(*) as count FROM media_assets ${typeFilter}`
+      );
+      const total = Number(countResult[0]?.count ?? 0);
+      return NextResponse.json({
+        items,
+        pagination: {
+          page,
+          pageSize,
+          total,
+          totalPages: Math.ceil(total / pageSize),
+          offset,
+        },
+      }, { headers: { "Cache-Control": "no-store" } });
+    } catch (fallbackErr) {
+      console.error("GET /api/admin/media fallback error:", fallbackErr);
+      return NextResponse.json({ error: err instanceof Error ? err.message : "Media database is unavailable" }, { status: 503 });
+    }
   }
 }
 

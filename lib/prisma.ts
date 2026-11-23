@@ -10,25 +10,32 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 /**
  * Ensures the `name` column exists on `media_assets` table in MySQL.
- * Runs once per process, self-healing any environments where migrations have not yet executed.
+ * Checks information_schema first, then alters table if needed.
  */
-export async function ensureMediaNameColumn() {
-  if (globalForPrisma.mediaNameColumnEnsured) return;
+export async function ensureMediaNameColumn(): Promise<boolean> {
+  if (globalForPrisma.mediaNameColumnEnsured) return true;
   try {
+    const existing = await prisma.$queryRaw<unknown[]>`
+      SELECT COLUMN_NAME
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = 'media_assets'
+        AND COLUMN_NAME = 'name'
+      LIMIT 1
+    `;
+    if (Array.isArray(existing) && existing.length > 0) {
+      globalForPrisma.mediaNameColumnEnsured = true;
+      return true;
+    }
+
     await prisma.$executeRawUnsafe(
-      "ALTER TABLE media_assets ADD COLUMN IF NOT EXISTS name VARCHAR(255) NULL"
+      "ALTER TABLE `media_assets` ADD COLUMN `name` VARCHAR(255) NULL"
     );
     globalForPrisma.mediaNameColumnEnsured = true;
-  } catch {
-    try {
-      await prisma.$executeRawUnsafe(
-        "ALTER TABLE media_assets ADD COLUMN name VARCHAR(255) NULL"
-      );
-      globalForPrisma.mediaNameColumnEnsured = true;
-    } catch {
-      // Column already exists or table cannot be modified; ignore
-      globalForPrisma.mediaNameColumnEnsured = true;
-    }
+    return true;
+  } catch (err) {
+    console.error("ensureMediaNameColumn error:", err);
+    return false;
   }
 }
 
