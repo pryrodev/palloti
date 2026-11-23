@@ -136,26 +136,46 @@ const heroSlideSchema = z.object({
   title: nonEmptyText.max(500),
   subtitle: z.string().max(1000),
 });
+function fillMissingKeys(target: Record<string, unknown>, defaults: Record<string, unknown>): Record<string, unknown> {
+  if (typeof target !== "object" || target === null || Array.isArray(target)) return target;
+  const result: Record<string, unknown> = { ...target };
+  for (const [key, defaultValue] of Object.entries(defaults)) {
+    if (!Object.hasOwn(result, key) || result[key] === undefined) {
+      result[key] = defaultValue;
+    } else if (
+      typeof defaultValue === "object" &&
+      defaultValue !== null &&
+      !Array.isArray(defaultValue) &&
+      typeof result[key] === "object" &&
+      result[key] !== null &&
+      !Array.isArray(result[key])
+    ) {
+      result[key] = fillMissingKeys(result[key] as Record<string, unknown>, defaultValue as Record<string, unknown>);
+    }
+  }
+  return result;
+}
+
 const siteContentSchema = z.preprocess((input) => {
   if (typeof input !== "object" || input === null || Array.isArray(input)) return input;
   const content = input as Record<string, unknown>;
-  const withRectorImageDefault = { ...content };
+  const filled = { ...content };
   for (const [locale, defaults] of [["en", enDictionary], ["fr", frDictionary], ["it", itDictionary]] as const) {
     const localized = content[locale];
-    if (typeof localized !== "object" || localized === null || Array.isArray(localized)) continue;
-    const localizedRecord = localized as Record<string, unknown>;
-    const home = localizedRecord.home;
-    if (typeof home !== "object" || home === null || Array.isArray(home)) continue;
-    const homeRecord = home as Record<string, unknown>;
-    withRectorImageDefault[locale] = {
-      ...localizedRecord,
-      home: {
-        ...homeRecord,
-        rectorImage: homeRecord.rectorImage ?? defaults.home.rectorImage,
-      },
-    };
+    if (typeof localized !== "object" || localized === null || Array.isArray(localized)) {
+      if (locale === "it") {
+        filled.it = itDictionary;
+      }
+      continue;
+    }
+    const merged = fillMissingKeys(localized as Record<string, unknown>, defaults as Record<string, unknown>);
+    const home = merged.home as Record<string, unknown> | undefined;
+    if (home && typeof home === "object" && !Array.isArray(home)) {
+      home.rectorImage = home.rectorImage ?? defaults.home.rectorImage;
+    }
+    filled[locale] = merged;
   }
-  return withRectorImageDefault;
+  return filled;
 }, z.object({
   en: dictionaryCopySchema,
   fr: z.record(z.string(), z.unknown()).refine((value) => hasSameShape(value, frDictionary), "French dictionary structure cannot be changed"),

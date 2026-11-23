@@ -36,6 +36,10 @@ export async function getAdminCollection(req: NextRequest, key: CmsCollectionKey
     if (error instanceof CmsRevisionConflictError) {
       return NextResponse.json({ error: error.message, currentRevision: error.currentRevision }, { status: 409 });
     }
+    if (error instanceof ZodError) {
+      console.error(`CMS collection validation failed (${key})`, error.issues);
+      return NextResponse.json({ error: "CMS content validation error: " + error.issues.map((i) => i.message).join(", ") }, { status: 422 });
+    }
     console.error(`CMS collection read failed (${key})`, error);
     return NextResponse.json({ error: "CMS database is unavailable or has not been initialized" }, { status: 503 });
   }
