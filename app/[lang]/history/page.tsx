@@ -81,12 +81,15 @@ export default async function HistoryPage({ params }: { params: Promise<{ lang: 
             <p className="badge mb-4">
               {lang === "fr" ? "Province Sainte Famille · SAC" : "Holy Family Province · SAC"}
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-6 ">
-              {[
-                { number: (dict.home as Record<string, unknown>).statFoundedNum as string || "1890", label: lang === "fr" ? "Début de la mission" : "Mission began" },
-                { number: (dict.home as Record<string, unknown>).statMembersNum as string || "111+",  label: lang === "fr" ? "Membres" : "Members" },
-                { number: (dict.home as Record<string, unknown>).statCountriesNum as string || "3",    label: lang === "fr" ? "Pays" : "Countries" },
-              ].map((stat, i) => (
+            <div className={`grid grid-cols-1 sm:grid-cols-${Math.min(5, Math.max(2, (dict.home as Record<string, unknown>).stats && Array.isArray((dict.home as Record<string, unknown>).stats) ? ((dict.home as Record<string, unknown>).stats as unknown[]).length : 3))} gap-8 mt-6`}>
+              {((dict.home as Record<string, unknown>).stats && Array.isArray((dict.home as Record<string, unknown>).stats) && ((dict.home as Record<string, unknown>).stats as unknown[]).length > 0
+                ? ((dict.home as Record<string, unknown>).stats as { value: string; label: string }[]).map((s) => ({ number: s.value, label: s.label }))
+                : [
+                    { number: (dict.home as Record<string, unknown>).statFoundedNum as string || "1890", label: lang === "fr" ? "Début de la mission" : "Mission began" },
+                    { number: (dict.home as Record<string, unknown>).statMembersNum as string || "111+",  label: lang === "fr" ? "Membres" : "Members" },
+                    { number: (dict.home as Record<string, unknown>).statCountriesNum as string || "3",    label: lang === "fr" ? "Pays" : "Countries" },
+                  ]
+              ).map((stat, i) => (
                 <div key={i}>
                   <p className="font-bold mb-1"
                     style={{ fontFamily: "Georgia, serif", color: "var(--gold)", fontSize: "clamp(2rem, 3.5vw, 3rem)" }}>{stat.number}</p>

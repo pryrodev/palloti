@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Check, ImageOff, Pencil, X } from "lucide-react";
+import { Check, ImageOff, Pencil, Plus, Trash2, X } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import type { DataGridFeatures } from "@/components/reui/data-grid/data-grid";
 import { useCmsCollection, useSaveCmsCollection } from "@/lib/useCmsCollection";
 import CloudinaryMediaPicker from "./CloudinaryMediaPicker";
 import DataTable from "../components/DataTable";
+import ConfirmDeleteAction from "../components/ConfirmDeleteAction";
 
 type Member = { name: string; role: string; image?: string };
 type DirectionPayload = { en: Member[]; fr: Member[] };
@@ -91,6 +92,52 @@ export default function DirectionEditor() {
     }
   }, [editingMember, savingIndex, lang, enMembers, frMembers, saveCollection, query]);
 
+  const addMember = useCallback(async () => {
+    const newMember: Member = { name: "New Member", role: "Role", image: "" };
+    const updated = [...members, newMember];
+    const payload: DirectionPayload = {
+      en: lang === "en" ? updated : enMembers,
+      fr: lang === "fr" ? updated : frMembers,
+    };
+    try {
+      const saved = await saveCollection.mutateAsync(payload);
+      setEnMembers(payload.en);
+      setFrMembers(payload.fr);
+      serverSnapshot.current = JSON.stringify(payload);
+      serverRevision.current = saved.revision;
+      const newIndex = updated.length - 1;
+      setEditingIndex(newIndex);
+      setEditingMember({ ...newMember });
+      setMessage("New member added. Update the details and click Save.");
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Could not add member.");
+    }
+  }, [members, lang, enMembers, frMembers, saveCollection]);
+
+  const deleteMember = useCallback(async (index: number) => {
+    const target = members[index];
+    if (!target) return;
+    const updated = members.filter((_, i) => i !== index);
+    const payload: DirectionPayload = {
+      en: lang === "en" ? updated : enMembers,
+      fr: lang === "fr" ? updated : frMembers,
+    };
+    try {
+      const saved = await saveCollection.mutateAsync(payload);
+      setEnMembers(payload.en);
+      setFrMembers(payload.fr);
+      serverSnapshot.current = JSON.stringify(payload);
+      serverRevision.current = saved.revision;
+      if (editingIndex === index) {
+        setEditingIndex(null);
+        setEditingMember(null);
+      }
+      setMessage("Member deleted.");
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Could not delete member.");
+    }
+  }, [members, lang, enMembers, frMembers, saveCollection, editingIndex]);
+
   const columns = useMemo<ColumnDef<DataGridFeatures, Member>[]>(() => [
     {
       id: "index",
@@ -166,12 +213,22 @@ export default function DirectionEditor() {
           <Button type="button" size="sm" variant="outline" disabled={savingIndex !== null} onClick={cancelEdit}>
             <X data-icon="inline-start" />Cancel
           </Button>
-        </div> : <Button type="button" size="sm" variant="outline" disabled={editingIndex !== null} onClick={() => editRow(index, row.original)}>
-          <Pencil data-icon="inline-start" />Edit
-        </Button>;
+        </div> : <div className="flex items-center gap-2">
+          <Button type="button" size="sm" variant="outline" disabled={editingIndex !== null} onClick={() => editRow(index, row.original)}>
+            <Pencil data-icon="inline-start" />Edit
+          </Button>
+          <ConfirmDeleteAction
+            title="Delete member?"
+            description={`Are you sure you want to remove “${row.original.name}”?`}
+            confirmLabel="Delete"
+            onConfirm={() => void deleteMember(index)}
+          >
+            Delete
+          </ConfirmDeleteAction>
+        </div>;
       },
     },
-  ], [members, editingIndex, editingMember, savingIndex, saveRow, cancelEdit, editRow]);
+  ], [members, editingIndex, editingMember, savingIndex, saveRow, cancelEdit, editRow, deleteMember]);
 
   return <section className="flex flex-col gap-4">
     {query.isLoading && <p role="status" className="text-sm text-muted-foreground">Loading direction…</p>}
@@ -192,6 +249,16 @@ export default function DirectionEditor() {
           {locale.toUpperCase()}
         </Button>)}
       </div>
+      <Button
+        type="button"
+        size="sm"
+        disabled={savingIndex !== null || editingIndex !== null}
+        className="bg-[#5C3317] text-white hover:bg-[#70411e]"
+        style={{ backgroundColor: "#5C3317", color: "#fff" }}
+        onClick={() => void addMember()}
+      >
+        <Plus data-icon="inline-start" />+ Add Member
+      </Button>
     </div>
 
     <DataTable

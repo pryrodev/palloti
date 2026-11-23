@@ -66,6 +66,11 @@
     ],
     "ctaPrimary": "Découvrir Notre Mission",
     "ctaSecondary": "Nos Communautés",
+    "stats": [
+      { "value": "1890", "label": "Année de Fondation", "icon": "landmark" },
+      { "value": "111+", "label": "Membres", "icon": "users" },
+      { "value": "3", "label": "Pays", "icon": "globe" }
+    ],
     "statFounded": "Année de Fondation",
     "statFoundedNum": "1890",
     "statMembers": "Membres",

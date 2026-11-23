@@ -12,7 +12,7 @@ import { DEFAULT_SITE_THEME, SITE_THEME_LABELS, type SiteTheme } from "@/lib/sit
 import { useCmsCollection, useSaveCmsCollection } from "@/lib/useCmsCollection";
 import type { CmsPayload } from "@/lib/cmsSchemas";
 import CloudinaryMediaPicker from "./CloudinaryMediaPicker";
-import { Globe, Landmark, Users } from "lucide-react";
+import { Award, BookOpen, Church, Globe, Heart, Landmark, MapPin, Plus, Trash2, Users, type LucideIcon } from "lucide-react";
 import ConfirmDeleteAction from "../components/ConfirmDeleteAction";
 import RichTextEditor from "./RichTextEditor";
 
@@ -20,6 +20,28 @@ type Locale = "en" | "fr";
 type TextField = { path: (string | number)[]; label: string; value: string };
 type HeroSlide = { image: string; location: string; title: string; subtitle: string };
 type RectorTextField = "welcomeBadge" | "welcomeTitle" | "rectorName" | "rectorTitle" | "rectorQuote";
+type StatItem = {
+  value: string;
+  label: string;
+  icon?: string;
+};
+
+const STAT_ICONS: Array<{ id: string; label: string; icon: LucideIcon }> = [
+  { id: "landmark", label: "Landmark / History", icon: Landmark },
+  { id: "users", label: "Members / People", icon: Users },
+  { id: "globe", label: "Countries / Globe", icon: Globe },
+  { id: "church", label: "Church / Faith", icon: Church },
+  { id: "heart", label: "Heart / Charity", icon: Heart },
+  { id: "book", label: "Book / Education", icon: BookOpen },
+  { id: "award", label: "Award / Mission", icon: Award },
+  { id: "map-pin", label: "Location / Presence", icon: MapPin },
+];
+
+function getStatIconComponent(iconName?: string): LucideIcon {
+  const match = STAT_ICONS.find((item) => item.id === iconName?.toLowerCase());
+  return match ? match.icon : Landmark;
+}
+
 type HomeContent = Record<string, unknown> & {
   heroSlides: HeroSlide[];
   rectorImage: string;
@@ -29,6 +51,7 @@ type HomeContent = Record<string, unknown> & {
   rectorTitle: string;
   rectorQuote: string;
   welcomeBody: string[] | string;
+  stats?: StatItem[];
   statFounded?: string;
   statFoundedNum?: string;
   statMembers?: string;
@@ -519,103 +542,167 @@ export default function SiteContentEditor() {
                 </div>
               </FramePanel>
               <FramePanel fit>
-                <div className="mb-3 border-b border-border pb-3">
-                  <div className="flex flex-wrap items-center justify-between gap-1">
-                    <div>
-                      <h3 className="text-sm font-semibold text-foreground">Key Statistics (Stats Bar)</h3>
-                      <p className="text-xs text-muted-foreground">The 3 stats displayed in the gold-accented bar on the Home page (and History banner).</p>
-                    </div>
-                    <span className="text-[11px] font-medium text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5">
-                      Banner below Hero
-                    </span>
-                  </div>
-                </div>
+                {(() => {
+                  const homeData = (draft[locale]?.home ?? {}) as HomeContent;
+                  const currentStats: StatItem[] = Array.isArray(homeData.stats) && homeData.stats.length > 0
+                    ? homeData.stats
+                    : [
+                        {
+                          value: String(homeData.statFoundedNum ?? "1890"),
+                          label: String(homeData.statFounded ?? (locale === "fr" ? "Année de Fondation" : "Founded")),
+                          icon: "landmark",
+                        },
+                        {
+                          value: String(homeData.statMembersNum ?? "111+"),
+                          label: String(homeData.statMembers ?? (locale === "fr" ? "Membres" : "Members")),
+                          icon: "users",
+                        },
+                        {
+                          value: String(homeData.statCountriesNum ?? "3"),
+                          label: String(homeData.statCountries ?? (locale === "fr" ? "Pays" : "Countries")),
+                          icon: "globe",
+                        },
+                      ];
 
-                <div className="grid gap-4 sm:grid-cols-3">
-                  {/* Founded Stat */}
-                  <div className="border border-border bg-card p-3.5 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 mb-3 text-xs font-bold text-[#3e2009]">
-                        <Landmark className="size-4 text-[#C9952A]" />
-                        <span>Stat 1: Founded</span>
-                      </div>
-                      <label className="block text-xs font-medium text-muted-foreground mb-2">
-                        Number / Year
-                        <input
-                          value={String(draft[locale].home.statFoundedNum ?? "1890")}
-                          onChange={(event) => updateCopy(["home", "statFoundedNum"], event.target.value)}
-                          placeholder="1890"
-                          className="mt-1 w-full border border-input bg-background px-3 py-2 text-base font-bold text-[#3e2009] outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 sm:text-sm"
-                        />
-                      </label>
-                      <label className="block text-xs font-medium text-muted-foreground">
-                        Label
-                        <input
-                          value={String(draft[locale].home.statFounded ?? (locale === "fr" ? "Année de Fondation" : "Founded"))}
-                          onChange={(event) => updateCopy(["home", "statFounded"], event.target.value)}
-                          placeholder={locale === "fr" ? "Année de Fondation" : "Founded"}
-                          className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
-                        />
-                      </label>
-                    </div>
-                  </div>
+                  const updateStatsList = (newStats: StatItem[]) => {
+                    setDraft((prev) => {
+                      const nextHome = {
+                        ...prev[locale].home,
+                        stats: newStats,
+                        statFoundedNum: newStats[0]?.value ?? "",
+                        statFounded: newStats[0]?.label ?? "",
+                        statMembersNum: newStats[1]?.value ?? "",
+                        statMembers: newStats[1]?.label ?? "",
+                        statCountriesNum: newStats[2]?.value ?? "",
+                        statCountries: newStats[2]?.label ?? "",
+                      };
+                      return {
+                        ...prev,
+                        [locale]: {
+                          ...prev[locale],
+                          home: nextHome,
+                        },
+                      };
+                    });
+                  };
 
-                  {/* Members Stat */}
-                  <div className="border border-border bg-card p-3.5 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 mb-3 text-xs font-bold text-[#3e2009]">
-                        <Users className="size-4 text-[#C9952A]" />
-                        <span>Stat 2: Members</span>
-                      </div>
-                      <label className="block text-xs font-medium text-muted-foreground mb-2">
-                        Number / Count
-                        <input
-                          value={String(draft[locale].home.statMembersNum ?? "111+")}
-                          onChange={(event) => updateCopy(["home", "statMembersNum"], event.target.value)}
-                          placeholder="111+"
-                          className="mt-1 w-full border border-input bg-background px-3 py-2 text-base font-bold text-[#3e2009] outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 sm:text-sm"
-                        />
-                      </label>
-                      <label className="block text-xs font-medium text-muted-foreground">
-                        Label
-                        <input
-                          value={String(draft[locale].home.statMembers ?? (locale === "fr" ? "Membres" : "Members"))}
-                          onChange={(event) => updateCopy(["home", "statMembers"], event.target.value)}
-                          placeholder={locale === "fr" ? "Membres" : "Members"}
-                          className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
-                        />
-                      </label>
-                    </div>
-                  </div>
+                  const updateStatItem = (index: number, patch: Partial<StatItem>) => {
+                    const next = currentStats.map((item, i) => (i === index ? { ...item, ...patch } : item));
+                    updateStatsList(next);
+                  };
 
-                  {/* Countries Stat */}
-                  <div className="border border-border bg-card p-3.5 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 mb-3 text-xs font-bold text-[#3e2009]">
-                        <Globe className="size-4 text-[#C9952A]" />
-                        <span>Stat 3: Countries</span>
+                  const addStatItem = () => {
+                    if (currentStats.length >= 5) return;
+                    const next = [
+                      ...currentStats,
+                      { value: "10+", label: locale === "fr" ? "Paroisses" : "Parishes", icon: "church" },
+                    ];
+                    updateStatsList(next);
+                  };
+
+                  const removeStatItem = (index: number) => {
+                    if (currentStats.length <= 1) return;
+                    const next = currentStats.filter((_, i) => i !== index);
+                    updateStatsList(next);
+                  };
+
+                  return (
+                    <>
+                      <div className="mb-3 border-b border-border pb-3">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div>
+                            <h3 className="text-sm font-semibold text-foreground">Key Statistics (Stats Bar)</h3>
+                            <p className="text-xs text-muted-foreground">
+                              The stats displayed in the gold-accented bar on the Home page (and History banner). Customize up to 5 stats.
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] font-medium text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5">
+                              {currentStats.length} of 5 max
+                            </span>
+                            {currentStats.length < 5 && (
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={addStatItem}
+                                className="h-7 text-xs gap-1 border-amber-300 text-[#5C3317] hover:bg-amber-50"
+                              >
+                                <Plus className="size-3.5" />
+                                Add Stat
+                              </Button>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <label className="block text-xs font-medium text-muted-foreground mb-2">
-                        Number / Count
-                        <input
-                          value={String(draft[locale].home.statCountriesNum ?? "3")}
-                          onChange={(event) => updateCopy(["home", "statCountriesNum"], event.target.value)}
-                          placeholder="3"
-                          className="mt-1 w-full border border-input bg-background px-3 py-2 text-base font-bold text-[#3e2009] outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 sm:text-sm"
-                        />
-                      </label>
-                      <label className="block text-xs font-medium text-muted-foreground">
-                        Label
-                        <input
-                          value={String(draft[locale].home.statCountries ?? (locale === "fr" ? "Pays" : "Countries"))}
-                          onChange={(event) => updateCopy(["home", "statCountries"], event.target.value)}
-                          placeholder={locale === "fr" ? "Pays" : "Countries"}
-                          className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
+
+                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {currentStats.map((stat, index) => {
+                          const IconComp = getStatIconComponent(stat.icon);
+                          return (
+                            <div key={index} className="border border-border bg-card p-3.5 flex flex-col justify-between">
+                              <div>
+                                <div className="flex items-center justify-between gap-2 mb-2.5 pb-2 border-b border-border/60">
+                                  <div className="flex items-center gap-1.5 text-xs font-semibold text-[#3e2009]">
+                                    <IconComp className="size-4 text-[#C9952A] shrink-0" />
+                                    <span>Stat {index + 1}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <select
+                                      value={stat.icon ?? "landmark"}
+                                      onChange={(e) => updateStatItem(index, { icon: e.target.value })}
+                                      aria-label={`Select icon for stat ${index + 1}`}
+                                      className="text-xs border border-input bg-background rounded px-1.5 py-0.5 text-foreground cursor-pointer"
+                                    >
+                                      {STAT_ICONS.map((item) => (
+                                        <option key={item.id} value={item.id}>
+                                          {item.label}
+                                        </option>
+                                      ))}
+                                    </select>
+                                    {currentStats.length > 1 && (
+                                      <Button
+                                        type="button"
+                                        size="icon"
+                                        variant="ghost"
+                                        className="size-6 text-muted-foreground hover:text-destructive"
+                                        onClick={() => removeStatItem(index)}
+                                        title="Remove this stat"
+                                        aria-label="Remove this stat"
+                                      >
+                                        <Trash2 className="size-3.5" />
+                                      </Button>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <label className="block text-xs font-medium text-muted-foreground mb-2">
+                                  Number / Value
+                                  <input
+                                    value={stat.value}
+                                    onChange={(event) => updateStatItem(index, { value: event.target.value })}
+                                    placeholder="e.g. 1890, 111+, 3"
+                                    className="mt-1 w-full border border-input bg-background px-3 py-1.5 text-base font-bold text-[#3e2009] outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 sm:text-sm"
+                                  />
+                                </label>
+
+                                <label className="block text-xs font-medium text-muted-foreground">
+                                  Label
+                                  <input
+                                    value={stat.label}
+                                    onChange={(event) => updateStatItem(index, { label: event.target.value })}
+                                    placeholder={locale === "fr" ? "ex: Membres" : "e.g. Members"}
+                                    className="mt-1 w-full border border-input bg-background px-3 py-1.5 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30"
+                                  />
+                                </label>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  );
+                })()}
               </FramePanel>
               <FramePanel fit>
                 <div className="flex flex-wrap items-center justify-between gap-3">

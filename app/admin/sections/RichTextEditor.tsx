@@ -3,9 +3,11 @@
 import { useEffect, useRef } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Bold, Heading2, Heading3, Italic, Link2, List, ListOrdered, Quote, Underline } from "lucide-react";
+import ImageExtension from "@tiptap/extension-image";
+import { Bold, Heading2, Heading3, ImageIcon, Italic, Link2, List, ListOrdered, Quote, Underline } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { decodeArticleContent, encodeArticleContent, safeArticleHref } from "@/lib/articleRichText";
+import CloudinaryMediaPicker, { type MediaAsset } from "./CloudinaryMediaPicker";
 
 type RichTextEditorProps = {
   value: string;
@@ -17,7 +19,10 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
   const lastEmittedValue = useRef<string | null>(null);
 
   const editor = useEditor({
-    extensions: [StarterKit.configure({ heading: { levels: [2, 3] } })],
+    extensions: [
+      StarterKit.configure({ heading: { levels: [2, 3] } }),
+      ImageExtension.configure({ inline: false, allowBase64: true }),
+    ],
     content: decodeArticleContent(value),
     immediatelyRender: false,
     editorProps: {
@@ -59,6 +64,11 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
     if (href) editor.chain().focus().setLink({ href }).run();
   }
 
+  function handleInsertImage(asset: MediaAsset) {
+    if (!editor) return;
+    editor.chain().focus().setImage({ src: asset.secureUrl, alt: asset.name || "Article body image" }).run();
+  }
+
   const toolbar = [
     { label: "Bold", icon: Bold, action: () => editor?.chain().focus().toggleBold().run() },
     { label: "Italic", icon: Italic, action: () => editor?.chain().focus().toggleItalic().run() },
@@ -90,6 +100,8 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
             <Icon aria-hidden="true" />
           </Button>
         ))}
+        <div className="h-5 w-px bg-[#eadfd2] mx-1 self-center" />
+        <CloudinaryMediaPicker label="Insert photo" resourceType="image" onSelect={handleInsertImage} />
       </div>
       <EditorContent editor={editor} />
     </div>

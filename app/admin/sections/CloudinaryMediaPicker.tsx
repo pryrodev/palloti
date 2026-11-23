@@ -134,7 +134,10 @@ export default function CloudinaryMediaPicker({
         cache: "no-store",
         signal,
       });
-      if (!response.ok) throw new Error("Could not load the media library.");
+      if (!response.ok) {
+        const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(payload?.error ?? "Could not load the media library.");
+      }
       return response.json();
     },
     enabled: open && view === "library",
@@ -173,15 +176,53 @@ export default function CloudinaryMediaPicker({
     onSelect(asset);
   }
 
-  function uploadFromComputer() {
+  async function ensureCloudinaryLoaded(): Promise<boolean> {
+    if (typeof window !== "undefined" && window.cloudinary) return true;
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://upload-widget.cloudinary.com/latest/global/all.js";
+      script.async = true;
+      script.onload = () => {
+        setCloudinaryReady(true);
+        resolve(true);
+      };
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  }
+
+  async function uploadFromComputer() {
     setError("");
-    if (!window.cloudinary || !cloudinaryReady || !process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || !process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY) {
-      setError("Computer uploads are not ready. Check the Cloudinary configuration and try again.");
+    const isLoaded = await ensureCloudinaryLoaded();
+    if (!isLoaded || !window.cloudinary) {
+      setError("Could not load the upload widget. Check your internet connection and try again.");
       return;
     }
+
+    let cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+    let apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
+
+    if (!cloudName || !apiKey) {
+      try {
+        const res = await fetch("/api/admin/cloudinary-signature", { credentials: "include" });
+        if (res.ok) {
+          const creds = await res.json() as { cloudName?: string; apiKey?: string };
+          if (creds.cloudName && creds.apiKey) {
+            cloudName = creds.cloudName;
+            apiKey = creds.apiKey;
+          }
+        }
+      } catch {}
+    }
+
+    if (!cloudName || !apiKey) {
+      setError("Computer uploads are not ready. Cloudinary credentials (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY) are missing in the server configuration.");
+      return;
+    }
+
     const widget = window.cloudinary.createUploadWidget({
-      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-      apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
+      cloudName,
+      apiKey,
       uploadSignature: async (callback: (signature: string) => void, params: Record<string, string | number>) => {
         const response = await fetch("/api/admin/cloudinary-signature", {
           method: "POST",
@@ -359,8 +400,12 @@ export default function CloudinaryMediaPicker({
               </div>)}
             </div>}
             {mediaQuery.error && <div role="alert" className="flex flex-col items-start gap-3 border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
-              <p>{mediaQuery.error.message}</p>
-              <Button type="button" variant="outline" size="sm" onClick={() => void mediaQuery.refetch()}>Try again</Button>
+              <p className="font-medium">{mediaQuery.error.message}</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button type="button" variant="outline" size="sm" onClick={() => void mediaQuery.refetch()}>Try again</Button>
+                <Button type="button" size="sm" onClick={uploadFromComputer}>Upload from computer</Button>
+                <Button type="button" variant="outline" size="sm" onClick={() => setView("sources")}>Back to sources</Button>
+              </div>
             </div>}
             {!mediaQuery.isLoading && !mediaQuery.error && mediaQuery.data?.pagination.total === 0 && <div className="border border-dashed border-border bg-muted/30 p-10 text-center">
               <p className="text-sm font-medium">No matching media yet</p>

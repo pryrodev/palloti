@@ -44,6 +44,7 @@ export const newsArticleSchema = z.object({
   summary: z.string().max(10000),
   content: z.string().max(50000).optional(),
   imageUrl: mediaUrl,
+  images: z.array(mediaUrl).max(50).optional(),
 });
 
 const bilingualNews = z.object({ en: z.array(newsArticleSchema).max(1000), fr: z.array(newsArticleSchema).max(1000) });
@@ -72,6 +73,15 @@ function hasSameShape(value: unknown, baseline: unknown, keyName = ""): boolean 
     if (Array.isArray(value)) return value.every((entry) => typeof entry === "string" && entry.length <= 20000);
     return false;
   }
+  if (keyName === "stats") {
+    if (!Array.isArray(value)) return false;
+    return value.length >= 1 && value.length <= 5 && value.every((entry) =>
+      typeof entry === "object" &&
+      entry !== null &&
+      typeof (entry as Record<string, unknown>).value === "string" &&
+      typeof (entry as Record<string, unknown>).label === "string"
+    );
+  }
   if (typeof baseline === "string") return typeof value === "string" && value.length <= 20000;
   if (typeof baseline === "number") return typeof value === "number";
   if (typeof baseline === "boolean") return typeof value === "boolean";
@@ -83,11 +93,16 @@ function hasSameShape(value: unknown, baseline: unknown, keyName = ""): boolean 
   }
   if (typeof baseline === "object" && baseline !== null) {
     if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
-    const expectedKeys = Object.keys(baseline);
-    const actualKeys = Object.keys(value);
-    return expectedKeys.length === actualKeys.length && expectedKeys.every((key) =>
+    const expectedKeys = Object.keys(baseline).filter((k) => k !== "stats");
+    const actualKeys = Object.keys(value).filter((k) => k !== "stats");
+    const shapeMatches = expectedKeys.length === actualKeys.length && expectedKeys.every((key) =>
       Object.hasOwn(value, key) && hasSameShape((value as Record<string, unknown>)[key], (baseline as Record<string, unknown>)[key], key),
     );
+    if (!shapeMatches) return false;
+    if (Object.hasOwn(value, "stats")) {
+      return hasSameShape((value as Record<string, unknown>).stats, [], "stats");
+    }
+    return true;
   }
   return false;
 }

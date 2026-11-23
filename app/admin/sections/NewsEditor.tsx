@@ -25,9 +25,10 @@ type Article = {
   summary: string;
   content?: string;
   imageUrl: string;
+  images?: string[];
 };
 
-const EMPTY: Article = { id: Date.now(), slug: "", title: "", seoTitle: "", seoDescription: "", date: "", tags: "", summary: "", content: "", imageUrl: "" };
+const EMPTY: Article = { id: Date.now(), slug: "", title: "", seoTitle: "", seoDescription: "", date: "", tags: "", summary: "", content: "", imageUrl: "", images: [] };
 
 export default function NewsEditor() {
   const [enArticles, setEnArticles] = useState<Article[]>([]);
@@ -319,7 +320,6 @@ export default function NewsEditor() {
               { key: "title",    label: "Title",     type: "text" },
               { key: "date",     label: "Date",      type: "text", placeholder: "DD/MM/YYYY" },
               { key: "tags",     label: "Tags",      type: "text", placeholder: "Tag1 | Tag2" },
-              { key: "imageUrl", label: "Image URL", type: "text", placeholder: "/images/p5.jpg" },
             ].map(({ key, label, type, placeholder }) => (
               <div key={key} className="mb-3">
                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">{label}</label>
@@ -342,11 +342,86 @@ export default function NewsEditor() {
             <div className="mb-4">
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Article body</label>
               <RichTextEditor value={editing.content ?? ""} onChange={(content) => setEditing({ ...editing, content })} />
-              <p className="mt-1 text-xs text-gray-400">Use the toolbar to format the article. If left blank, the article page will show the summary.</p>
+              <p className="mt-1 text-xs text-gray-400">Use the toolbar to format text or insert photos. If left blank, the article will show the summary.</p>
             </div>
-            <div className="mb-4 flex items-center gap-3">
-              <span className="text-xs font-bold text-gray-500">Article image</span>
-              <CloudinaryMediaPicker label="Choose image" resourceType="image" onSelect={(asset) => setEditing({ ...editing, imageUrl: asset.secureUrl })} />
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Article Photos</span>
+                <CloudinaryMediaPicker
+                  label="+ Add photo"
+                  resourceType="image"
+                  onSelect={(asset) => {
+                    const currentImages = Array.isArray(editing.images) ? editing.images : (editing.imageUrl ? [editing.imageUrl] : []);
+                    const newUrl = asset.secureUrl;
+                    if (!currentImages.includes(newUrl)) {
+                      const nextImages = [...currentImages, newUrl];
+                      setEditing({
+                        ...editing,
+                        imageUrl: editing.imageUrl || newUrl,
+                        images: nextImages,
+                      });
+                    }
+                  }}
+                />
+              </div>
+
+              {(() => {
+                const imageList = Array.isArray(editing.images) && editing.images.length > 0
+                  ? editing.images
+                  : (editing.imageUrl ? [editing.imageUrl] : []);
+
+                if (imageList.length === 0) {
+                  return (
+                    <div className="border border-dashed border-gray-200 bg-gray-50 p-4 text-center text-xs text-gray-400">
+                      No article photos selected yet. Click "+ Add photo" to choose one or more images.
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {imageList.map((url, i) => {
+                      const isCover = url === editing.imageUrl;
+                      return (
+                        <div key={`${url}-${i}`} className={`relative rounded border p-1 text-left ${isCover ? "border-[#C9952A] bg-amber-50/50 ring-1 ring-[#C9952A]" : "border-gray-200 bg-white"}`}>
+                          <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
+                            <img src={url} alt="" className="h-full w-full object-cover" />
+                          </div>
+                          <div className="mt-1 flex items-center justify-between gap-1">
+                            {isCover ? (
+                              <span className="rounded bg-[#C9952A] px-1.5 py-0.5 text-[9px] font-bold text-white uppercase">Cover</span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => setEditing({ ...editing, imageUrl: url })}
+                                className="text-[10px] text-amber-800 hover:underline font-semibold"
+                              >
+                                Set cover
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const nextImages = imageList.filter((item) => item !== url);
+                                const nextCover = editing.imageUrl === url ? (nextImages[0] || "") : editing.imageUrl;
+                                setEditing({
+                                  ...editing,
+                                  imageUrl: nextCover,
+                                  images: nextImages,
+                                });
+                              }}
+                              title="Remove image"
+                              className="text-[10px] text-red-600 hover:text-red-800 font-bold px-1"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </div>
             {validation && !validation.success && <p role="alert" className="mb-3 text-xs text-red-700">{validation.error.issues[0]?.message}</p>}
             <div className="flex flex-wrap justify-end gap-2 sm:gap-3">

@@ -19,6 +19,7 @@ type Article = {
   summary: string;
   content?: string;
   imageUrl: string;
+  images?: string[];
 };
 
 async function getArticle(lang: string, identifier: string) {
@@ -107,6 +108,21 @@ export default async function NewsArticlePage({ params }: { params: Promise<{ la
               <span aria-hidden="true" className="my-7 block h-[2px] w-14 bg-[var(--gold)]" />
 
               <ArticleBody content={article.content ?? ""} fallback={article.summary} />
+
+              {article.images && article.images.length > 1 && (
+                <section className="mt-12 border-t border-[var(--cream3)] pt-8">
+                  <h2 className="font-serif text-2xl font-bold text-[var(--dark)] mb-6">
+                    {lang === "fr" ? "Galerie de photos" : "Photo Gallery"}
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {article.images.map((img, idx) => (
+                      <a key={idx} href={img} target="_blank" rel="noopener noreferrer" className="relative aspect-4/3 overflow-hidden rounded-xs border border-[var(--cream3)] bg-white shadow-xs transition-transform hover:scale-[1.02]">
+                        <Image src={img} alt={`${article.title} - ${idx + 1}`} fill unoptimized sizes="(max-width: 640px) 100vw, 33vw" className="object-cover" />
+                      </a>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               <div className="mt-10 border-t border-[var(--cream3)] pt-6">
                 <Link href={`/${lang}/news`} className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-[var(--red)] hover:text-[var(--gold-dk)]">

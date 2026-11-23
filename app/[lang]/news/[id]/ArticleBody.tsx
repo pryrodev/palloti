@@ -36,6 +36,20 @@ function renderNode(node: ArticleNode, key: string): ReactNode {
     case "listItem": return <li key={key}>{children}</li>;
     case "codeBlock": return <pre key={key} className="overflow-x-auto bg-[var(--cream2)] p-4 text-sm"><code>{children}</code></pre>;
     case "horizontalRule": return <hr key={key} className="border-[var(--cream3)]" />;
+    case "image": return (
+      <figure key={key} className="my-6">
+        <img
+          src={String(node.attrs?.src ?? "")}
+          alt={String(node.attrs?.alt ?? "")}
+          className="mx-auto max-h-[520px] w-auto max-w-full rounded-sm border border-[var(--cream3)] object-contain shadow-xs"
+        />
+        {node.attrs?.title && (
+          <figcaption className="mt-2 text-center text-xs italic text-[var(--mid)]">
+            {String(node.attrs.title)}
+          </figcaption>
+        )}
+      </figure>
+    );
     default: return null;
   }
 }

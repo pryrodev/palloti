@@ -27,8 +27,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Invalid media resource type." }, { status: 400 });
   }
   const where = resourceType ? { resourceType } : undefined;
-  await ensureMediaNameColumn();
   try {
+    await ensureMediaNameColumn();
     const [items, total] = await Promise.all([
       prisma.mediaAsset.findMany({
         where,
@@ -71,8 +71,54 @@ export async function GET(req: NextRequest) {
         },
       }, { headers: { "Cache-Control": "no-store" } });
     } catch (fallbackErr) {
-      console.error("GET /api/admin/media fallback error:", fallbackErr);
-      return NextResponse.json({ error: err instanceof Error ? err.message : "Media database is unavailable" }, { status: 503 });
+      console.error("GET /api/admin/media fallback error, trying Cloudinary API:", fallbackErr);
+      const cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+      const apiKey = process.env.CLOUDINARY_API_KEY || process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
+      const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+      if (cloudName && apiKey && apiSecret) {
+        try {
+          const { v2: cloudinary } = await import("cloudinary");
+          cloudinary.config({ cloud_name: cloudName, api_key: apiKey, api_secret: apiSecret });
+          const resType = resourceType === "video" ? "video" : resourceType === "raw" ? "raw" : "image";
+          const cloudResult = await cloudinary.api.resources({
+            resource_type: resType,
+            type: "upload",
+            max_results: pageSize,
+          }) as { resources?: Record<string, unknown>[] };
+
+          const cloudItems = (cloudResult.resources ?? []).map((r) => ({
+            id: String(r.asset_id ?? r.public_id),
+            publicId: String(r.public_id),
+            name: typeof r.filename === "string" && r.filename ? r.filename : String(r.public_id).split("/").pop(),
+            url: String(r.url ?? r.secure_url),
+            secureUrl: String(r.secure_url ?? r.url),
+            resourceType: String(r.resource_type ?? "image"),
+            format: typeof r.format === "string" ? r.format : undefined,
+            bytes: typeof r.bytes === "number" ? r.bytes : undefined,
+            width: typeof r.width === "number" ? r.width : undefined,
+            height: typeof r.height === "number" ? r.height : undefined,
+            createdAt: r.created_at ? new Date(String(r.created_at)).toISOString() : new Date().toISOString(),
+          }));
+
+          return NextResponse.json({
+            items: cloudItems,
+            pagination: {
+              page,
+              pageSize,
+              total: cloudItems.length,
+              totalPages: 1,
+              offset: 0,
+            },
+          }, { headers: { "Cache-Control": "no-store" } });
+        } catch (cErr) {
+          console.error("Cloudinary fallback error:", cErr);
+        }
+      }
+
+      return NextResponse.json({
+        error: "Media library is temporarily unavailable. Check database or Cloudinary configuration.",
+      }, { status: 503 });
     }
   }
 }
