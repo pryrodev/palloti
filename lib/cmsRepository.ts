@@ -193,3 +193,92 @@ export async function saveCmsCollection<K extends CmsCollectionKey>(
     timeout: 20_000,
   });
 }
+
+type GalleryItemData = { src: string; title: string; sub: string };
+
+export async function addGalleryItems(newItems: GalleryItemData[]) {
+  return prisma.$transaction(async (tx) => {
+    const collection = await tx.cmsCollection.findUniqueOrThrow({
+      where: { key: "gallery" },
+      select: { payload: true, revision: true },
+    });
+    const existing = (Array.isArray(collection.payload) ? collection.payload : []) as GalleryItemData[];
+    const updated = [...newItems, ...existing];
+    const nextRevision = collection.revision + 1;
+    await tx.cmsCollection.update({
+      where: { key: "gallery" },
+      data: { payload: updated as never, revision: nextRevision },
+    });
+    await tx.cmsRecord.deleteMany({ where: { collectionKey: "gallery" } });
+    const records = cmsRecordsFor("gallery", updated);
+    for (let start = 0; start < records.length; start += 250) {
+      await tx.cmsRecord.createMany({ data: records.slice(start, start + 250) as never });
+    }
+    return { revision: nextRevision, total: updated.length };
+  }, { maxWait: 10_000, timeout: 20_000 });
+}
+
+export async function deleteGalleryItem({ index, src }: { index?: number; src?: string }) {
+  return prisma.$transaction(async (tx) => {
+    const collection = await tx.cmsCollection.findUniqueOrThrow({
+      where: { key: "gallery" },
+      select: { payload: true, revision: true },
+    });
+    const existing = (Array.isArray(collection.payload) ? collection.payload : []) as GalleryItemData[];
+    let updated: GalleryItemData[];
+    if (typeof index === "number" && index >= 0 && index < existing.length) {
+      updated = existing.filter((_, i) => i !== index);
+    } else if (src) {
+      updated = existing.filter((item) => item.src !== src);
+    } else {
+      throw new Error("Must provide index or src to delete photo");
+    }
+    const nextRevision = collection.revision + 1;
+    await tx.cmsCollection.update({
+      where: { key: "gallery" },
+      data: { payload: updated as never, revision: nextRevision },
+    });
+    await tx.cmsRecord.deleteMany({ where: { collectionKey: "gallery" } });
+    const records = cmsRecordsFor("gallery", updated);
+    for (let start = 0; start < records.length; start += 250) {
+      await tx.cmsRecord.createMany({ data: records.slice(start, start + 250) as never });
+    }
+    return { revision: nextRevision, total: updated.length };
+  }, { maxWait: 10_000, timeout: 20_000 });
+}
+
+export async function updateGalleryPageItems({
+  page,
+  pageSize,
+  items,
+}: {
+  page: number;
+  pageSize: number;
+  items: GalleryItemData[];
+}) {
+  return prisma.$transaction(async (tx) => {
+    const collection = await tx.cmsCollection.findUniqueOrThrow({
+      where: { key: "gallery" },
+      select: { payload: true, revision: true },
+    });
+    const existing = (Array.isArray(collection.payload) ? collection.payload : []) as GalleryItemData[];
+    const offset = (page - 1) * pageSize;
+    const updated = [...existing];
+    for (let i = 0; i < items.length; i++) {
+      if (offset + i < updated.length) {
+        updated[offset + i] = items[i];
+      }
+    }
+    const nextRevision = collection.revision + 1;
+    await tx.cmsCollection.update({
+      where: { key: "gallery" },
+      data: { payload: updated as never, revision: nextRevision },
+    });
+    await tx.cmsRecord.deleteMany({ where: { collectionKey: "gallery" } });
+    const records = cmsRecordsFor("gallery", updated);
+    for (let start = 0; start < records.length; start += 250) {
+      await tx.cmsRecord.createMany({ data: records.slice(start, start + 250) as never });
+    }
+    return { revision: nextRevision, total: updated.length };
+  }, { maxWait: 10_000, timeout: 20_000 });
+}
