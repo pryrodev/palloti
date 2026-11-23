@@ -33,13 +33,14 @@ export async function POST(req: NextRequest) {
     api_secret: process.env.CLOUDINARY_API_SECRET,
   });
 
-  // 1. Find all assets that still have no name
+  // 1. Find all assets that still have no name — use raw SQL so this works
+  //    even before the migration adds the column (the column defaults to NULL).
   let assets: { id: string; publicId: string | null; resourceType: string }[];
   try {
-    assets = await prisma.mediaAsset.findMany({
-      where: { name: null, publicId: { not: null } },
-      select: { id: true, publicId: true, resourceType: true },
-    });
+    assets = await prisma.$queryRaw<{ id: string; publicId: string | null; resourceType: string }[]>`
+      SELECT id, publicId, resourceType FROM media_assets
+      WHERE (name IS NULL OR name = '') AND publicId IS NOT NULL
+    `;
   } catch {
     return NextResponse.json({ error: "Database is unavailable." }, { status: 503 });
   }
@@ -77,10 +78,9 @@ export async function POST(req: NextRequest) {
         ? (format ? `${originalFilename}.${format}` : originalFilename)
         : (asset.publicId.split("/").pop() ?? asset.publicId);
 
-      await prisma.mediaAsset.update({
-        where: { id: asset.id },
-        data: { name: name.slice(0, 255) },
-      });
+      await prisma.$executeRaw`
+        UPDATE media_assets SET name = ${name.slice(0, 255)} WHERE id = ${asset.id}
+      `;
       updated++;
     } catch (err) {
       failed++;
