@@ -60,6 +60,7 @@ function AdminNavigation({
         return <Link
           key={item.href}
           href={item.href}
+          prefetch={false}
           onClick={onNavigate}
           aria-current={isActive ? "page" : undefined}
           className="mb-1 flex min-h-11 w-full items-center gap-3 px-3 py-2.5 text-left text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#C9952A]"
