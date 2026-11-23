@@ -6,6 +6,7 @@ import { FadeUp, StaggerContainer, StaggerItem } from "../components/motion";
 import HeroSlider from "../components/HeroSlider";
 import DecorativeDivider from "../components/ui/DecorativeDivider";
 import { getArticleSegment } from "@/lib/seoPaths";
+import ArticleBody from "./news/[id]/ArticleBody";
 
 type NewsItem = { id: number | string; slug?: string; date: string; tags: string; title: string; excerpt: string; image?: string };
 
@@ -100,9 +101,13 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
 
                 {/* Body copy */}
                 <div className="space-y-5">
-                  {dict.home.welcomeBody.map((p: string, i: number) => (
-                    <p key={i} className="text-base leading-[1.9]" style={{ color: "var(--mid)", textAlign: "justify" }}>{p}</p>
-                  ))}
+                  {typeof dict.home.welcomeBody === "string" ? (
+                    <ArticleBody content={dict.home.welcomeBody} fallback="" />
+                  ) : Array.isArray(dict.home.welcomeBody) ? (
+                    (dict.home.welcomeBody as string[]).map((p: string, i: number) => (
+                      <p key={i} className="text-base leading-[1.9]" style={{ color: "var(--mid)", textAlign: "justify" }}>{p}</p>
+                    ))
+                  ) : null}
                 </div>
               </div>
 

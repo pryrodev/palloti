@@ -208,7 +208,7 @@ export default function VideosEditor() {
     <Dialog.Root open={playingVideo !== null} onOpenChange={(open) => { if (!open) setPlayingVideo(null); }}>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/70" />
-        <Dialog.Popup className="fixed left-1/2 top-1/2 z-50 flex max-h-[90vh] w-[min(94vw,64rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-3 overflow-y-auto border border-border bg-background p-4 text-foreground shadow-lg">
+        <Dialog.Popup className="fixed left-1/2 top-1/2 z-50 flex max-h-[90dvh] w-[min(94vw,64rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-3 overflow-y-auto overscroll-contain border border-border bg-background p-3 text-foreground shadow-lg sm:p-4">
           {playingVideo && <>
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">

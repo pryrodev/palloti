@@ -20,12 +20,15 @@ export function MobileMenu({
 }) {
   return (
     <div
+      id="mobile-site-menu"
+      aria-hidden={!isOpen}
+      inert={!isOpen}
       className={cn(
-        "fixed inset-0 z-[90] xl:hidden transition-all duration-500 ease-in-out bg-gradient-to-br from-[var(--red-dk)] via-[var(--red)] to-[var(--red-lt)]",
+        "fixed inset-0 z-[90] h-dvh xl:hidden transition-all duration-500 ease-in-out bg-gradient-to-br from-[var(--red-dk)] via-[var(--red)] to-[var(--red-lt)]",
         isOpen ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
       )}
     >
-      <div className="flex flex-col h-full pt-24 px-8 gap-6 overflow-y-auto">
+      <div className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto px-5 pb-6 pt-20 sm:gap-6 sm:px-8 sm:pt-24">
 
         {/* Regular links */}
         {navLinks.map((link) => (
@@ -33,7 +36,7 @@ export function MobileMenu({
             key={link.href}
             href={link.href}
             className={cn(
-              "text-2xl font-serif font-bold border-b border-white/20 pb-4 transition-all",
+              "min-h-11 break-words border-b border-white/20 pb-3 font-serif text-xl font-bold transition-all sm:pb-4 sm:text-2xl",
               pathname === link.href ? "text-yellow-400 translate-x-2" : "text-white"
             )}
           >
@@ -43,14 +46,14 @@ export function MobileMenu({
 
         {/* Media group */}
         <div className="border-b border-white/20 pb-4">
-          <p className="text-2xl font-serif font-bold text-white mb-3">{mediaLabel}</p>
+          <p className="mb-3 text-xl font-serif font-bold text-white sm:text-2xl">{mediaLabel}</p>
           <div className="flex flex-col gap-2 pl-4">
             {mediaItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "text-base font-bold tracking-wide uppercase transition-colors",
+                  "min-h-11 break-words py-2 text-sm font-bold uppercase tracking-wide transition-colors sm:text-base",
                   pathname === item.href ? "text-yellow-400" : "text-white/80 hover:text-yellow-400"
                 )}
               >

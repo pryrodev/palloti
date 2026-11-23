@@ -106,6 +106,9 @@ export default function NewsFilter({ articles, readMore, lang, allPublicationsLa
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const page = Math.min(currentPage, totalPages);
+  const firstVisiblePage = Math.max(1, Math.min(page - 2, totalPages - 4));
+  const lastVisiblePage = Math.min(totalPages, firstVisiblePage + 4);
+  const visiblePages = Array.from({ length: lastVisiblePage - firstVisiblePage + 1 }, (_, index) => firstVisiblePage + index);
   const pageArticles = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const hasMagazineLayout = page === 1 && activeKey === "all";
   const featured = hasMagazineLayout ? pageArticles[0] : undefined;
@@ -251,11 +254,19 @@ export default function NewsFilter({ articles, readMore, lang, allPublicationsLa
                 <button type="button" onClick={() => setCurrentPage((current) => Math.max(1, current - 1))} disabled={page === 1} aria-label={copy.previous} className="inline-flex min-h-10 items-center gap-2 border border-[var(--cream3)] px-3 text-xs font-bold uppercase tracking-wider text-[var(--red)] hover:bg-[var(--cream2)] disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)]">
                   <ArrowLeft aria-hidden="true" className="size-4" /><span className="hidden sm:inline">{copy.previous}</span>
                 </button>
-                {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+                {firstVisiblePage > 1 && <>
+                  <button type="button" onClick={() => setCurrentPage(1)} aria-label={`${copy.page} 1`} className="size-10 border border-[var(--cream3)] bg-white text-xs font-bold tabular-nums text-[var(--red)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)]">1</button>
+                  {firstVisiblePage > 2 && <span aria-hidden="true" className="px-1 text-[var(--gray)]">…</span>}
+                </>}
+                {visiblePages.map((pageNumber) => (
                   <button key={pageNumber} type="button" onClick={() => setCurrentPage(pageNumber)} aria-label={`${copy.page} ${pageNumber}`} aria-current={pageNumber === page ? "page" : undefined} className={`size-10 border text-xs font-bold tabular-nums focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)] ${pageNumber === page ? "border-[var(--red)] bg-[var(--red)] text-white" : "border-[var(--cream3)] bg-white text-[var(--red)] hover:bg-[var(--cream2)]"}`}>
                     {pageNumber}
                   </button>
                 ))}
+                {lastVisiblePage < totalPages && <>
+                  {lastVisiblePage < totalPages - 1 && <span aria-hidden="true" className="px-1 text-[var(--gray)]">…</span>}
+                  <button type="button" onClick={() => setCurrentPage(totalPages)} aria-label={`${copy.page} ${totalPages}`} className="size-10 border border-[var(--cream3)] bg-white text-xs font-bold tabular-nums text-[var(--red)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)]">{totalPages}</button>
+                </>}
                 <button type="button" onClick={() => setCurrentPage((current) => Math.min(totalPages, current + 1))} disabled={page === totalPages} aria-label={copy.next} className="inline-flex min-h-10 items-center gap-2 border border-[var(--cream3)] px-3 text-xs font-bold uppercase tracking-wider text-[var(--red)] hover:bg-[var(--cream2)] disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gold)]">
                   <span className="hidden sm:inline">{copy.next}</span><ArrowRight aria-hidden="true" className="size-4" />
                 </button>

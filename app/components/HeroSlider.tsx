@@ -71,7 +71,7 @@ export default function HeroSlider({
     >
       <div className="mx-auto grid max-w-[1480px] grid-cols-1 px-3 sm:px-6 lg:grid-cols-[minmax(300px,0.78fr)_minmax(0,1.8fr)] lg:px-10">
         {/* This brand panel stays fixed while the story and image change. */}
-        <div className="relative z-10 flex min-h-[510px] flex-col items-center bg-[var(--cream)] px-5 py-7 text-center shadow-xl sm:px-8 sm:py-9 lg:min-h-[610px] lg:px-8 xl:px-10">
+        <div className="order-2 relative z-10 flex min-h-[460px] flex-col items-center bg-[var(--cream)] px-5 py-7 text-center shadow-xl sm:min-h-[510px] sm:px-8 sm:py-9 lg:order-1 lg:min-h-[610px] lg:px-8 xl:px-10">
           <div className="relative flex h-[88px] w-[min(100%,240px)] shrink-0 items-center justify-center border border-[var(--cream3)] bg-white px-5 shadow-sm sm:h-[104px]">
             <Image src="/p4.png" alt="SAC Pallottins" fill sizes="(max-width: 640px) 200px, 240px" className="object-contain p-5" priority />
           </div>
@@ -130,7 +130,7 @@ export default function HeroSlider({
         </div>
 
         {/* Only this image panel advances with the story content. */}
-        <div className="relative min-h-[340px] overflow-hidden border-t-4 border-[var(--gold)] bg-[var(--red-dk)] sm:min-h-[440px] lg:min-h-[610px] lg:border-l-4 lg:border-t-0">
+        <div className="order-1 relative min-h-[300px] overflow-hidden border-b-4 border-[var(--gold)] bg-[var(--red-dk)] sm:min-h-[440px] lg:order-2 lg:min-h-[610px] lg:border-b-0 lg:border-l-4">
           {slides.map((slide, i) => (
             <div
               key={`image-${slide.image}`}

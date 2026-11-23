@@ -142,7 +142,7 @@ export const Footer = ({ lang, dict, navigation }: FooterProps) => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
                     </svg>
                   </div>
-                  <span className="text-base text-white transition-colors">{item.text}</span>
+                  <span className="max-w-full break-words text-base text-white transition-colors">{item.text}</span>
                 </li>
               ))}
             </ul>

@@ -18,11 +18,27 @@ function getLocale(request: NextRequest): string {
   return matchLocale(languages.length > 0 ? languages : [i18n.defaultLocale], locales, i18n.defaultLocale);
 }
 
+const SESSION_COOKIE_NAMES = [
+  "better-auth.session_token",
+  "__Secure-better-auth.session_token",
+];
+
+function hasSessionCookie(request: NextRequest): boolean {
+  return SESSION_COOKIE_NAMES.some((name) => request.cookies.has(name));
+}
+
 export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // The CMS has its own routes and is not part of the public localized site.
-  if (pathname === "/admin" || pathname.startsWith("/admin/")) return;
+  // Protect all /admin routes except /admin/login at the proxy edge
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+    if (pathname !== "/admin/login" && !pathname.startsWith("/admin/login") && !hasSessionCookie(request)) {
+      const loginUrl = new URL("/admin/login", request.url);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    return;
+  }
 
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`

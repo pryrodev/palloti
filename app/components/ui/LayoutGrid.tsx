@@ -94,8 +94,8 @@ export const LayoutGrid = ({ cards, galleryCards = cards, lang = "en" }: { cards
               exit={{ scale: 0.85, opacity: 0 }}
               transition={{ duration: 0.25 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-5xl overflow-hidden"
-              style={{ maxHeight: "80vh" }}
+            className="relative w-full max-w-5xl overflow-hidden"
+              style={{ maxHeight: "80dvh" }}
             >
               {/* Close button */}
               <button
@@ -130,7 +130,7 @@ export const LayoutGrid = ({ cards, galleryCards = cards, lang = "en" }: { cards
               </button>
 
               {/* Image */}
-              <div className="relative w-full" style={{ height: "min(70vh, 760px)" }}>
+              <div className="relative w-full" style={{ height: "min(70dvh, 760px)" }}>
                 <Image
                   src={selected.thumbnail}
                   alt={selected.alt}

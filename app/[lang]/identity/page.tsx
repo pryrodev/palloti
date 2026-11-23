@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getDictionary } from "@/lib/getDictionary";
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
+import ArticleBody from "../news/[id]/ArticleBody";
 import type { Metadata } from "next";
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
@@ -56,17 +57,21 @@ export default async function IdentityPage({ params }: { params: Promise<{ lang:
               <h2 className="font-bold mb-4" style={{ fontFamily: "Georgia, serif", fontSize: "clamp(1.6rem, 3vw, 2.2rem)", color: "var(--red)" }}>
                 {founder.title}
               </h2>
-              {founder.biography.map((paragraph: string, index: number) => (
-                <p key={index} className="leading-relaxed" style={{ fontSize: "1.05rem", color: "var(--mid)" }}>
-                  {index === 0 && (
-                    <span className="float-left text-6xl font-bold mr-3 leading-none"
-                      style={{ fontFamily: "Georgia, serif", color: "var(--red)" }}>
-                      {paragraph[0]}
-                    </span>
-                  )}
-                  {index === 0 ? paragraph.slice(1) : paragraph}
-                </p>
-              ))}
+              {typeof (founder.biography as unknown) === "string" ? (
+                <ArticleBody content={founder.biography as unknown as string} fallback="" />
+              ) : Array.isArray(founder.biography) ? (
+                (founder.biography as string[]).map((paragraph: string, index: number) => (
+                  <p key={index} className="leading-relaxed" style={{ fontSize: "1.05rem", color: "var(--mid)" }}>
+                    {index === 0 && (
+                      <span className="float-left text-6xl font-bold mr-3 leading-none"
+                        style={{ fontFamily: "Georgia, serif", color: "var(--red)" }}>
+                        {paragraph[0]}
+                      </span>
+                    )}
+                    {index === 0 ? paragraph.slice(1) : paragraph}
+                  </p>
+                ))
+              ) : null}
             </div>
           </div>
         </div>

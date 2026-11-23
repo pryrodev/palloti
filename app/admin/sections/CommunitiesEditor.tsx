@@ -69,8 +69,8 @@ export default function CommunitiesEditor() {
     <div>
       {query.isLoading && <p className="mb-4 text-sm text-gray-500">Loading communities…</p>}
       {query.error && <p role="alert" className="mb-4 text-sm text-red-700">{query.error.message}</p>}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex gap-2">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-2">
           {(["en","fr"] as const).map((l) => (
             <button key={l} onClick={() => setLang(l)}
               className="px-4 py-1.5  text-sm font-bold"
@@ -79,8 +79,8 @@ export default function CommunitiesEditor() {
             </button>
           ))}
         </div>
-        <div className="flex gap-3 items-center">
-          {msg && <span className="text-sm font-bold">{msg}</span>}
+        <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
+          {msg && <span role="status" className="text-sm font-bold">{msg}</span>}
           <button onClick={save} disabled={saving}
             className="px-4 py-2  text-sm font-black disabled:opacity-50"
             style={{ background: "#5C3317", color: "#fff" }}>
@@ -123,7 +123,7 @@ export default function CommunitiesEditor() {
       {/* Edit modal */}
       {editing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white  p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
+          <div className="max-h-[90dvh] w-full max-w-lg overflow-y-auto overscroll-contain bg-white p-4 shadow-2xl sm:p-6">
             <h2 className="font-black text-lg mb-4">Edit Community</h2>
             {[
               { key: "name", label: "Name" },
@@ -155,7 +155,7 @@ export default function CommunitiesEditor() {
                 onChange={(e) => setEditing({ ...editing, works: e.target.value.split("\n").filter(Boolean) })}
                 className="w-full px-3 py-2  border border-gray-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#C9952A]" />
             </div>
-            <div className="flex gap-3 justify-end">
+            <div className="flex flex-wrap justify-end gap-2 sm:gap-3">
               <button onClick={() => setEditing(null)}
                 className="px-4 py-2 text-sm font-bold  bg-gray-100 hover:bg-gray-200">Cancel</button>
               <button onClick={saveEditing}

@@ -6,12 +6,14 @@ import Link from "next/link";
 import enDictionary from "@/dictionaries/en.json";
 import frDictionary from "@/dictionaries/fr.json";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Frame, FramePanel } from "@/components/reui/frame";
 import { DEFAULT_SITE_THEME, SITE_THEME_LABELS, type SiteTheme } from "@/lib/siteTheme";
 import { useCmsCollection, useSaveCmsCollection } from "@/lib/useCmsCollection";
 import type { CmsPayload } from "@/lib/cmsSchemas";
 import CloudinaryMediaPicker from "./CloudinaryMediaPicker";
 import ConfirmDeleteAction from "../components/ConfirmDeleteAction";
+import RichTextEditor from "./RichTextEditor";
 
 type Locale = "en" | "fr";
 type TextField = { path: (string | number)[]; label: string; value: string };
@@ -25,10 +27,19 @@ type HomeContent = Record<string, unknown> & {
   rectorName: string;
   rectorTitle: string;
   rectorQuote: string;
-  welcomeBody: string[];
+  welcomeBody: string[] | string;
+};
+type FounderContent = Record<string, unknown> & {
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  biography?: string[] | string;
+  quote?: string;
+  quoteAuthor?: string;
 };
 type EditableDictionary = Record<string, unknown> & {
   home: HomeContent;
+  founder?: FounderContent;
 };
 type SiteContent = Omit<CmsPayload<"siteContent">, "en" | "fr"> & { en: EditableDictionary; fr: EditableDictionary };
 
@@ -50,6 +61,7 @@ const DYNAMIC_CONTENT_PATHS = new Set([
   "home.rectorTitle",
   "home.rectorQuote",
   "home.welcomeBody",
+  "founder.biography",
 ]);
 const SECTION_LABELS: Record<string, string> = {
   home: "Home page",
@@ -230,7 +242,12 @@ export default function SiteContentEditor() {
     content.home && typeof content.home === "object" ? JSON.stringify(content.home) : "",
     "provincial rector portrait quote message paragraphs",
   ].join(" ").toLocaleLowerCase();
-  const showRectorEditor = activeSection === "home" && (!search.trim() || rectorSearchText.includes(search.trim().toLocaleLowerCase()));
+  const showRectorEditor = (activeSection === "home" && !search.trim()) || (Boolean(search.trim()) && rectorSearchText.includes(search.trim().toLocaleLowerCase()));
+  const founderSearchText = [
+    content.founder && typeof content.founder === "object" ? JSON.stringify(content.founder) : "",
+    "founder saint vincent pallotti biography",
+  ].join(" ").toLocaleLowerCase();
+  const showFounderEditor = (activeSection === "founder" && !search.trim()) || (Boolean(search.trim()) && founderSearchText.includes(search.trim().toLocaleLowerCase()));
   const fieldGroups = visibleFields.reduce<Map<string, TextField[]>>((groups, field) => {
     const groupKey = field.path.length > 2 && typeof field.path[1] === "string" ? field.path[1] : "pageCopy";
     const group = groups.get(groupKey) ?? [];
@@ -266,8 +283,12 @@ export default function SiteContentEditor() {
     updateCopy(["home", field], value);
   }
 
-  function updateRectorParagraph(index: number, value: string) {
-    updateCopy(["home", "welcomeBody", index], value);
+  function updateRectorBody(value: string) {
+    updateCopy(["home", "welcomeBody"], value);
+  }
+
+  function updateFounderBiography(value: string) {
+    updateCopy(["founder", "biography"], value);
   }
 
   async function save() {
@@ -310,8 +331,8 @@ export default function SiteContentEditor() {
   }
 
   return (
-    <div className="flex max-w-6xl flex-col gap-3">
-      <Frame spacing="sm" className="[--frame-radius:0px] [--frame-panel-radius:0px]">
+    <div className="site-content-editor flex min-w-0 w-full max-w-6xl flex-col gap-3">
+      <Frame spacing="sm" className="sticky top-0 z-20 bg-background [--frame-radius:0px] [--frame-panel-radius:0px]">
         <FramePanel fit className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-2">
             <div className="min-w-0">
@@ -337,7 +358,31 @@ export default function SiteContentEditor() {
             ))}
             <label className="ml-auto min-w-48 flex-1 sm:max-w-sm">
               <span className="sr-only">Search copy</span>
-              <input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search copy" className="w-full border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30" />
+              <input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search copy" className="w-full border border-input bg-background px-3 py-2 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 sm:text-sm" />
+            </label>
+          </div>
+          <div className="xl:hidden">
+            <label className="block text-xs font-medium text-muted-foreground">
+              Choose a page
+              <Select value={activeSection} onValueChange={(value) => {
+                if (typeof value === "string") {
+                  setActiveSection(value);
+                  setSearch("");
+                }
+              }}>
+                <SelectTrigger aria-label="Choose a site page" className="mt-1 w-full rounded-none text-base sm:text-sm">
+                  <SelectValue placeholder="Choose a page" />
+                </SelectTrigger>
+                <SelectContent align="start" className="max-h-[65dvh] rounded-none">
+                  {SECTION_GROUPS.map((group) => {
+                    const availableSections = group.sections.filter((section) => editorSections.includes(section));
+                    return availableSections.length > 0 ? <SelectGroup key={group.label}>
+                      <SelectLabel>{group.label}</SelectLabel>
+                      {availableSections.map((section) => <SelectItem key={section} value={section}>{formatSectionLabel(section)}</SelectItem>)}
+                    </SelectGroup> : null;
+                  })}
+                </SelectContent>
+              </Select>
             </label>
           </div>
         </FramePanel>
@@ -347,7 +392,7 @@ export default function SiteContentEditor() {
       {query.error && <p role="alert" className="border border-warning/30 bg-warning/5 px-3 py-2 text-sm text-foreground">Could not load saved copy. The committed English and French text is open; saving creates its CMS record when the database is available.</p>}
 
       <div className="grid min-w-0 gap-4 xl:grid-cols-[13rem_minmax(0,1fr)]">
-        <nav aria-label="Site content sections" className="flex min-w-0 gap-3 overflow-x-auto xl:flex-col xl:overflow-visible">
+        <nav aria-label="Site content sections" className="hidden min-w-0 gap-3 xl:flex xl:flex-col xl:overflow-visible">
           {SECTION_GROUPS.map((group) => {
             const availableSections = group.sections.filter((section) => editorSections.includes(section));
             if (availableSections.length === 0) return null;
@@ -377,7 +422,7 @@ export default function SiteContentEditor() {
                   <h3 id="site-colors-heading" className="text-sm font-semibold text-foreground">Brand colors</h3>
                   <p className="text-xs text-muted-foreground">Palette values used across the public site.</p>
                 </div>
-                <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="grid gap-2 sm:grid-cols-2 2xl:grid-cols-3">
                   {(Object.keys(SITE_THEME_LABELS) as (keyof SiteTheme)[]).map((key) => (
                     <label key={key} className="flex min-w-0 items-center gap-3 border border-border bg-background p-2">
                       <input type="color" value={draft.theme[key]} onChange={(event) => updateTheme(key, event.target.value.toUpperCase())} aria-label={`${SITE_THEME_LABELS[key]} color`} className="size-9 shrink-0 cursor-pointer border-0 bg-transparent p-0" />
@@ -431,23 +476,28 @@ export default function SiteContentEditor() {
                       ] as const).map(([field, label]) => (
                         <label key={field} className="block min-w-0 text-xs font-medium text-muted-foreground">
                           {label}
-                          <input value={draft[locale].home[field]} onChange={(event) => updateRectorText(field, event.target.value)} className="mt-1 w-full border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30" />
+                          <input value={draft[locale].home[field]} onChange={(event) => updateRectorText(field, event.target.value)} className="mt-1 w-full border border-input bg-background px-3 py-2 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 sm:text-sm" />
                         </label>
                       ))}
                     </div>
                     <label className="block text-xs font-medium text-muted-foreground">
                       Quote
-                      <textarea value={draft[locale].home.rectorQuote} rows={2} onChange={(event) => updateRectorText("rectorQuote", event.target.value)} className="mt-1 w-full resize-y border border-input bg-background px-3 py-2 text-sm leading-relaxed text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30" />
+                      <textarea value={draft[locale].home.rectorQuote} rows={2} onChange={(event) => updateRectorText("rectorQuote", event.target.value)} className="mt-1 w-full resize-y border border-input bg-background px-3 py-2 text-base leading-relaxed text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 sm:text-sm" />
                     </label>
                     <div className="border-t border-border pt-3">
-                      <h4 className="mb-2 text-xs font-semibold text-foreground">Message paragraphs</h4>
-                      <div className="flex flex-col gap-3">
-                        {draft[locale].home.welcomeBody.map((paragraph, index) => (
-                          <label key={index} className="block text-xs font-medium text-muted-foreground">
-                            Paragraph {index + 1}
-                            <textarea value={paragraph} rows={3} onChange={(event) => updateRectorParagraph(index, event.target.value)} className="mt-1 w-full resize-y border border-input bg-background px-3 py-2 text-sm leading-relaxed text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30" />
-                          </label>
-                        ))}
+                      <div className="mb-2 flex flex-wrap items-center justify-between gap-1">
+                        <h4 className="text-xs font-semibold text-foreground">Message Body</h4>
+                        <span className="text-[11px] text-muted-foreground">Rich text — formatting, links, and paragraphs supported</span>
+                      </div>
+                      <div className="border border-input bg-background">
+                        <RichTextEditor
+                          value={
+                            Array.isArray(draft[locale].home.welcomeBody)
+                              ? draft[locale].home.welcomeBody.join("\n\n")
+                              : String(draft[locale].home.welcomeBody || "")
+                          }
+                          onChange={updateRectorBody}
+                        />
                       </div>
                     </div>
                   </div>
@@ -470,7 +520,7 @@ export default function SiteContentEditor() {
                     <summary className="cursor-pointer text-sm font-medium text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
                       Slide {index + 1}{slide.title ? ` — ${slide.title}` : " — Untitled"}
                     </summary>
-                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <div className="mt-3 grid gap-3 lg:grid-cols-2">
                       {(["location", "title", "subtitle"] as const).map((field) => (
                         <label key={field} className="block text-xs font-medium text-muted-foreground">
                           {field === "location" ? "Location label" : formatSectionLabel(field)}
@@ -496,6 +546,30 @@ export default function SiteContentEditor() {
               ))}
             </Frame>}
 
+            {showFounderEditor && <Frame spacing="sm" stacked className="[--frame-radius:0px] [--frame-panel-radius:0px]">
+              <FramePanel fit>
+                <div className="mb-3 border-b border-border pb-3">
+                  <div className="flex flex-wrap items-center justify-between gap-1">
+                    <div>
+                      <h3 className="text-sm font-semibold text-foreground">Founder Biography</h3>
+                      <p className="text-xs text-muted-foreground">Saint Vincent Pallotti biography shown on the Identity / Founder page.</p>
+                    </div>
+                    <span className="text-[11px] text-muted-foreground">Rich text — formatting, links, and paragraphs supported</span>
+                  </div>
+                </div>
+                <div className="border border-input bg-background">
+                  <RichTextEditor
+                    value={
+                      Array.isArray(draft[locale].founder?.biography)
+                        ? (draft[locale].founder.biography as string[]).join("\n\n")
+                        : String(draft[locale].founder?.biography || "")
+                    }
+                    onChange={updateFounderBiography}
+                  />
+                </div>
+              </FramePanel>
+            </Frame>}
+
             {fieldGroups.size > 0 ? <Frame spacing="sm" stacked className="[--frame-radius:0px] [--frame-panel-radius:0px]">
               {[...fieldGroups.entries()].map(([group, fields]) => (
                 <FramePanel key={group} fit>
@@ -516,9 +590,9 @@ export default function SiteContentEditor() {
                               <CloudinaryMediaPicker label="Choose image" resourceType="image" onSelect={(asset) => updateCopy(field.path, asset.secureUrl || asset.url)} />
                             </div>
                           ) : isLongCopyField(field.path, field.value) ? (
-                            <textarea value={field.value} rows={3} onChange={(event) => updateCopy(field.path, event.target.value)} className="w-full resize-y border border-input bg-background px-3 py-2 text-sm leading-relaxed text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30" />
+                        <textarea value={field.value} rows={3} onChange={(event) => updateCopy(field.path, event.target.value)} className="w-full resize-y border border-input bg-background px-3 py-2 text-base leading-relaxed text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 sm:text-sm" />
                           ) : (
-                            <input value={field.value} onChange={(event) => updateCopy(field.path, event.target.value)} className="w-full border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30" />
+                        <input value={field.value} onChange={(event) => updateCopy(field.path, event.target.value)} className="w-full border border-input bg-background px-3 py-2 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 sm:text-sm" />
                           )}
                         </label>
                       ))}

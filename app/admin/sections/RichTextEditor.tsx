@@ -22,7 +22,7 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: "article-rich-editor-content min-h-64 max-h-[60vh] overflow-y-auto px-4 py-3 text-sm leading-7 text-[#3e2009] outline-none",
+        class: "article-rich-editor-content min-h-64 max-h-[60dvh] overflow-y-auto px-4 py-3 text-base leading-7 text-[#3e2009] outline-none sm:text-sm",
         role: "textbox",
         "aria-label": "Article body",
         "aria-multiline": "true",
@@ -80,7 +80,7 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
             type="button"
             variant="ghost"
             size="icon-sm"
-            className="rounded-none"
+            className="size-11 rounded-none"
             aria-label={label}
             title={label}
             disabled={!editor}
