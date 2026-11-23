@@ -99,3 +99,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Could not save media metadata" }, { status: 503 });
   }
 }
+
+const renameSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1).max(255),
+});
+
+export async function PATCH(req: NextRequest) {
+  if (!(await isAuthenticated(req))) return unauthorized();
+  const parsed = renameSchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) return NextResponse.json({ error: "Invalid name. Name must be between 1 and 255 characters." }, { status: 400 });
+  try {
+    await ensureMediaNameColumn();
+    await prisma.$executeRaw`
+      UPDATE media_assets SET name = ${parsed.data.name.trim().slice(0, 255)} WHERE id = ${parsed.data.id}
+    `;
+    return NextResponse.json({ success: true, id: parsed.data.id, name: parsed.data.name.trim() });
+  } catch (err) {
+    console.error("PATCH /api/admin/media error:", err);
+    return NextResponse.json({ error: "Could not rename asset" }, { status: 500 });
+  }
+}
