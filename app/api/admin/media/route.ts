@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { isAuthenticated, unauthorized } from "@/lib/adminAuth";
-import { prisma } from "@/lib/prisma";
+import { prisma, ensureMediaNameColumn } from "@/lib/prisma";
 
 const assetSchema = z.object({
   publicId: z.string().min(1).max(191),
@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Invalid media resource type." }, { status: 400 });
   }
   const where = resourceType ? { resourceType } : undefined;
+  await ensureMediaNameColumn();
   try {
     const [items, total] = await Promise.all([
       prisma.mediaAsset.findMany({
@@ -47,8 +48,9 @@ export async function GET(req: NextRequest) {
         offset: (page - 1) * pageSize,
       },
     }, { headers: { "Cache-Control": "no-store" } });
-  } catch {
-    return NextResponse.json({ error: "Media database is unavailable" }, { status: 503 });
+  } catch (err) {
+    console.error("GET /api/admin/media error:", err);
+    return NextResponse.json({ error: err instanceof Error ? err.message : "Media database is unavailable" }, { status: 503 });
   }
 }
 
@@ -57,6 +59,7 @@ export async function POST(req: NextRequest) {
   const parsed = assetSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Invalid media metadata", issues: parsed.error.issues }, { status: 400 });
   try {
+    await ensureMediaNameColumn();
     const { name, ...rest } = parsed.data;
     // Upsert without `name` — Prisma client on main may not have this field yet.
     const asset = await prisma.mediaAsset.upsert({
