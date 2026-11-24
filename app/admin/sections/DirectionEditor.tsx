@@ -186,7 +186,7 @@ export default function DirectionEditor() {
         const isEditing = editingIndex === index && editingMember !== null;
         return isEditing ? <label className="block">
           <span className="sr-only">Name</span>
-          <input autoFocus value={editingMember.name} disabled={savingIndex !== null} onChange={(event) => setEditingMember((current) => current ? { ...current, name: event.target.value } : current)} className="w-full min-w-0 border border-input bg-background px-2 py-1.5 text-sm font-semibold text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30" />
+          <input value={editingMember.name} disabled={savingIndex !== null} onChange={(event) => setEditingMember((current) => current ? { ...current, name: event.target.value } : current)} className="w-full min-w-0 border border-input bg-background px-2 py-1.5 text-sm font-semibold text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30" />
         </label> : <span className="break-words text-sm font-semibold text-foreground">{row.original.name}</span>;
       },
     },

@@ -126,7 +126,7 @@ export default function VideosEditor() {
         const isEditing = editingIndex === index && editingVideo !== null;
         return isEditing ? <label className="block">
           <span className="sr-only">Video title</span>
-          <input autoFocus value={editingVideo.title} disabled={saving} onChange={(event) => setEditingVideo((current) => current ? { ...current, title: event.target.value } : current)} className="w-full min-w-0 border border-input bg-background px-2 py-1.5 text-sm font-semibold text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30" />
+          <input value={editingVideo.title} disabled={saving} onChange={(event) => setEditingVideo((current) => current ? { ...current, title: event.target.value } : current)} className="w-full min-w-0 border border-input bg-background px-2 py-1.5 text-sm font-semibold text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30" />
         </label> : <span className="break-words text-sm font-semibold text-foreground">{row.original.title}</span>;
       },
     },
