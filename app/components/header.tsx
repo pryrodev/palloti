@@ -54,15 +54,10 @@ export const Header = ({ lang, navigation }: HeaderProps) => {
   const navLinks = [
     { href: `/${lang}`,             label: navigation.home },
     { href: `/${lang}/identity`,    label: navigation.identity },
+    { href: `/${lang}/direction`,   label: navigation.provincialDirection },
     { href: `/${lang}/communities`, label: navigation.communitiesAndWorks },
     { href: `/${lang}/news`,        label: navigation.news },
     { href: `/${lang}/contact`,     label: navigation.contact },
-  ];
-
-  const directionLabel = navigation.provincialDirection;
-  const directionItems = [
-    { href: `/${lang}/direction`, label: navigation.provincialDirection },
-    { href: `/${lang}/catalog`,   label: navigation.catalog || (lang === "fr" ? "Catalogue" : lang === "it" ? "Catalogo" : "Catalog") },
   ];
 
   const mediaLabel = navigation.media;
@@ -70,6 +65,7 @@ export const Header = ({ lang, navigation }: HeaderProps) => {
     { href: `/${lang}/galleries`,    label: navigation.gallery },
     { href: `/${lang}/videos`,       label: navigation.videos },
     { href: `/${lang}/publications`,  label: navigation.publications },
+    { href: `/${lang}/catalog`,       label: navigation.catalog || (lang === "fr" ? "Catalogue" : lang === "it" ? "Catalogo" : "Catalog") },
   ];
 
   return (
@@ -88,8 +84,6 @@ export const Header = ({ lang, navigation }: HeaderProps) => {
             <DesktopNav
               navLinks={navLinks}
               pathname={pathname}
-              directionLabel={directionLabel}
-              directionItems={directionItems}
               mediaLabel={mediaLabel}
               mediaItems={mediaItems}
             />
@@ -107,8 +101,6 @@ export const Header = ({ lang, navigation }: HeaderProps) => {
         isOpen={isMenuOpen}
         navLinks={navLinks}
         pathname={pathname}
-        directionLabel={directionLabel}
-        directionItems={directionItems}
         mediaLabel={mediaLabel}
         mediaItems={mediaItems}
       />
