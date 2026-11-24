@@ -448,9 +448,12 @@ body {
 /* Keep the automatic French and Italian CMS translation hidden while the Google widget
    applies its translation to page copy in the background. */
 .google-translate-hidden {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
+  display: none !important;
+  position: fixed !important;
+  left: -10000px !important;
+  top: -10000px !important;
+  width: 0 !important;
+  height: 0 !important;
   overflow: hidden !important;
   opacity: 0 !important;
   pointer-events: none !important;
@@ -463,6 +466,13 @@ body > .skiptranslate,
 .goog-te-ftab,
 .goog-te-balloon-frame,
 .goog-te-menu-frame,
+.goog-te-gadget,
+.goog-te-spinner-pos,
+.goog-te-menu-value,
+.goog-logo-link,
+iframe[src*="translate.google"],
+[class*="VIpgJd-ZVi9od"],
+[id^="goog-gt-"],
 #goog-gt-tt,
 #goog-gt-vt {
   display: none !important;
