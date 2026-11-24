@@ -2,9 +2,8 @@
 
 import Script from "next/script";
 import Image from "next/image";
-import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, FileUp, FolderOpen, HardDrive, ImagePlus, LoaderCircle, RotateCw } from "lucide-react";
+import { useRef, useState } from "react";
+import { FileUp, FolderOpen, HardDrive, LoaderCircle, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -13,7 +12,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import PaginationControls from "@/components/ui/PaginationControls";
-import { cmsQueryKeys } from "@/lib/useCmsCollection";
+import { getCloudinaryCredentials, signCloudinaryUpload, useMediaMutations, useMediaPage } from "@/lib/adminQueries";
 
 export type MediaAsset = {
   id?: string;
@@ -47,14 +46,11 @@ type GooglePickerBuilder = {
 
 declare global {
   interface Window {
-    cloudinary?: {
-      createUploadWidget: (
-        options: Record<string, unknown>,
-        callback: (error: unknown, result: { event?: string; info?: Record<string, unknown> }) => void,
-      ) => { open: () => void };
-    };
     gapi?: { load: (name: string, callback: () => void) => void };
     google?: {
+      translate?: {
+        TranslateElement: new (options: { pageLanguage: string; includedLanguages: string; autoDisplay: boolean }, elementId: string) => unknown;
+      };
       accounts?: {
         oauth2?: {
           initTokenClient: (options: {
@@ -110,39 +106,18 @@ export default function CloudinaryMediaPicker({
   label?: string;
   resourceType?: MediaAsset["resourceType"];
 }) {
-  const queryClient = useQueryClient();
-  const [cloudinaryReady, setCloudinaryReady] = useState(false);
+  const mediaMutations = useMediaMutations();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [googleReady, setGoogleReady] = useState(false);
   const [googlePickerReady, setGooglePickerReady] = useState(false);
   const [open, setOpen] = useState(false);
-  const [view, setView] = useState<"sources" | "library">("sources");
   const [mediaPage, setMediaPage] = useState(1);
   const [error, setError] = useState("");
   const [driveImporting, setDriveImporting] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
   const mediaPageSize = 20;
 
-  const mediaQuery = useQuery<{
-    items: MediaAsset[];
-    pagination: { page: number; pageSize: number; total: number; totalPages: number; offset: number };
-  }>({
-    queryKey: cmsQueryKeys.mediaPage(mediaPage, mediaPageSize, resourceType),
-    queryFn: async ({ signal }) => {
-      const params = new URLSearchParams({ page: String(mediaPage), pageSize: String(mediaPageSize) });
-      if (resourceType) params.set("resourceType", resourceType);
-      const response = await fetch(`/api/admin/media?${params}`, {
-        credentials: "include",
-        cache: "no-store",
-        signal,
-      });
-      if (!response.ok) {
-        const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-        throw new Error(payload?.error ?? "Could not load the media library.");
-      }
-      return response.json();
-    },
-    enabled: open && view === "library",
-    refetchInterval: false,
-  });
+  const mediaQuery = useMediaPage(mediaPage, mediaPageSize, resourceType, { enabled: open, refetchInterval: false });
   const assets = mediaQuery.data?.items ?? [];
 
   async function saveAsset(info: Record<string, unknown>) {
@@ -165,110 +140,42 @@ export default function CloudinaryMediaPicker({
       width: typeof info.width === "number" ? info.width : undefined,
       height: typeof info.height === "number" ? info.height : undefined,
     };
-    const response = await fetch("/api/admin/media", {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(asset),
-    });
-    if (!response.ok) throw new Error("The asset could not be added to the media library.");
-    await queryClient.invalidateQueries({ queryKey: cmsQueryKeys.media });
+    await mediaMutations.register.mutateAsync(asset);
     onSelect(asset);
   }
 
-  async function ensureCloudinaryLoaded(): Promise<boolean> {
-    if (typeof window !== "undefined" && window.cloudinary) return true;
-    return new Promise((resolve) => {
-      const script = document.createElement("script");
-      script.src = "https://upload-widget.cloudinary.com/latest/global/all.js";
-      script.async = true;
-      script.onload = () => {
-        setCloudinaryReady(true);
-        resolve(true);
-      };
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-  }
-
-  async function uploadFromComputer() {
+  async function uploadFromComputer(file: File) {
     setError("");
-    const isLoaded = await ensureCloudinaryLoaded();
-    if (!isLoaded || !window.cloudinary) {
-      setError("Could not load the upload widget. Check your internet connection and try again.");
-      return;
-    }
-
-    let cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-    let apiKey = process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY;
-
-    if (!cloudName || !apiKey) {
-      try {
-        const res = await fetch("/api/admin/cloudinary-signature", { credentials: "include" });
-        if (res.ok) {
-          const creds = await res.json() as { cloudName?: string; apiKey?: string };
-          if (creds.cloudName && creds.apiKey) {
-            cloudName = creds.cloudName;
-            apiKey = creds.apiKey;
-          }
-        }
-      } catch {}
-    }
-
-    if (!cloudName || !apiKey) {
-      setError("Computer uploads are not ready. Cloudinary credentials (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY) are missing in the server configuration.");
-      return;
-    }
-
-    const widget = window.cloudinary.createUploadWidget({
-      cloudName,
-      apiKey,
-      uploadSignature: async (callback: (signature: string) => void, params: Record<string, string | number>) => {
-        const response = await fetch("/api/admin/cloudinary-signature", {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(params),
-        });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error ?? "Could not sign upload");
-        callback(result.signature);
-      },
-      resourceType: resourceType ?? "auto",
-      sources: ["local"],
-      multiple: false,
-      folder: "pallotti-cms",
-      clientAllowedFormats: ["jpg", "jpeg", "png", "webp", "gif", "avif", "mp4", "mov", "webm", "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx"],
-      maxFileSize: 100_000_000,
-      showAdvancedOptions: false,
-    }, async (widgetError, result) => {
-      if (widgetError) {
-        setError("Cloudinary could not open the upload widget.");
-        return;
-      }
-      if (result.event !== "success" || !result.info) return;
-      try {
-        await saveAsset(result.info);
-      } catch (uploadError) {
-        setError(uploadError instanceof Error ? uploadError.message : "Could not save this upload.");
-      }
-    });
-    widget.open();
+    if (file.size > 100_000_000) { setError("Choose a file smaller than 100 MB."); return; }
+    setUploadingFile(true);
+    try {
+      const creds = await getCloudinaryCredentials();
+      if (!creds.cloudName || !creds.apiKey) throw new Error("Cloudinary uploads are not configured.");
+      const timestamp = Math.floor(Date.now() / 1000);
+      const folder = "pallotti-cms";
+      const { signature } = await signCloudinaryUpload({ timestamp, folder });
+      const type = resourceType ?? (file.type.startsWith("video/") ? "video" : file.type === "application/pdf" ? "raw" : "image");
+      const body = new FormData();
+      body.append("file", file);
+      body.append("api_key", creds.apiKey);
+      body.append("timestamp", String(timestamp));
+      body.append("folder", folder);
+      body.append("signature", signature);
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${creds.cloudName}/${type}/upload`, { method: "POST", body });
+      const info = await response.json() as Record<string, unknown> & { error?: { message?: string } };
+      if (!response.ok) throw new Error(info.error?.message ?? "Cloudinary could not upload this file.");
+      await saveAsset(info);
+      setOpen(false);
+    } catch (uploadError) {
+      setError(uploadError instanceof Error ? uploadError.message : "Could not upload this file.");
+    } finally { setUploadingFile(false); }
   }
 
   async function importFromDrive(fileId: string, accessToken: string) {
     setDriveImporting(true);
     setError("");
     try {
-      const response = await fetch("/api/admin/media/import-drive", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fileId, accessToken, resourceType }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error ?? "Could not import this Drive file.");
-      await queryClient.invalidateQueries({ queryKey: cmsQueryKeys.media });
+      const result = await mediaMutations.importDrive.mutateAsync({ fileId, accessToken, resourceType });
       onSelect(result as MediaAsset);
       setOpen(false);
     } catch (importError) {
@@ -336,17 +243,15 @@ export default function CloudinaryMediaPicker({
     setOpen(false);
   }
 
-  function openSources() {
+  function openExisting() {
     setError("");
     setMediaPage(1);
-    setView("sources");
     setOpen(true);
   }
 
   const anyGoogleScripts = GOOGLE_DRIVE_READY;
 
   return <>
-    <Script src="https://upload-widget.cloudinary.com/latest/global/all.js" onReady={() => setCloudinaryReady(true)} />
     {anyGoogleScripts && <>
       <Script src="https://accounts.google.com/gsi/client" onReady={() => setGoogleReady(true)} />
       <Script src="https://apis.google.com/js/api.js" onReady={() => {
@@ -354,38 +259,32 @@ export default function CloudinaryMediaPicker({
       }} />
     </>}
 
-    <Button type="button" size="sm" variant="outline" onClick={openSources}>
-      <ImagePlus data-icon="inline-start" />
-      {label}
-    </Button>
+    <input ref={fileInputRef} type="file" className="sr-only" accept={resourceType === "image" ? "image/*" : resourceType === "video" ? "video/*" : resourceType === "raw" ? ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" : "image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"} onChange={(event) => { const file = event.target.files?.[0]; if (file) void uploadFromComputer(file); event.currentTarget.value = ""; }} />
+    <div className="flex flex-wrap items-center gap-2">
+      <Button type="button" size="sm" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={uploadingFile}>
+        {uploadingFile ? <LoaderCircle data-icon="inline-start" className="animate-spin" /> : <FileUp data-icon="inline-start" />}
+        {uploadingFile ? "Uploading..." : label}
+      </Button>
+      <Button type="button" size="sm" variant="ghost" onClick={openExisting}>
+        <FolderOpen data-icon="inline-start" />Choose existing
+      </Button>
+    </div>
     {error && <p role="alert" aria-live="polite" className="mt-2 text-xs text-destructive">{error}</p>}
     {driveImporting && <p role="status" aria-live="polite" className="mt-2 inline-flex items-center gap-2 text-xs text-muted-foreground"><LoaderCircle className="size-3.5" /> Importing from Google Drive…</p>}
 
     <Sheet open={open} onOpenChange={(nextOpen) => {
       setOpen(nextOpen);
-      if (!nextOpen) setView("sources");
     }}>
       <SheetContent side="right" className="data-[side=right]:w-[min(96vw,64rem)] data-[side=right]:sm:max-w-none gap-0 overflow-hidden p-0">
         <SheetHeader className="shrink-0 border-b border-border px-6 py-4 pr-14">
-          <SheetTitle>{view === "sources" ? "Add media" : "Choose from media"}</SheetTitle>
+          <SheetTitle>Choose from media</SheetTitle>
         </SheetHeader>
         {error && <p role="alert" aria-live="polite" className="mx-4 mt-4 border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">{error}</p>}
 
-        {view === "sources" ? <div className="grid gap-3 p-6 sm:grid-cols-3">
-          <Button type="button" size="lg" variant="outline" className="w-full justify-start" onClick={() => setView("library")}>
-            <FolderOpen data-icon="inline-start" className="text-primary" /> Choose from media
-          </Button>
-          <Button type="button" size="lg" variant="outline" className="w-full justify-start" onClick={uploadFromComputer}>
-            <FileUp data-icon="inline-start" className="text-primary" /> From local computer
-          </Button>
-          <Button type="button" size="lg" variant="outline" className="w-full justify-start" onClick={openGoogleDrive} disabled={driveImporting}>
-            <HardDrive data-icon="inline-start" className="text-primary" /> From Google Drive
-          </Button>
-        </div> : <div className="flex min-h-0 flex-1 flex-col">
+        <div className="flex min-h-0 flex-1 flex-col">
           <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border p-3">
-            <Button type="button" variant="outline" size="sm" onClick={() => setView("sources")}>
-              <ArrowLeft data-icon="inline-start" />
-              Back to sources
+            <Button type="button" variant="outline" size="sm" onClick={openGoogleDrive} disabled={driveImporting}>
+              <HardDrive data-icon="inline-start" /> Import from Google Drive
             </Button>
             <Button type="button" variant="outline" size="sm" onClick={() => void mediaQuery.refetch()} disabled={mediaQuery.isFetching}>
               <RotateCw data-icon="inline-start" />
@@ -403,14 +302,13 @@ export default function CloudinaryMediaPicker({
               <p className="font-medium">{mediaQuery.error.message}</p>
               <div className="flex flex-wrap items-center gap-2">
                 <Button type="button" variant="outline" size="sm" onClick={() => void mediaQuery.refetch()}>Try again</Button>
-                <Button type="button" size="sm" onClick={uploadFromComputer}>Upload from computer</Button>
-                <Button type="button" variant="outline" size="sm" onClick={() => setView("sources")}>Back to sources</Button>
+                <Button type="button" size="sm" onClick={() => fileInputRef.current?.click()}>Upload from computer</Button>
               </div>
             </div>}
             {!mediaQuery.isLoading && !mediaQuery.error && mediaQuery.data?.pagination.total === 0 && <div className="border border-dashed border-border bg-muted/30 p-10 text-center">
               <p className="text-sm font-medium">No matching media yet</p>
               <div className="mt-4 flex flex-wrap justify-center gap-2">
-              <Button type="button" size="sm" onClick={uploadFromComputer}>Upload from local computer</Button>
+              <Button type="button" size="sm" onClick={() => fileInputRef.current?.click()}>Upload from local computer</Button>
                 <Button type="button" size="sm" variant="outline" onClick={openGoogleDrive}>Choose from Google Drive</Button>
               </div>
             </div>}
@@ -453,7 +351,7 @@ export default function CloudinaryMediaPicker({
               onPageChange={setMediaPage}
             />}
           </div>
-        </div>}
+        </div>
       </SheetContent>
     </Sheet>
   </>;

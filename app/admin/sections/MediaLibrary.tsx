@@ -1,18 +1,12 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { Check, FileText, Images, Pencil, Play, Wand2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cmsQueryKeys } from "@/lib/useCmsCollection";
+import { useMediaMutations, useMediaPage } from "@/lib/adminQueries";
 import PaginationControls from "@/components/ui/PaginationControls";
 import CloudinaryMediaPicker, { type MediaAsset } from "./CloudinaryMediaPicker";
-
-type MediaPage = {
-  items: MediaAsset[];
-  pagination: { page: number; pageSize: number; total: number; totalPages: number; offset: number };
-};
 
 const PAGE_SIZE = 24;
 const MEDIA_FILTERS = [
@@ -23,7 +17,6 @@ const MEDIA_FILTERS = [
 ] as const;
 
 export default function MediaLibrary() {
-  const client = useQueryClient();
   const [page, setPage] = useState(1);
   const [resourceType, setResourceType] = useState<(typeof MEDIA_FILTERS)[number]["value"]>("all");
   const [backfilling, setBackfilling] = useState(false);
@@ -32,77 +25,31 @@ export default function MediaLibrary() {
   const [renameValue, setRenameValue] = useState("");
   const [savingRename, setSavingRename] = useState(false);
 
-  const query = useQuery<MediaPage>({
-    queryKey: cmsQueryKeys.mediaPage(page, PAGE_SIZE, resourceType),
-    queryFn: async ({ signal }) => {
-      const params = new URLSearchParams({ page: String(page), pageSize: String(PAGE_SIZE) });
-      if (resourceType !== "all") params.set("resourceType", resourceType);
-      const response = await fetch(`/api/admin/media?${params}`, {
-        credentials: "include",
-        cache: "no-store",
-        signal,
-      });
-      if (!response.ok) throw new Error("Could not load media. Check the database connection.");
-      return response.json();
-    },
-    refetchInterval: 15_000,
-  });
+  // Media changes are refreshed by mutation invalidation or by navigating the
+  // filters/pages. Polling every 15 seconds made this screen fetch continuously.
+  const query = useMediaPage(page, PAGE_SIZE, resourceType);
+  const mutations = useMediaMutations();
   const { items = [], pagination } = query.data ?? { items: [], pagination: { page, pageSize: PAGE_SIZE, total: 0, totalPages: 0, offset: 0 } };
 
   async function runBackfill() {
     setBackfilling(true);
     setBackfillMsg("");
     try {
-      const res = await fetch("/api/admin/media/backfill-names", {
-        method: "POST",
-        credentials: "include",
-      });
-      const data = await res.json() as {
-        updated?: number;
-        total?: number;
-        failed?: number;
-        message?: string;
-        error?: string;
-        errors?: string[];
-      };
-
-      if (!res.ok) {
-        setBackfillMsg(`⚠️ ${data.error ?? "Failed to connect to media service."}`);
-      } else if (data.message) {
-        setBackfillMsg(`ℹ️ ${data.message}`);
-      } else if ((data.updated ?? 0) > 0) {
-        setBackfillMsg(`✅ Successfully updated ${data.updated} file name${(data.updated ?? 0) > 1 ? "s" : ""}.`);
-        await client.invalidateQueries({ queryKey: cmsQueryKeys.media });
-      } else {
-        setBackfillMsg("⚠️ Cloudinary original names were not found for these files. You can rename them directly below.");
-      }
-    } catch {
-      setBackfillMsg("⚠️ Network error — please try again.");
-    } finally {
-      setBackfilling(false);
-    }
+      const data = await mutations.backfill.mutateAsync();
+      if (data.message) setBackfillMsg(data.message);
+      else if ((data.updated ?? 0) > 0) setBackfillMsg(`Successfully updated ${data.updated} file name${(data.updated ?? 0) > 1 ? "s" : ""}.`);
+      else setBackfillMsg("Cloudinary original names were not found. Rename the files below.");
+    } catch (error) {
+      setBackfillMsg(error instanceof Error ? error.message : "Network error. Please try again.");
+    } finally { setBackfilling(false); }
   }
-
   async function saveRename(assetId: string) {
     if (!renameValue.trim()) return;
     setSavingRename(true);
-    try {
-      const res = await fetch("/api/admin/media", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ id: assetId, name: renameValue.trim() }),
-      });
-      if (!res.ok) throw new Error("Could not rename");
-      await client.invalidateQueries({ queryKey: cmsQueryKeys.media });
-      setRenamingId(null);
-    } catch {
-      alert("Could not update the file name. Please try again.");
-    } finally {
-      setSavingRename(false);
-    }
+    try { await mutations.rename.mutateAsync({ id: assetId, name: renameValue.trim() }); setRenamingId(null); }
+    catch { alert("Could not update the file name. Please try again."); }
+    finally { setSavingRename(false); }
   }
-
   function startRename(asset: MediaAsset) {
     const currentName = asset.name?.trim() || asset.publicId?.split("/").pop() || "";
     setRenamingId(asset.id ?? asset.publicId);
@@ -130,9 +77,9 @@ export default function MediaLibrary() {
           title="Fetch readable filenames from Cloudinary for all documents that still show a hash ID"
         >
           <Wand2 data-icon="inline-start" />
-          {backfilling ? "Fixing names…" : "Fix document names"}
+          {backfilling ? "Fixing namesâ€¦" : "Fix document names"}
         </Button>
-        <CloudinaryMediaPicker label="Upload or select media" onSelect={() => client.invalidateQueries({ queryKey: cmsQueryKeys.media })} />
+        <CloudinaryMediaPicker label="Upload or select media" onSelect={() => undefined} />
       </div>
     </div>
 
@@ -149,7 +96,7 @@ export default function MediaLibrary() {
       </Button>)}
     </div>
 
-    {query.isLoading && <p className="text-sm text-gray-500">Loading media…</p>}
+    {query.isLoading && <p className="text-sm text-gray-500">Loading mediaâ€¦</p>}
     {query.error && <p role="alert" className="text-sm text-red-700">{query.error.message}</p>}
     {!query.isLoading && !query.error && pagination.total === 0 && <div className="border border-dashed border-[#d8cbbb] bg-white p-10 text-center text-sm text-gray-500">No media in this file type yet.</div>}
 
@@ -261,3 +208,4 @@ export default function MediaLibrary() {
     />}
   </section>;
 }
+

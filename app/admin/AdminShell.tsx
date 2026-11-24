@@ -7,6 +7,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   FileText,
+  BookOpen,
   FolderOpen,
   Globe,
   Images,
@@ -29,6 +30,7 @@ const NAV: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "News", href: "/admin/news", icon: Newspaper },
   { label: "Gallery", href: "/admin/gallery", icon: Images },
   { label: "Videos", href: "/admin/videos", icon: Video },
+  { label: "Catalog", href: "/admin/catalog", icon: BookOpen },
   { label: "Publications", href: "/admin/publications", icon: FileText },
   { label: "Communities", href: "/admin/communities", icon: Users },
   { label: "Direction", href: "/admin/direction", icon: Network },
@@ -47,7 +49,7 @@ function AdminNavigation({
 }) {
   return <div className="flex h-full min-h-0 flex-col text-white">
     <div className="flex shrink-0 flex-col items-center border-b border-white/10 px-4 py-4 sm:py-5">
-      <Image src="/p4.png" alt="SAC logo" width={40} height={40} className="mb-1 size-10 object-contain" />
+      <Image src="/p4.png" alt="SAC logo" width={206} height={40} className="mb-1 h-auto w-10 object-contain" />
       <p className="text-center text-xs font-black leading-tight tracking-wider text-white">
         <span className="font-bold text-[#C9952A]">CMS Admin</span>
       </p>

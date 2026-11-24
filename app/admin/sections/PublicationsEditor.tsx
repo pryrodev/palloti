@@ -184,7 +184,7 @@ export default function PublicationsEditor() {
       </div>
     </article>)}</div>
     <PaginationControls page={activePage} totalPages={totalPages} totalItems={books.length} pageSize={pageSize} itemLabel="publications" lang="en" onPageChange={setPage} />
-    {editing && <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-3 sm:p-4"><div className="max-h-[90dvh] w-full max-w-md overflow-y-auto overscroll-contain bg-white p-4 shadow-2xl sm:p-6">
+    {editing && <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-3 sm:p-4" onMouseDown={(event) => { if (event.target === event.currentTarget) setEditing(null); }}><div className="max-h-[90dvh] w-full max-w-md overflow-y-auto overscroll-contain bg-white p-4 shadow-2xl sm:p-6">
       <h2 className="mb-4 text-lg font-black">Publication details</h2>
       {(["number", "title", "subtitle", "description"] as const).map((field) => <label key={field} className="mb-3 block text-xs font-bold capitalize text-gray-500">{field}<input value={editing[field] ?? ""} onChange={(event) => {
         const value = event.target.value;

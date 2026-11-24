@@ -1,45 +1,23 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PaginationControls from "@/components/ui/PaginationControls";
 import CloudinaryMediaPicker from "./CloudinaryMediaPicker";
 import { Trash2 } from "lucide-react";
 import ConfirmDeleteAction from "../components/ConfirmDeleteAction";
-
-type GalleryItem = { src: string; title: string; sub: string };
-type GalleryPageResponse = {
-  data: GalleryItem[];
-  pagination: { page: number; pageSize: number; total: number; totalPages: number; offset: number };
-};
+import { useGalleryMutations, useGalleryPage, type GalleryItem } from "@/lib/adminQueries";
 
 const PAGE_SIZE = 24;
 
 export default function GalleryEditor() {
-  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [prevQueryData, setPrevQueryData] = useState<GalleryItem[] | undefined>(undefined);
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
-  const serverRevision = useRef<number | null>(null);
-
-  const query = useQuery<GalleryPageResponse>({
-    queryKey: ["cms", "gallery", page, PAGE_SIZE],
-    queryFn: async ({ signal }) => {
-      const response = await fetch(`/api/admin/gallery?page=${page}&pageSize=${PAGE_SIZE}`, {
-        credentials: "include",
-        cache: "no-store",
-        signal,
-      });
-      if (!response.ok) throw new Error("Could not load gallery.");
-      const rev = Number(response.headers.get("X-CMS-Revision"));
-      if (Number.isSafeInteger(rev)) serverRevision.current = rev;
-      return response.json();
-    },
-    staleTime: 60_000,
-  });
+  const query = useGalleryPage(page, PAGE_SIZE);
+  const mutations = useGalleryMutations(page, PAGE_SIZE);
 
   const pagination = query.data?.pagination ?? { page, pageSize: PAGE_SIZE, total: items.length, totalPages: 1, offset: 0 };
 
@@ -53,20 +31,10 @@ export default function GalleryEditor() {
     setSaving(true);
     setMessage("");
     try {
-      const res = await fetch("/api/admin/gallery", {
-        method: "PATCH",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ page, pageSize: PAGE_SIZE, items }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Could not save gallery.");
-      }
-      const data = await res.json();
-      serverRevision.current = data.revision;
+      const revision = query.data?.revision;
+      if (revision === undefined) throw new Error("Wait for the current gallery revision before saving.");
+      await mutations.save.mutateAsync({ items, expectedRevision: revision });
       setMessage("Saved.");
-      await queryClient.invalidateQueries({ queryKey: ["cms", "gallery"] });
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Could not save gallery.");
     } finally {
@@ -80,18 +48,10 @@ export default function GalleryEditor() {
     setMessage("");
     try {
       const globalIndex = pagination.offset + pageIndex;
-      const res = await fetch("/api/admin/gallery", {
-        method: "DELETE",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ index: globalIndex, src: item.src }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Could not delete this photo.");
-      }
+      const revision = query.data?.revision;
+      if (revision === undefined) throw new Error("Wait for the current gallery revision before deleting.");
+      await mutations.remove.mutateAsync({ index: globalIndex, src: item.src, expectedRevision: revision });
       setMessage("Photo deleted.");
-      await queryClient.invalidateQueries({ queryKey: ["cms", "gallery"] });
       return true;
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Could not delete this photo.");
@@ -111,19 +71,9 @@ export default function GalleryEditor() {
         title: asset.publicId.split("/").pop() ?? "Photo",
         sub: "Holy Family Province",
       };
-      const res = await fetch("/api/admin/gallery", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ photos: [newPhoto] }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "Could not add photo.");
-      }
+      await mutations.add.mutateAsync(newPhoto);
       setMessage("Photo added.");
       setPage(1);
-      await queryClient.invalidateQueries({ queryKey: ["cms", "gallery"] });
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Could not add photo.");
     } finally {
@@ -140,7 +90,7 @@ export default function GalleryEditor() {
         <div className="flex items-center gap-3">
           {message && <span role="status" className="text-sm font-bold text-[#5C3317]">{message}</span>}
           <CloudinaryMediaPicker label="+ Add Photos" resourceType="image" onSelect={addPhotos} />
-          <button onClick={save} disabled={saving} className="bg-[#5C3317] px-4 py-2 text-sm font-black text-white disabled:opacity-50">
+          <button onClick={save} disabled={saving || !query.data?.revision} className="bg-[#5C3317] px-4 py-2 text-sm font-black text-white disabled:opacity-50">
             {saving ? "Saving…" : "Save"}
           </button>
         </div>

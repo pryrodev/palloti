@@ -69,6 +69,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
                     alt={dict.home.rectorName}
                     fill
                     sizes="(max-width: 768px) 90vw, (max-width: 1200px) 40vw, 450px"
+                    loading="eager"
                     className="object-cover object-top"
                   />
                 </div>

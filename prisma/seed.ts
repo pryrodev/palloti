@@ -49,10 +49,11 @@ function mergeMissingDefaults(defaults: unknown, current: unknown): unknown {
 }
 
 async function seed() {
-  const [gallery, videos, publications, en, fr] = await Promise.all([
+  const [gallery, videos, publications, catalog, en, fr] = await Promise.all([
     jsonFile<unknown>("data/gallery.json"),
     jsonFile<unknown>("data/videos.json"),
     jsonFile<unknown>("data/publications.json"),
+    jsonFile<unknown>("data/catalog.json"),
     jsonFile<{ newsSection: { articles: unknown[] }; communities: { items: unknown[] }; direction: { members: unknown[] } }>("dictionaries/en.json"),
     jsonFile<{ newsSection: { articles: unknown[] }; communities: { items: unknown[] }; direction: { members: unknown[] } }>("dictionaries/fr.json"),
   ]);
@@ -64,6 +65,7 @@ async function seed() {
     news: { en: en.newsSection.articles, fr: fr.newsSection.articles },
     communities: { en: en.communities.items, fr: fr.communities.items },
     direction: { en: en.direction.members, fr: fr.direction.members },
+    catalog,
     siteContent: { en, fr, theme: DEFAULT_SITE_THEME },
   };
 

@@ -10,6 +10,7 @@ const ADMIN_PATHS: Record<string, string> = {
   publications: "/admin/publications",
   communities: "/admin/communities",
   direction: "/admin/direction",
+  catalog: "/admin/catalog",
   media: "/admin/media",
   siteContent: "/admin/site-content",
 };

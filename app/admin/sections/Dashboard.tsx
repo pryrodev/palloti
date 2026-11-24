@@ -14,18 +14,9 @@ import { Frame, FrameDescription, FrameHeader, FramePanel, FrameTitle } from "@/
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getArticleSegment } from "@/lib/seoPaths";
-import { useQuery } from "@tanstack/react-query";
+import { useDashboardSummary } from "@/lib/adminQueries";
 
 type Article = { id: number; slug?: string; title: string; date: string; tags: string; summary: string };
-type DashboardSummary = {
-  stats: {
-    news: { en: number; fr: number };
-    publications: number;
-    gallery: number;
-    videos: number;
-  };
-  recentNews: Article[];
-};
 type ArticleRow = { id: string; date: string; sortDate: number; title: string; tags: string; href: string };
 type DashboardProps = { onNavigate: (section: string) => void };
 
@@ -45,15 +36,7 @@ function formatDate(value: string) {
 }
 
 export default function Dashboard({ onNavigate }: DashboardProps) {
-  const dashboardQuery = useQuery({
-    queryKey: ["cms", "dashboard-summary"],
-    queryFn: async ({ signal }) => {
-      const res = await fetch("/api/admin/dashboard", { signal, credentials: "include" });
-      if (!res.ok) throw new Error("Failed to load dashboard overview");
-      return (await res.json()) as DashboardSummary;
-    },
-    staleTime: 30_000,
-  });
+  const dashboardQuery = useDashboardSummary();
   const [sorting, setSorting] = useState<SortingState>([{ id: "sortDate", desc: true }]);
   const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 5 });
 

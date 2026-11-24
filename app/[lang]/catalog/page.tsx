@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { getDictionary } from "@/lib/getDictionary";
+import { readPublishedData } from "@/lib/getData";
 import type { Metadata } from "next";
 import DecorativeDivider from "../../components/ui/DecorativeDivider";
 import { User, BookOpen, Quote } from "lucide-react";
@@ -19,9 +20,12 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 
 type Member = {
   name: string;
-  role: string;
+  role?: string;
   image?: string;
   biography?: string;
+  birthYear?: string;
+  deathYear?: string;
+  lifeStatus?: "living" | "deceased" | "unknown";
 };
 
 export default async function CatalogPage({ params }: { params: Promise<{ lang: string }> }) {
@@ -30,7 +34,7 @@ export default async function CatalogPage({ params }: { params: Promise<{ lang: 
   const isFr = lang === "fr";
   const isIt = lang === "it";
 
-  const members = ((dict.direction as { members?: Member[] })?.members ?? []) as Member[];
+  const members = await readPublishedData<Member[]>("catalog", "catalog.json");
 
   const pageBadge = isFr ? "Province Sainte Famille SAC" : isIt ? "Provincia Santa Famiglia SAC" : "Holy Family Province SAC";
   const pageTitle = isFr ? "Catalogue des Confrères" : isIt ? "Catalogo dei Confratelli" : "Confreres Catalog";
@@ -96,7 +100,7 @@ export default async function CatalogPage({ params }: { params: Promise<{ lang: 
                   <div className="flex flex-1 flex-col justify-between p-5 sm:p-6">
                     <div>
                       <span className="inline-block bg-[var(--cream)] px-2.5 py-1 text-[9px] font-extrabold uppercase tracking-[0.16em] text-[var(--gold-dk)]">
-                        {member.role}
+                        {member.role || (isFr ? "Confrère" : isIt ? "Confratello" : "Confrere")}
                       </span>
                       <h3
                         className="mt-2 text-xl font-bold leading-snug text-[var(--dark)]"
@@ -110,6 +114,11 @@ export default async function CatalogPage({ params }: { params: Promise<{ lang: 
                       <BookOpen className="size-3.5 text-[var(--gold-dk)]" />
                       <span>{isFr ? "Notice biographique" : isIt ? "Profilo biografico" : "Biographical profile"}</span>
                     </div>
+                    {member.lifeStatus && member.lifeStatus !== "unknown" && <p className="mt-3 text-xs font-semibold text-[var(--mid)]">
+                      <span className="mr-1.5 inline-block size-2 rounded-full align-middle" style={{ backgroundColor: member.lifeStatus === "living" ? "#4d7c55" : "#8b7355" }} />
+                      {member.birthYear || member.deathYear ? `${member.birthYear || "?"} – ${member.lifeStatus === "living" ? (isFr ? "Aujourd’hui" : isIt ? "Presente" : "Present") : member.deathYear || "?"} · ` : ""}
+                      {member.lifeStatus === "living" ? (isFr ? "Vivant" : isIt ? "Vivente" : "Living") : (isFr ? "Décédé" : isIt ? "Deceduto" : "Deceased")}
+                    </p>}
                   </div>
                 </div>
 

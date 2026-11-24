@@ -59,51 +59,51 @@
     "heroSlides": [
       {
         "image": "/images/gikondo.jpg",
-        "location": "Kigali — Gikondo, Rwanda",
-        "title": "Holy Family Provincial House",
-        "subtitle": "Seat of the Holy Family Province · Mother House"
+        "location": "Kigali — Gikondo, Ruanda",
+        "title": "Casa provinciale della Sacra Famiglia",
+        "subtitle": "Sede della Provincia della Sacra Famiglia · Casa madre"
       },
       {
         "image": "/images/hero.jpg",
         "location": "Kigali — Rwanda",
-        "title": "Sanctuary of Divine Mercy",
-        "subtitle": "A place of prayer and welcome"
+        "title": "Santuario della Divina Misericordia",
+        "subtitle": "Un luogo di preghiera e accoglienza"
       },
       {
         "image": "/images/hero2.jpg",
         "location": "Kibeho — Rwanda",
-        "title": "The New Community of Kibeho",
-        "subtitle": "Serving the faithful in a place of pilgrimage"
+        "title": "La nuova comunità di Kibeho",
+        "subtitle": "Al servizio dei fedeli in un luogo di pellegrinaggio"
       },
       {
         "image": "/images/home2.jpeg",
         "location": "Holy Family Province",
         "title": "Formation & Apostolate",
-        "subtitle": "Community life and pastoral service"
+        "subtitle": "Vita comunitaria e servizio pastorale"
       },
       {
         "image": "/images/home3.jpg",
-        "location": "Union of Catholic Apostolate",
+        "location": "Unione dell’Apostolato Cattolico",
         "title": "Youth & Vocations",
-        "subtitle": "Union of Catholic Apostolate"
+        "subtitle": "Unione dell’Apostolato Cattolico"
       },
       {
         "image": "/images/hero3.jpeg",
         "location": "Montereau — France",
-        "title": "The New Pallottine Community of Montereau",
-        "subtitle": "A mission beyond borders"
+        "title": "La nuova comunità pallottina di Montereau",
+        "subtitle": "Una missione senza frontiere"
       },
       {
         "image": "/images/hero4.jpg",
         "location": "Holy Family Province",
-        "title": "Pallottines of the Holy Family Province",
-        "subtitle": "Come, let us rebuild the walls of Jerusalem."
+        "title": "Pallottini della Provincia della Sacra Famiglia",
+        "subtitle": "Venite, ricostruiamo le mura di Gerusalemme."
       },
       {
         "image": "/images/hero5.jpg",
         "location": "Kabuga — Rwanda",
-        "title": "Genezareth Pallottine Formation Centre",
-        "subtitle": "Formation and service across our communities"
+        "title": "Centro di formazione pallottino Genezareth",
+        "subtitle": "Formazione e servizio nelle nostre comunità"
       }
     ],
     "ctaPrimary": "Scopri la Nostra Missione",
@@ -150,68 +150,68 @@
     "newsItems": [
       {
         "date": "29/06/2026",
-        "tags": "Newsletter | Press Releases | Generalate | Holy Family Province",
-        "title": "Official Publication of the Appointments of Confreres 2026-2027",
-        "excerpt": "Official Publication of the Appointments of the Confreres 2026-2027 for the Holy Family Province.",
+        "tags": "Giornale pallottino | Annunci | Generalato | Provincia della Sacra Famiglia",
+        "title": "Pubblicazione ufficiale delle nomine dei confratelli 2026–2027",
+        "excerpt": "Pubblicazione ufficiale delle nomine dei confratelli per l’anno 2026–2027 nella Provincia della Sacra Famiglia.",
         "image": "/images/p5.jpg"
       },
       {
         "date": "17/05/2026",
-        "tags": "Newsletter | Generalate | Holy Family Province | Union of the Catholic Apostolate",
-        "title": "International Meeting of Pallottine Trainers — Kigali, Rwanda, from 16...",
-        "excerpt": "The work of this meeting, which brings together trainers and formation directors from across the Pallottine world.",
+        "tags": "Giornale pallottino | Generalato | Provincia della Sacra Famiglia | Unione dell’Apostolato Cattolico",
+        "title": "Incontro internazionale dei formatori pallottini a Kigali, Ruanda",
+        "excerpt": "L’incontro, tenutosi a Kigali dal 16 maggio, riunisce formatori e responsabili della formazione pallottina provenienti da tutto il mondo.",
         "image": "/images/p6.jpg"
       },
       {
         "date": "12/03/2026",
-        "tags": "Newsletter | Press Releases | Holy Family Province",
-        "title": "Info PSF No 25 — March 2026",
-        "excerpt": "Through this information, we want to strengthen the sense of belonging and fraternal communion within our Province.",
+        "tags": "Giornale pallottino | Annunci | Provincia della Sacra Famiglia",
+        "title": "Info PSF n. 25 — marzo 2026",
+        "excerpt": "Con questa pubblicazione desideriamo rafforzare il senso di appartenenza e la comunione fraterna nella nostra Provincia.",
         "image": "/images/p7.jpg"
       },
       {
         "date": "17/02/2026",
-        "tags": "Newsletter | Generalate | Holy Family Province",
-        "title": "Handover and Takeover within the Provincial Commissary",
-        "excerpt": "Unless the Lord builds the house, the builders work in vain. Handover and resumption between the outgoing and incoming Provincial Councils.",
+        "tags": "Giornale pallottino | Generalato | Provincia della Sacra Famiglia",
+        "title": "Passaggio di consegne nel Commissariato provinciale",
+        "excerpt": "«Se il Signore non costruisce la casa, invano vi faticano i costruttori». Passaggio di consegne tra il Consiglio provinciale uscente e quello entrante.",
         "image": "/images/p8.jpg"
       },
       {
         "date": "07/02/2026",
-        "tags": "Newsletter | Generalate | Holy Family Province | Union of the Catholic Apostolate",
-        "title": "Handover and Resumption between the Outgoing and Incoming Provincial Councils",
-        "excerpt": "A solemn ceremony marking the transition of leadership within the Holy Family Province.",
+        "tags": "Giornale pallottino | Generalato | Provincia della Sacra Famiglia | Unione dell’Apostolato Cattolico",
+        "title": "Passaggio di consegne tra il Consiglio provinciale uscente e quello entrante",
+        "excerpt": "Una solenne cerimonia ha segnato il passaggio di responsabilità nella Provincia della Sacra Famiglia.",
         "image": "/images/pic1.jpeg"
       },
       {
         "date": "30/01/2026",
-        "tags": "Newsletter | Holy Family Province",
-        "title": "Provincial Assembly — Summary and Resolutions",
-        "excerpt": "Key decisions and resolutions adopted during the Provincial Assembly held in Kigali.",
+        "tags": "Giornale pallottino | Generalato | Provincia della Sacra Famiglia | Unione dell’Apostolato Cattolico",
+        "title": "Assemblea provinciale — sintesi e deliberazioni",
+        "excerpt": "Le principali decisioni e deliberazioni dell’Assemblea provinciale riunitasi a Kigali.",
         "image": "/images/p2.jpg"
       }
     ],
-    "missionBadge": "Our Inspiration",
-    "missionQuote": "The love of Christ urges us on.",
-    "missionAuthor": "Saint Vincent Pallotti"
+    "missionBadge": "La nostra ispirazione",
+    "missionQuote": "L’amore di Cristo ci spinge.",
+    "missionAuthor": "San Vincenzo Pallotti"
   },
   "hero": {
     "badge": "Societas Apostolatus Catholici",
-    "title": "Holy Family Province",
-    "subtitle": "SAC · Kigali, Rwanda",
-    "description": "Inspired by Saint Vincent Pallotti, we are a community of priests and brothers united in the mission of spreading God's love through charity, apostolate, and service to all people.",
-    "ctaPrimary": "Discover Our Mission",
-    "ctaSecondary": "Meet Our Community"
+    "title": "Provincia della Sacra Famiglia",
+    "subtitle": "SAC · Kigali, Ruanda",
+    "description": "Ispirati da San Vincenzo Pallotti, siamo una comunità di sacerdoti e fratelli uniti nella missione di diffondere l’amore di Dio attraverso la carità, l’apostolato e il servizio a tutti.",
+    "ctaPrimary": "Scopri la nostra missione",
+    "ctaSecondary": "Incontra la nostra comunità"
   },
   "founder": {
     "badge": "Il Nostro Fondatore",
     "title": "San Vincenzo Pallotti",
     "subtitle": "Fondatore dei Pallottini",
     "biography": [
-      "Vincent Pallotti was a descendant of the Pallotti family of Norcia and the De Rossi family of Rome, thus he was of noble ancestry. He completed his early studies at the school of San Pantaleone, then at the college in Rome. At the age of 16, he decided he wanted to become a priest. He was ordained a priest on May 16, 1818, and celebrated his first Mass at the Church of the Gesù (Frascati), at the altar of Our Lady, Refuge of Sinners.",
-      "On July 25, he became a doctor of theology and was appointed a professor of theology. He was an excellent theologian who could have had a brilliant career teaching this discipline, but his vocation led him more towards apostolic work.",
-      "He traveled throughout the city of Rome, providing material aid and comfort to the poor, preaching the gospel, living on little and sharing what he had, hearing confessions, and spiritually assisting all the faithful who came to him.",
-      "Pallotti was convinced of the importance of charity and its practice by all Catholics in order to bring the Good News to everyone. He founded the Society of the Catholic Apostolate (SAC) in 1835, a congregation that continues his mission worldwide to this day."
+      "Vincenzo Pallotti discendeva dalla famiglia Pallotti di Norcia e dalla famiglia De Rossi di Roma, ed era quindi di nobili origini. Compì i primi studi presso la scuola di San Pantaleone e poi in un collegio romano. A sedici anni decise di diventare sacerdote. Fu ordinato il 16 maggio 1818 e celebrò la prima Messa nella chiesa del Gesù a Frascati, all’altare della Madonna Rifugio dei Peccatori.",
+      "Il 25 luglio conseguì il dottorato in teologia e fu nominato professore della stessa disciplina. Era un teologo eminente e avrebbe potuto intraprendere una brillante carriera accademica, ma la sua vocazione lo orientò maggiormente all’attività apostolica.",
+      "Percorreva la città di Roma per portare aiuto materiale e conforto ai poveri, annunciare il Vangelo, vivere con semplicità condividendo ciò che aveva, ascoltare le confessioni e offrire assistenza spirituale a tutti i fedeli che si rivolgevano a lui.",
+      "Pallotti era convinto che la carità dovesse essere praticata da tutti i cattolici per portare a ogni persona la Buona Novella. Nel 1835 fondò la Società dell’Apostolato Cattolico (SAC), che continua ancora oggi la sua missione in tutto il mondo."
     ],
     "quote": "La carità di Cristo ci sprona.",
     "quoteAuthor": "San Vincenzo Pallotti (1795–1850)"
@@ -221,10 +221,10 @@
     "title": "Il Nostro Carisma",
     "image": "/images/charisma.jpg",
     "paragraphs": [
-      "Throughout history, God has enriched men and women with the gifts of the Holy Spirit so that the saving mission of Christ might continue for the good of humanity and the building up of the Church.",
-      "Saint Vincent Pallotti (1795–1850) belongs to the number of those whom, during the first half of the 19th century, God enriched with his gifts and inspirations, so that they might come to the aid of the Church in the fulfillment of its mission.",
-      "Faced with the worsening problems of faith that the Church of his time had to confront, and faced with the multiplication of its tasks for the spread of the Gospel in mission lands, he realized the urgency of reviving faith and rekindling charity among Catholics, with the intention of bringing all people to the unity of faith in Christ.",
-      "To achieve this goal, he considered it indispensable to ensure the collaboration of all members of the Church, both clergy and laity, and to unite their efforts in order to promote its apostolic mission more effectively."
+      "Nel corso della storia, Dio ha arricchito uomini e donne con i doni dello Spirito Santo, perché la missione salvifica di Cristo continui per il bene dell’umanità e per la crescita della Chiesa.",
+      "San Vincenzo Pallotti (1795–1850) è tra coloro che, nella prima metà del XIX secolo, Dio arricchì di doni e ispirazioni perché aiutassero la Chiesa a compiere la propria missione.",
+      "Di fronte alle crescenti difficoltà della fede che la Chiesa del suo tempo doveva affrontare e ai numerosi impegni per annunciare il Vangelo nei territori di missione, comprese l’urgenza di ravvivare la fede e riaccendere la carità tra i cattolici, per condurre tutti all’unità della fede in Cristo.",
+      "Per raggiungere questo obiettivo, riteneva indispensabile la collaborazione di tutti i membri della Chiesa, laici e clero, e l’unione dei loro sforzi per sostenere con maggiore efficacia la missione apostolica."
     ],
     "subtitle": "Rianimare la fede e riaccendere la carità in tutto il mondo."
   },
@@ -235,18 +235,18 @@
       {
         "year": "1890",
         "image": "/images/history1.jpg",
-        "text": "It all begins in 1890, when the Holy See asked the German Pallottines to take charge of the territory of Cameroon and appointed Fr. Heinrich Vieter as Apostolic Prefect. He, along with another German Pallottine, Fr. George Walter, and six Pallottine brothers, embarked from Hamburg for Cameroon, arriving on October 25, 1890. Despite the early hardships, they succeeded in laying the foundations of the first Cameroonian mission, which Fr. Heinrich Vieter would call Marienberg (Mount of Mary). On December 8, 1890, they celebrated Mass in the first hut they had just built, and Fr. Heinrich Vieter placed the Cameroon mission under the protection of the Virgin Mary, Queen of the Apostles."
+        "text": "Tutto ebbe inizio nel 1890, quando la Santa Sede affidò ai Pallottini tedeschi il territorio del Camerun e nominò prefetto apostolico padre Heinrich Vieter. Insieme a un altro Pallottino tedesco, padre George Walter, e a sei fratelli Pallottini, partì da Amburgo per il Camerun, dove arrivò il 25 ottobre 1890. Nonostante le difficoltà iniziali, il gruppo pose le basi della prima missione camerunese, che padre Vieter chiamò Marienberg (Monte di Maria). L’8 dicembre 1890 celebrarono la Messa nella prima capanna appena costruita e affidarono la missione del Camerun alla protezione della Vergine Maria, Regina degli Apostoli."
       },
       {
         "year": "1973",
         "image": "/images/history2.jpg",
-        "text": "Fr. Alojzy Majewski, who worked as a missionary for four years in Cameroon, left Africa in 1907 and went to Poland to found the very first Pallottine community there, becoming the Founder of the Polish Pallottine Province of Christ the King. It was at the request of Bishop Jean-Baptiste Gahamanyi, the first Bishop of Butare, that the Pallottine Missionaries of the Polish Province of Christ the King arrived in the Great Lakes Region. The first group of 10 missionaries arrived in Rwanda on June 8, 1973. Upon their arrival, they took charge of parishes in the Diocese of Butare at Mugombwa, and later at Kansi and Gikongoro; in the Archdiocese of Kigali at Masaka, Gikondo and Kabuga; and in the Diocese of Kabgayi at Kinazi and Ruhango."
+        "text": "Padre Alojzy Majewski, missionario in Camerun per quattro anni, lasciò l’Africa nel 1907 e si recò in Polonia, dove fondò la prima comunità pallottina del Paese e divenne fondatore della Provincia pallottina polacca di Cristo Re. Su richiesta del vescovo Jean-Baptiste Gahamanyi, primo vescovo di Butare, i missionari pallottini della Provincia polacca di Cristo Re arrivarono nella regione dei Grandi Laghi. Il primo gruppo di dieci missionari giunse in Ruanda l’8 giugno 1973. Inizialmente assunsero la cura pastorale delle parrocchie della diocesi di Butare a Mugombwa, poi a Kansi e Gikongoro; dell’arcidiocesi di Kigali a Masaka, Gikondo e Kabuga; e della diocesi di Kabgayi a Kinazi e Ruhango."
       },
       {
         "year": "2015",
         "image": "/images/history3.jpg",
-        "caption": "Mgr Henryk HOSER, one of the first Polish missionaries in Rwanda",
-        "text": "In June 1981, the Pallottines began their mission in Zaire (today the Democratic Republic of Congo), serving in the parishes of Rugari and Rutshuru in the Diocese of Goma. In 1986, the first Community was established in Brussels, Belgium. On May 3, 1988, the Delegation became the Holy Family Region, dependent on the Province of Christ the King. On December 27, 2015, this Region was canonically erected as a Province, according to SAC law numbers 89, 311 and 312 and Decision No. 8 of the 20th General Assembly. The Holy Family Province is the first in Africa. It has an international and intercultural character, being composed of 111 members from three countries: Poland, Rwanda and the Democratic Republic of Congo."
+        "caption": "Mons. Henryk HOSER, uno dei primi missionari polacchi in Ruanda",
+        "text": "Nel giugno 1981 i Pallottini iniziarono la loro missione nello Zaire, oggi Repubblica Democratica del Congo, nelle parrocchie di Rugari e Rutshuru, nella diocesi di Goma. Nel 1986 fu fondata la prima comunità a Bruxelles, in Belgio. Il 3 maggio 1988 la Delegazione divenne Regione della Sacra Famiglia, dipendente dalla Provincia di Cristo Re. Il 27 dicembre 2015 la Regione fu eretta canonicamente a Provincia, secondo gli articoli 89, 311 e 312 del diritto SAC e la decisione n. 8 della XX Assemblea Generale. La Provincia della Sacra Famiglia è la prima in Africa. Ha carattere internazionale e interculturale e conta 111 membri provenienti da tre Paesi: Polonia, Ruanda e Repubblica Democratica del Congo."
       }
     ],
     "subtitle": "Un cammino di fede e servizio iniziato nel 1890."
@@ -257,27 +257,27 @@
     "subtitle": "I membri che guidano la Provincia Santa Famiglia SAC.",
     "members": [
       {
-        "name": "Fr. Eugène NIYONZIMA",
+        "name": "P. Eugène NIYONZIMA",
         "role": "Provincial Rector",
         "image": "/images/eugene.jpg"
       },
       {
-        "name": "Fr. Jean Pierre NSABIMANA",
+        "name": "P. Jean Pierre NSABIMANA",
         "role": "First Consultor",
         "image": "/images/pierre.jpg"
       },
       {
-        "name": "Fr. Ildéphonse BIZIMUNGU",
+        "name": "P. Ildéphonse BIZIMUNGU",
         "role": "Consultor",
         "image": "/images/bizimungu.jpg"
       },
       {
-        "name": "Fr. Jean de Dieu KAMBALE MATHE",
+        "name": "P. Jean de Dieu KAMBALE MATHE",
         "role": "Consultor",
         "image": "/images/kambale.jpeg"
       },
       {
-        "name": "Fr. Simon SAFARI BURHUNGANE",
+        "name": "P. Simon SAFARI BURHUNGANE",
         "role": "Consultor",
         "image": "/images/simon.jpg"
       }
@@ -294,7 +294,16 @@
       "belgium": "Belgio",
       "mission": "Missione",
       "works": "Opere e Ministeri",
-      "imageUnavailable": "Immagine non disponibile"
+      "imageUnavailable": "Immagine non disponibile",
+      "members": "Membri della comunità",
+      "viewDetails": "Visualizza i membri",
+      "hideDetails": "Nascondi i membri",
+      "showing": "Visualizzati",
+      "of": "di",
+      "results": "comunità",
+      "previous": "Precedente",
+      "next": "Successivo",
+      "page": "Pagina"
     },
     "items": [
       {
@@ -303,62 +312,62 @@
         "location": "Kigali-Gikondo, Rwanda",
         "region": "rwanda",
         "image": "/images/gikondo.jpg",
-        "description": "The Provincial House and Mother House of the Holy Family Province. Seat of provincial government and administration, hosting the Parish of Saint Vincent Pallotti, the Saint Vincent Pallotti Centre, the Caritas Pallottine office, and the Pallottine Foundation for the Family.",
+        "description": "La Casa provinciale e Casa madre della Provincia della Sacra Famiglia. È sede del governo e dell’amministrazione provinciali e ospita la parrocchia di San Vincenzo Pallotti, il Centro San Vincenzo Pallotti, l’ufficio della Caritas Pallottina e la Fondazione Pallottina per la Famiglia.",
         "works": [
-          "Provincial Government",
-          "Parish of St. Vincent Pallotti",
-          "St. Vincent Pallotti Centre Ltd",
-          "Caritas Pallottine",
-          "Pallottine Foundation for the Family"
+          "Governo provinciale",
+          "Parrocchia di San Vincenzo Pallotti",
+          "Centro San Vincenzo Pallotti Ltd",
+          "Caritas Pallottina",
+          "Fondazione Pallottina per la Famiglia"
         ],
-        "memberSummary": "The Communauté Sainte Famille de Gikondo is named after the Holy Family because it is the seat of the Holy Family Missionary Province, which extends over Rwanda, DR Congo and Belgium. It is often called the 'Mother House' or 'Provincial House'. It serves three main works: the general services of provincial government and administration, the Parish of Saint Vincent Pallotti de Gikondo, and the Saint Vincent Pallotti Centre/Gikondo. It also hosts the Caritas Pallottine office and the Pallottine Foundation for the Family. It is composed of 10 priests, 2 brothers, 1 deacon and 1 seminarian on internship.",
+        "memberSummary": "La Communauté Sainte Famille de Gikondo prende il nome dalla Sacra Famiglia perché è sede della Provincia Missionaria della Sacra Famiglia, presente in Ruanda, nella Repubblica Democratica del Congo e in Belgio. È conosciuta come «Casa madre» o «Casa provinciale». Vi si svolgono tre attività principali: i servizi di governo e amministrazione provinciali, la parrocchia di San Vincenzo Pallotti a Gikondo e il Centro San Vincenzo Pallotti. Ospita inoltre l’ufficio della Caritas Pallottina e la Fondazione Pallottina per la Famiglia. La comunità è composta da dieci sacerdoti, due fratelli, un diacono e un seminarista in tirocinio.",
         "members": [
           {
-            "name": "Fr. Eugène NIYONZIMA",
-            "role": "Provincial Rector"
+            "name": "P. Eugène NIYONZIMA",
+            "role": "Rettore provinciale"
           },
           {
-            "name": "Fr. Jean de Dieu KASEREKA KANEFU",
-            "role": "Community Rector, Director of St. Vincent Pallotti Centre Ltd, Internal Audit Officer"
+            "name": "P. Jean de Dieu KASEREKA KANEFU",
+            "role": "Rettore della comunità, direttore del Centro San Vincenzo Pallotti Ltd e responsabile della revisione interna"
           },
           {
-            "name": "Fr. Jean Pierre NSABIMANA",
-            "role": "Vice-Rector, Parish Priest of Gikondo, Provincial Secretary for Missions, Coordinator of the Socio-Charitable Dept. of FPF"
+            "name": "P. Jean Pierre NSABIMANA",
+            "role": "Vice-rettore, parroco di Gikondo, segretario provinciale per le missioni e coordinatore del settore socio-caritativo della FPF"
           },
           {
-            "name": "Fr. Jackson NIYONSENGA BANZUBAZE",
-            "role": "Provincial Administrator"
+            "name": "P. Jackson NIYONSENGA BANZUBAZE",
+            "role": "Amministratore provinciale"
           },
           {
-            "name": "Fr. Patrick NSANZAMAHORO",
-            "role": "Provincial Secretary, Secretary to the Provincial Rector, Deputy Provincial Master of Ceremonies, Sunday Vicar"
+            "name": "P. Patrick NSANZAMAHORO",
+            "role": "Segretario provinciale, segretario del Rettore provinciale, vice cerimoniere provinciale e vicario festivo"
           },
           {
-            "name": "Br. Jean-Marie Vianney NGENDAHIMANA",
-            "role": "Notary, Archivist, Director of the FPF"
+            "name": "Frat. Jean-Marie Vianney NGENDAHIMANA",
+            "role": "Notaio, archivista e direttore della FPF"
           },
           {
-            "name": "Fr. Patient KATEMBO KIOMA",
-            "role": "Community Bursar, Sunday Vicar at the Parish, Webmaster, 2nd Deputy ACR Officer"
+            "name": "P. Patient KATEMBO KIOMA",
+            "role": "Economo della comunità, vicario festivo in parrocchia, webmaster e secondo vice-responsabile ACR"
           },
           {
-            "name": "Fr. Gaspard AYABAGABO",
-            "role": "DAF at St. Vincent Pallotti Centre Ltd, 2nd Deputy Provincial Administrator"
+            "name": "P. Gaspard AYABAGABO",
+            "role": "Direttore amministrativo e finanziario del Centro San Vincenzo Pallotti Ltd, vice-amministratore provinciale"
           },
           {
-            "name": "Fr. Andrzej JAKACKI",
-            "role": "Editor of 'Communion' Review in Rwanda, Sunday Vicar"
+            "name": "P. Andrzej JAKACKI",
+            "role": "Direttore della rivista «Communion» in Ruanda e vicario festivo"
           },
           {
-            "name": "Fr. Patient POLEPOLE",
-            "role": "1st Deputy Provincial Administrator"
+            "name": "P. Patient POLEPOLE",
+            "role": "Primo vice-amministratore provinciale"
           },
           {
-            "name": "Fr. Pascal HABINEZA",
+            "name": "P. Pascal HABINEZA",
             "role": "Resident"
           },
           {
-            "name": "Br. Emmanuel NIYIZURUGERO",
+            "name": "Frat. Emmanuel NIYIZURUGERO",
             "role": "Annual Internship Seminarian"
           }
         ]
@@ -366,133 +375,133 @@
       {
         "id": "kabuga",
         "name": "Communauté Immaculée Conception de Kabuga",
-        "location": "Kabuga, Kigali — Archdiocese of Kigali",
+        "location": "Kabuga, Kigali — Arcidiocesi di Kigali",
         "region": "rwanda",
-        "description": "Named after the Immaculate Conception, this community serves the Parish of Kabuga and hosts the Saint John Paul II Centre. It is also home to the Shrine of Divine Mercy of Kabuga and supports the Pallottine Foundation for the Family.",
+        "description": "Intitolata all’Immacolata Concezione, questa comunità serve la parrocchia di Kabuga e ospita il Centro San Giovanni Paolo II. È inoltre sede del Santuario della Divina Misericordia di Kabuga e collabora con la Fondazione Pallottina per la Famiglia.",
         "works": [
-          "Parish of Kabuga",
-          "St. John Paul II Centre",
-          "Shrine of Divine Mercy",
-          "Pallottine Foundation for the Family",
-          "Vocational Animation"
+          "Parrocchia di Kabuga",
+          "Centro San Giovanni Paolo II",
+          "Santuario della Divina Misericordia",
+          "Fondazione Pallottina per la Famiglia",
+          "Animazione vocazionale"
         ],
-        "memberSummary": "The Communauté Immaculée Conception de Kabuga serves the Parish of Kabuga in the Archdiocese of Kigali. It hosts the Saint John Paul II Centre and the Shrine of Divine Mercy of Kabuga, and supports the Pallottine Foundation for the Family (FPF).",
+        "memberSummary": "La Communauté Immaculée Conception de Kabuga serve la parrocchia di Kabuga, nell’arcidiocesi di Kigali. Ospita il Centro San Giovanni Paolo II e il Santuario della Divina Misericordia di Kabuga e collabora con la Fondazione Pallottina per la Famiglia (FPF).",
         "members": [
           {
-            "name": "Fr. Ildéphonse BIZIMUNGU",
-            "role": "Community Rector and Parish Priest"
+            "name": "P. Ildéphonse BIZIMUNGU",
+            "role": "Rettore della comunità e parroco"
           },
           {
-            "name": "Fr. Alphonse NDAGIJIMANA",
-            "role": "Vice-Rector of the Community and Rector of the Shrine of Divine Mercy of Kabuga"
+            "name": "P. Alphonse NDAGIJIMANA",
+            "role": "Vice-rettore della comunità e rettore del Santuario della Divina Misericordia di Kabuga"
           },
           {
-            "name": "Fr. Gilbert KAZINGUFU SEMASAKA",
-            "role": "Chaplain at the Shrine, Vice-Director of the FPF, Coordinator of the Family & Life Dept. of the FPF, Sunday Vicar at the Parish"
+            "name": "P. Gilbert KAZINGUFU SEMASAKA",
+            "role": "Cappellano del Santuario, vice-direttore della FPF, coordinatore del settore Famiglia e Vita della FPF e vicario festivo in parrocchia"
           },
           {
-            "name": "Fr. Germain BOSENIKO KAMARA",
-            "role": "DAF of the FPF, 2nd Vicar at the Parish, Vocational Animation Officer at Kabuga"
+            "name": "P. Germain BOSENIKO KAMARA",
+            "role": "Direttore amministrativo e finanziario della FPF, secondo vicario in parrocchia e animatore vocazionale a Kabuga"
           },
           {
-            "name": "Fr. Jean-Delphin NYONGERA",
-            "role": "Community Bursar and 1st Vicar at the Parish"
+            "name": "P. Jean-Delphin NYONGERA",
+            "role": "Economo della comunità e primo vicario in parrocchia"
           }
         ]
       },
       {
         "id": "ruhango",
-        "name": "Community of Ruhango",
-        "location": "Ruhango — Diocese of Kabgayi",
+        "name": "Comunità di Ruhango",
+        "location": "Ruhango — Diocesi di Kabgayi",
         "region": "rwanda",
-        "description": "Serving the Diocese of Kabgayi, this community runs the Parish of Ruhango and hosts the Shrine of Jesus the Merciful, which includes a chapel of perpetual adoration and healing prayer gatherings.",
+        "description": "Al servizio della diocesi di Kabgayi, questa comunità cura la parrocchia di Ruhango e ospita il Santuario di Gesù Misericordioso, con una cappella di adorazione perpetua e incontri di preghiera per la guarigione.",
         "works": [
-          "Parish of Ruhango",
-          "Shrine of Jesus the Merciful",
-          "Perpetual Adoration Chapel",
-          "Healing Prayer",
-          "ACR Animation",
-          "Vocational Animation"
+          "Parrocchia di Ruhango",
+          "Santuario di Gesù Misericordioso",
+          "Cappella di adorazione perpetua",
+          "Preghiera per la guarigione",
+          "Animazione ACR",
+          "Animazione vocazionale"
         ],
-        "memberSummary": "The Community of Ruhango serves the Parish of Ruhango in the Diocese of Kabgayi. It is also home to the Shrine of Jesus the Merciful, with a chapel of perpetual adoration.",
+        "memberSummary": "La Comunità di Ruhango serve la parrocchia di Ruhango, nella diocesi di Kabgayi. Ospita inoltre il Santuario di Gesù Misericordioso e una cappella di adorazione perpetua.",
         "members": [
           {
-            "name": "Fr. Jean Marie Vianney NIZEYIMANA",
-            "role": "Community Rector and Rector of the Shrine of Jesus the Merciful"
+            "name": "P. Jean Marie Vianney NIZEYIMANA",
+            "role": "Rettore della comunità e del Santuario di Gesù Misericordioso"
           },
           {
-            "name": "Fr. Janvier GASORE",
-            "role": "Vice-Rector of the Community and Chaplain at the Shrine of Jesus the Merciful"
+            "name": "P. Janvier GASORE",
+            "role": "Vice-rettore della comunità e cappellano del Santuario di Gesù Misericordioso"
           },
           {
-            "name": "Fr. Dominique NGENDAHAYO TUMAINI",
-            "role": "Parish Priest of Ruhango and ACR Officer"
+            "name": "P. Dominique NGENDAHAYO TUMAINI",
+            "role": "Parroco di Ruhango e responsabile ACR"
           },
           {
-            "name": "Fr. Vincent NDUWAYO BIMENYIMANA",
-            "role": "Community Bursar, Parish Vicar, Parish Bursar, and Vocational Animation Officer at Ruhango"
+            "name": "P. Vincent NDUWAYO BIMENYIMANA",
+            "role": "Economo della comunità, vicario parrocchiale, economo parrocchiale e animatore vocazionale a Ruhango"
           }
         ]
       },
       {
         "id": "butare",
-        "name": "Community of Butare",
+        "name": "Comunità di Butare",
         "location": "Butare (Huye), Rwanda",
         "region": "rwanda",
-        "description": "A vibrant community in the Diocese of Butare dedicated to the formation of young men in the introductory period of religious life, known as the Novitiate. It is an international community that welcomes novices from different African Pallottine entities.",
+        "description": "Vivace comunità della diocesi di Butare, dedicata alla formazione dei giovani nel noviziato, la fase introduttiva della vita religiosa. È una comunità internazionale che accoglie novizi provenienti da diverse realtà pallottine africane.",
         "works": [
-          "Novitiate Formation",
-          "Introductory Period",
-          "International Formation House",
-          "Spiritual Direction"
+          "Formazione al noviziato",
+          "Periodo introduttivo",
+          "Casa di formazione internazionale",
+          "Direzione spirituale"
         ]
       },
       {
         "id": "kibeho",
-        "name": "Community of Kibeho",
+        "name": "Comunità di Kibeho",
         "location": "Kibeho, Rwanda",
         "region": "rwanda",
-        "description": "Serving at the renowned Marian shrine of Kibeho, accompanying pilgrims and the local faithful in their spiritual journey.",
+        "description": "Al servizio del celebre santuario mariano di Kibeho, accompagna i pellegrini e i fedeli del luogo nel loro cammino spirituale.",
         "works": [
-          "Shrine Ministry",
-          "Pilgrim Accompaniment",
-          "Pastoral Work"
+          "Servizio al santuario",
+          "Accoglienza dei pellegrini",
+          "Attività pastorale"
         ]
       },
       {
         "id": "kinoni",
-        "name": "Community of Kinoni",
+        "name": "Comunità di Kinoni",
         "location": "Kinoni, Rwanda",
         "region": "rwanda",
-        "description": "Pallottine community engaged in parish ministry and apostolic service in the Kinoni area.",
+        "description": "Comunità pallottina impegnata nel ministero parrocchiale e nel servizio apostolico nella zona di Kinoni.",
         "works": [
-          "Parish Ministry",
-          "Apostolic Service",
-          "Community Outreach"
+          "Ministero parrocchiale",
+          "Servizio apostolico",
+          "Attività a favore della comunità"
         ]
       },
       {
         "id": "muyumbu",
-        "name": "Community of Muyumbu",
+        "name": "Comunità di Muyumbu",
         "location": "Muyumbu, Rwanda",
         "region": "rwanda",
-        "description": "A Pallottine community serving the faithful of Muyumbu through parish ministry and apostolic works in Rwanda.",
+        "description": "Comunità pallottina al servizio dei fedeli di Muyumbu attraverso il ministero parrocchiale e le opere apostoliche in Ruanda.",
         "works": [
-          "Parish Ministry",
-          "Apostolic Service",
-          "Pastoral Care"
+          "Ministero parrocchiale",
+          "Servizio apostolico",
+          "Cura pastorale"
         ]
       },
       {
         "id": "kibirizi",
-        "name": "Community of Kibirizi",
+        "name": "Comunità di Kibirizi",
         "location": "Kibirizi, Rwanda",
         "region": "rwanda",
-        "description": "A Pallottine community engaged in parish ministry and apostolic service in the Kibirizi area of Rwanda.",
+        "description": "Comunità pallottina impegnata nel ministero parrocchiale e nel servizio apostolico nella zona di Kibirizi.",
         "works": [
-          "Parish Ministry",
-          "Apostolic Service",
-          "Community Outreach"
+          "Ministero parrocchiale",
+          "Servizio apostolico",
+          "Attività a favore della comunità"
         ]
       },
       {
@@ -500,150 +509,150 @@
         "name": "Palloti Press",
         "location": "Rwanda",
         "region": "rwanda",
-        "description": "The Pallottine publishing and media apostolate, producing Catholic literature, the 'Communion' review, and other evangelization materials.",
+        "description": "L’apostolato pallottino dell’editoria e dei media, che pubblica opere cattoliche, la rivista «Communion» e altri materiali per l’evangelizzazione.",
         "works": [
-          "Catholic Publishing",
-          "Media Apostolate",
-          "'Communion' Review"
+          "Editoria cattolica",
+          "Apostolato dei media",
+          "Rivista «Communion»"
         ]
       },
       {
         "id": "keshero",
-        "name": "Community of Goma-Keshero",
+        "name": "Comunità di Goma-Keshero",
         "location": "Goma-Keshero, DR Congo",
         "region": "drc",
-        "description": "Pallottine community in the Diocese of Goma serving the faithful of Keshero and Goma at large through religious retreats, Christian formation, and apostolic works.",
+        "description": "Comunità pallottina della diocesi di Goma, al servizio dei fedeli di Keshero e dell’intera città attraverso ritiri spirituali, formazione cristiana e opere apostoliche.",
         "works": [
-          "Religious Retreats",
-          "Christian Formation",
-          "Apostolic Works",
-          "Pastoral Care"
+          "Ritiri spirituali",
+          "Formazione cristiana",
+          "Opere apostoliche",
+          "Cura pastorale"
         ]
       },
       {
         "id": "buturande",
-        "name": "Community of Goma-Buturande",
+        "name": "Comunità di Goma-Buturande",
         "location": "Goma-Buturande, DR Congo",
         "region": "drc",
-        "description": "Serving the Christian community of Buturande in the Goma Diocese with pastoral care and community apostolate. Home to the Divine Mercy Shrine.",
+        "description": "Al servizio della comunità cristiana di Buturande, nella diocesi di Goma, con attività pastorali e apostoliche. Ospita il Santuario della Divina Misericordia.",
         "works": [
-          "Parish Ministry",
-          "Community Apostolate",
-          "Divine Mercy Shrine"
+          "Ministero parrocchiale",
+          "Apostolato comunitario",
+          "Santuario della Divina Misericordia"
         ]
       },
       {
         "id": "karhale",
-        "name": "Community of Bukavu-Karhale",
+        "name": "Comunità di Bukavu-Karhale",
         "location": "Bukavu-Karhale, DR Congo",
         "region": "drc",
-        "description": "Pallottine community in the Archdiocese of Bukavu, serving the Karhale area through parish ministry and social works.",
+        "description": "Comunità pallottina dell’arcidiocesi di Bukavu, al servizio della zona di Karhale attraverso il ministero parrocchiale e le opere sociali.",
         "works": [
-          "Parish Ministry",
-          "Social Works",
-          "Pastoral Service"
+          "Ministero parrocchiale",
+          "Opere sociali",
+          "Servizio pastorale"
         ]
       },
       {
         "id": "formation-drc",
-        "name": "Maison de Formation St. Vincent Pallotti",
+        "name": "Casa di formazione San Vincenzo Pallotti",
         "location": "DR Congo",
         "region": "drc",
-        "description": "The Pallottine formation house in DR Congo, accompanying candidates and seminarians in their spiritual and intellectual formation.",
+        "description": "Casa di formazione pallottina nella Repubblica Democratica del Congo, accompagna candidati e seminaristi nella loro formazione spirituale e intellettuale.",
         "works": [
-          "Priestly Formation",
-          "Spiritual Direction",
-          "Academic Studies"
+          "Formazione sacerdotale",
+          "Direzione spirituale",
+          "Studi accademici"
         ]
       },
       {
         "id": "brussels",
-        "name": "Community of Brussels",
+        "name": "Comunità di Bruxelles",
         "location": "Brussels, Belgium",
         "region": "belgium",
-        "description": "The first Pallottine community established in Belgium in 1986, serving the local Church and the African diaspora community. It initially served as a procure for those preparing for the French-speaking African missions.",
+        "description": "La prima comunità pallottina fondata in Belgio, nel 1986, al servizio della Chiesa locale e della diaspora africana. Inizialmente fu una casa di appoggio per coloro che si preparavano alle missioni africane francofone.",
         "works": [
-          "Parish Ministry",
-          "Diaspora Pastoral Care",
-          "Apostolic Works"
+          "Ministero parrocchiale",
+          "Attività pastorale per la diaspora",
+          "Opere apostoliche"
         ]
       },
       {
         "id": "namur",
-        "name": "Community of Namur",
+        "name": "Comunità di Namur",
         "location": "Namur, Belgium",
         "region": "belgium",
-        "description": "Pallottine community in Namur serving the local Church through pastoral ministry and apostolic engagement.",
+        "description": "Comunità pallottina di Namur al servizio della Chiesa locale attraverso il ministero pastorale e l’impegno apostolico.",
         "works": [
-          "Parish Ministry",
-          "Pastoral Work",
-          "Apostolic Service"
+          "Ministero parrocchiale",
+          "Attività pastorale",
+          "Servizio apostolico"
         ]
       },
       {
         "id": "italy",
-        "name": "Mission in Italy",
-        "location": "Italy",
+        "name": "Missione in Italia",
+        "location": "Italia",
         "region": "mission",
-        "description": "Pallottine confreres from the Holy Family Province serving in Italy, the homeland of Saint Vincent Pallotti, taking care of the Latin mission in the parish of Blessed Elisabeta Sanna.",
+        "description": "Confratelli della Provincia della Sacra Famiglia al servizio in Italia, patria di San Vincenzo Pallotti, impegnati nella missione latina della parrocchia della beata Elisabetta Sanna.",
         "works": [
-          "Parish Ministry",
-          "Apostolic Service"
+          "Ministero parrocchiale",
+          "Servizio apostolico"
         ]
       },
       {
         "id": "france",
-        "name": "Mission in France",
-        "location": "Montereau, France",
+        "name": "Missione in Francia",
+        "location": "Montereau, Francia",
         "region": "mission",
-        "description": "Confreres of the Holy Family Province engaged in pastoral and apostolic ministry in France, namely in Montereau.",
+        "description": "Confratelli della Provincia della Sacra Famiglia impegnati nel ministero pastorale e apostolico in Francia, a Montereau.",
         "works": [
-          "Parish Ministry",
-          "Pastoral Work"
+          "Ministero parrocchiale",
+          "Attività pastorale"
         ]
       },
       {
         "id": "poland",
-        "name": "Mission in Poland",
-        "location": "Poland",
+        "name": "Missione in Polonia",
+        "location": "Polonia",
         "region": "mission",
-        "description": "Confreres serving in Poland, the province of origin of the first Pallottine missionaries to Rwanda.",
+        "description": "Confratelli al servizio in Polonia, la provincia d’origine dei primi missionari pallottini giunti in Ruanda.",
         "works": [
-          "Parish Ministry",
-          "Formation Support"
+          "Ministero parrocchiale",
+          "Sostegno alla formazione"
         ]
       },
       {
         "id": "nairobi",
-        "name": "Mission in Nairobi",
+        "name": "Missione a Nairobi",
         "location": "Nairobi, Kenya",
         "region": "mission",
-        "description": "Pallottine confreres from the Holy Family Province serving in Nairobi, Kenya.",
+        "description": "Confratelli pallottini della Provincia della Sacra Famiglia al servizio a Nairobi, in Kenya.",
         "works": [
-          "Parish Ministry",
-          "Apostolic Service"
+          "Ministero parrocchiale",
+          "Servizio apostolico"
         ]
       },
       {
         "id": "ivory-coast",
-        "name": "Mission in Ivory Coast",
-        "location": "Ivory Coast",
+        "name": "Missione in Costa d’Avorio",
+        "location": "Costa d’Avorio",
         "region": "mission",
-        "description": "Confreres of the Holy Family Province engaged in apostolic ministry in Ivory Coast.",
+        "description": "Confratelli della Provincia della Sacra Famiglia impegnati nel ministero apostolico in Costa d’Avorio.",
         "works": [
-          "Parish Ministry",
-          "Apostolic Work"
+          "Ministero parrocchiale",
+          "Attività apostolica"
         ]
       },
       {
         "id": "cameroon",
-        "name": "Mission in Cameroon",
-        "location": "Cameroon",
+        "name": "Missione in Camerun",
+        "location": "Camerun",
         "region": "mission",
-        "description": "Serving in Cameroon, the land where the Pallottine mission in Africa first began in 1890.",
+        "description": "Al servizio in Camerun, dove ebbe inizio la missione pallottina in Africa nel 1890.",
         "works": [
-          "Parish Ministry",
-          "Historical Mission"
+          "Ministero parrocchiale",
+          "Missione storica"
         ]
       }
     ]
@@ -651,102 +660,102 @@
   "newsSection": {
     "badge": "Notizie e Media",
     "title": "Attualità e Notizie",
-    "readMore": "Read More",
+    "readMore": "Leggi di più",
     "articles": [
       {
         "id": 1,
-        "title": "Official Publication of the Appointments of Confreres 2026-2027",
+        "title": "Pubblicazione ufficiale delle nomine dei confratelli 2026–2027",
         "date": "29/06/2026",
-        "tags": "Pallottines' Newspaper | Announcements | Generalate | Holy Family Province",
-        "summary": "Official Publication of the Appointments of the Confreres 2026-2027 for the Holy Family Province.",
+        "tags": "Giornale pallottino | Annunci | Generalato | Provincia della Sacra Famiglia",
+        "summary": "Pubblicazione ufficiale delle nomine dei confratelli per l’anno 2026–2027 nella Provincia della Sacra Famiglia.",
         "imageUrl": "/images/p5.jpg"
       },
       {
         "id": 2,
-        "title": "International Meeting of Pallottine Trainers — Kigali, Rwanda",
+        "title": "Incontro internazionale dei formatori pallottini a Kigali, Ruanda",
         "date": "17/05/2026",
-        "tags": "Pallottines' Newspaper | Generalate | Holy Family Province | Union of the Catholic Apostolate",
-        "summary": "The work of this meeting, which brings together trainers and formation directors from across the Pallottine world, held in Kigali from 16...",
+        "tags": "Giornale pallottino | Generalato | Provincia della Sacra Famiglia | Unione dell’Apostolato Cattolico",
+        "summary": "L’incontro, tenutosi a Kigali dal 16 maggio, riunisce formatori e responsabili della formazione pallottina provenienti da tutto il mondo.",
         "imageUrl": "/images/p6.jpg"
       },
       {
         "id": 3,
-        "title": "Info PSF No 25 — March 2026",
+        "title": "Info PSF n. 25 — marzo 2026",
         "date": "12/03/2026",
-        "tags": "Pallottines' Newspaper | Announcements | Holy Family Province",
-        "summary": "Through this information, we wish to strengthen the sense of belonging and fraternal communion within our Province.",
+        "tags": "Giornale pallottino | Annunci | Provincia della Sacra Famiglia",
+        "summary": "Con questa pubblicazione desideriamo rafforzare il senso di appartenenza e la comunione fraterna nella nostra Provincia.",
         "imageUrl": "/images/p7.jpg"
       },
       {
         "id": 4,
-        "title": "Handover within the Provincial Commissary",
+        "title": "Passaggio di consegne nel Commissariato provinciale",
         "date": "17/02/2026",
-        "tags": "Pallottines' Newspaper | Generalate | Holy Family Province",
-        "summary": "'If the Lord does not build the house, the builders work in vain.' Handover and resumption between the outgoing and incoming Provincial Councils.",
+        "tags": "Giornale pallottino | Generalato | Provincia della Sacra Famiglia",
+        "summary": "«Se il Signore non costruisce la casa, invano vi faticano i costruttori». Passaggio di consegne tra il Consiglio provinciale uscente e quello entrante.",
         "imageUrl": "/images/p8.jpg"
       },
       {
         "id": 5,
-        "title": "Handover between the Outgoing and Incoming Provincial Councils",
+        "title": "Passaggio di consegne tra il Consiglio provinciale uscente e quello entrante",
         "date": "07/02/2026",
-        "tags": "Pallottines' Newspaper | Generalate | Holy Family Province | Union of the Catholic Apostolate",
-        "summary": "A solemn ceremony marking the transition of leadership within the Holy Family Province.",
+        "tags": "Giornale pallottino | Generalato | Provincia della Sacra Famiglia | Unione dell’Apostolato Cattolico",
+        "summary": "Una solenne cerimonia ha segnato il passaggio di responsabilità nella Provincia della Sacra Famiglia.",
         "imageUrl": "/images/pic1.jpeg"
       },
       {
         "id": 6,
-        "title": "Provincial Assembly — Summary and Resolutions",
+        "title": "Assemblea provinciale — sintesi e deliberazioni",
         "date": "30/01/2026",
-        "tags": "Pallottines' Newspaper | Generalate | Holy Family Province | Union of the Catholic Apostolate",
-        "summary": "Key decisions and resolutions adopted during the Provincial Assembly held in Kigali.",
+        "tags": "Giornale pallottino | Generalato | Provincia della Sacra Famiglia | Unione dell’Apostolato Cattolico",
+        "summary": "Le principali decisioni e deliberazioni dell’Assemblea provinciale riunitasi a Kigali.",
         "imageUrl": "/images/p2.jpg"
       },
       {
         "id": 7,
-        "title": "PÈRE CHRYSANTE RWASA WITH GOD",
+        "title": "Padre Chrysante Rwasa è tornato alla Casa del Padre",
         "date": "30/12/2025",
-        "tags": "Pallottines' Newspaper | Generalate | Holy Family Province | Union of the Catholic Apostolate",
-        "summary": "Fr. Chrysante lived and died as a true witness of Christ. May Jesus Christ say to him: 'Well done, good and faithful servant, enter into the joy of your Master.' (Matthew 25:23)",
+        "tags": "Giornale pallottino | Generalato | Provincia della Sacra Famiglia | Unione dell’Apostolato Cattolico",
+        "summary": "Padre Chrysante ha vissuto e concluso la sua vita come autentico testimone di Cristo. Il Signore gli dica: «Bene, servo buono e fedele, entra nella gioia del tuo padrone» (Mt 25,23).",
         "imageUrl": "/images/p5.jpg"
       },
       {
         "id": 8,
-        "title": "The Catholic Press in Rwanda Celebrates the Jubilee of the Church",
+        "title": "La stampa cattolica in Ruanda celebra il Giubileo della Chiesa",
         "date": "24/11/2025",
-        "tags": "Pallottines' Newspaper | Holy Family Province",
-        "summary": "Province Sainte Famille. Hobe intellectually formed us and since there was neither...",
+        "tags": "Giornale pallottino | Provincia della Sacra Famiglia",
+        "summary": "La Provincia della Sacra Famiglia ha contribuito alla formazione intellettuale di Hobe, nonostante le difficoltà incontrate...",
         "imageUrl": "/images/p6.jpg"
       },
       {
         "id": 9,
-        "title": "Blessing and Inauguration of the Extension of the Saint Vincent Pallotti Centre",
+        "title": "Benedizione e inaugurazione dell’ampliamento del Centro San Vincenzo Pallotti",
         "date": "22/11/2025",
-        "tags": "Pallottines' Newspaper | Holy Family Province | Union of the Catholic Apostolate",
-        "summary": "May the Lord build our house and grow our apostolic works for the glory of God and the service of His people.",
+        "tags": "Giornale pallottino | Provincia della Sacra Famiglia | Unione dell’Apostolato Cattolico",
+        "summary": "Il Signore faccia crescere la nostra casa e le nostre opere apostoliche, a gloria di Dio e al servizio del suo popolo.",
         "imageUrl": "/images/p7.jpg"
       },
       {
         "id": 10,
-        "title": "Mater Populi Fidelis — Doctrinal Note on Certain Marian Titles",
+        "title": "Mater Populi Fidelis — Nota dottrinale su alcuni titoli mariani",
         "date": "07/11/2025",
-        "tags": "Pallottines' Newspaper | Holy Family Province | Union of the Catholic Apostolate",
-        "summary": "Province Sainte Famille. A doctrinal reflection on certain titles of Our Lady in the Pallottine tradition.",
+        "tags": "Giornale pallottino | Provincia della Sacra Famiglia | Unione dell’Apostolato Cattolico",
+        "summary": "Una riflessione dottrinale su alcuni titoli mariani nella tradizione pallottina.",
         "imageUrl": "/images/p8.jpg"
       },
       {
         "id": 11,
-        "title": "Commemoration of All the Faithful Departed at Gikondo",
+        "title": "Commemorazione di tutti i fedeli defunti a Gikondo",
         "date": "03/11/2025",
-        "tags": "Pallottines' Newspaper | Holy Family Province | Union of the Catholic Apostolate",
-        "summary": "A solemn commemoration gathering the Pallottine community at Gikondo to pray for all the faithful departed.",
+        "tags": "Giornale pallottino | Provincia della Sacra Famiglia | Unione dell’Apostolato Cattolico",
+        "summary": "Una solenne commemorazione ha riunito la comunità pallottina di Gikondo nella preghiera per tutti i fedeli defunti.",
         "imageUrl": "/images/pic1.jpeg"
       },
       {
         "id": 12,
-        "title": "Diaconal Ordination at Kibilizi",
+        "title": "Ordinazione diaconale a Kibilizi",
         "date": "11/10/2025",
-        "tags": "Pallottines' Newspaper | Generalate | Holy Family Province | Union of the Catholic Apostolate",
-        "summary": "A joyful celebration of diaconal ordination at Kibilizi, marking a new step in the apostolic mission of the Holy Family Province.",
+        "tags": "Giornale pallottino | Generalato | Provincia della Sacra Famiglia | Unione dell’Apostolato Cattolico",
+        "summary": "Una gioiosa celebrazione a Kibilizi ha segnato un nuovo passo nella missione apostolica della Provincia della Sacra Famiglia.",
         "imageUrl": "/images/p2.jpg"
       }
     ],
@@ -761,7 +770,7 @@
     "subtitle": "Uno sguardo visivo alla vita delle nostre comunità e delle nostre celebrazioni."
   },
   "footer": {
-    "tagline": "The Pallottine Fathers and Brothers of the Holy Family Province are dedicated to spreading the love of God through apostolic work, education, and service.",
+    "tagline": "I sacerdoti e i fratelli Pallottini della Provincia della Sacra Famiglia si dedicano a diffondere l’amore di Dio attraverso l’apostolato, l’educazione e il servizio.",
     "quickLinks": "Collegamenti Rapidi",
     "contact": "Contattaci",
     "address": "Gikondo - 1083 Kigali, Rwanda",

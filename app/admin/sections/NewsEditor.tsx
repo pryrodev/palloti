@@ -389,8 +389,8 @@ export default function NewsEditor() {
 
       {/* Edit modal */}
       {editing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="max-h-[90dvh] w-full max-w-lg overflow-y-auto overscroll-contain bg-white p-4 shadow-2xl sm:p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onMouseDown={(event) => { if (event.target === event.currentTarget) setEditing(null); }}>
+          <div className="max-h-[94dvh] w-full max-w-7xl overflow-y-auto overscroll-contain bg-white p-4 shadow-2xl sm:p-6 lg:p-8">
             <div className="mb-4 flex items-center justify-between border-b border-gray-100 pb-3">
               <div>
                 <h2 className="font-black text-lg text-gray-800">
@@ -545,9 +545,9 @@ export default function NewsEditor() {
             {validation && !validation.success && <p role="alert" className="mb-3 text-xs text-red-700">{validation.error.issues[0]?.message}</p>}
             <div className="flex flex-wrap justify-end gap-2 sm:gap-3">
               <button onClick={() => setEditing(null)}
-                className="cursor-pointer px-4 py-2 text-sm font-bold bg-gray-100 text-gray-700 transition-all duration-150 ease-out hover:bg-gray-200 active:scale-95">Cancel</button>
+                className="cursor-pointer px-4 py-2 text-sm font-bold bg-gray-100 text-gray-700 shadow-xs transition-all duration-150 ease-out hover:-translate-y-0.5 hover:bg-gray-200 hover:shadow-md active:translate-y-0 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9952A]">Cancel</button>
               <button onClick={saveEditing} disabled={!validation?.success}
-                className="cursor-pointer px-4 py-2 text-sm font-black text-white shadow-xs transition-all duration-150 ease-out hover:brightness-110 hover:shadow-md active:scale-95 disabled:pointer-events-none"
+                className="cursor-pointer px-4 py-2 text-sm font-black text-white shadow-xs transition-all duration-150 ease-out hover:-translate-y-0.5 hover:brightness-110 hover:shadow-md active:translate-y-0 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9952A] disabled:pointer-events-none"
                 style={{ background: "#5C3317", opacity: validation?.success ? 1 : 0.5 }}>Save</button>
             </div>
           </div>

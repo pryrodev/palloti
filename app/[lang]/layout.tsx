@@ -5,6 +5,7 @@ import { Footer } from "../components/Footer";
 import { getDictionary } from "@/lib/getDictionary";
 import type { CSSProperties } from "react";
 import { absoluteUrl } from "@/lib/seoPaths";
+import LocaleGoogleTranslate from "../components/LocaleGoogleTranslate";
 
 export const dynamic = "force-dynamic";
 
@@ -51,6 +52,7 @@ export default async function LangLayout({
       "--gray": dictionary.theme.gray,
       "--white": dictionary.theme.white,
     } as CSSProperties}>
+      {(lang === "it" || lang === "fr") && <LocaleGoogleTranslate language={lang} />}
       <Header lang={lang} navigation={dictionary.navigation} />
       <div className="flex-1">{children}</div>
       <Footer lang={lang} dict={dictionary.footer} navigation={dictionary.navigation} />

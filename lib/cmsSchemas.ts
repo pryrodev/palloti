@@ -72,6 +72,15 @@ const directionMemberSchema = z.object({
   image: mediaUrl.optional(),
   biography: z.string().max(10000).optional(),
 }).passthrough();
+const catalogMemberSchema = z.object({
+  name: nonEmptyText.max(500),
+  role: z.string().max(1000).optional(),
+  image: mediaUrl.optional(),
+  biography: z.string().max(10000).optional(),
+  birthYear: z.string().regex(/^\\d{4}$/).optional(),
+  deathYear: z.string().regex(/^\\d{4}$/).optional(),
+  lifeStatus: z.enum(["living", "deceased", "unknown"]).optional(),
+});
 const bilingualCommunities = z.object({
   en: z.array(communitySchema).max(1000),
   fr: z.array(communitySchema).max(1000),
@@ -163,9 +172,6 @@ const siteContentSchema = z.preprocess((input) => {
   for (const [locale, defaults] of [["en", enDictionary], ["fr", frDictionary], ["it", itDictionary]] as const) {
     const localized = content[locale];
     if (typeof localized !== "object" || localized === null || Array.isArray(localized)) {
-      if (locale === "it") {
-        filled.it = itDictionary;
-      }
       continue;
     }
     const merged = fillMissingKeys(localized as Record<string, unknown>, defaults as Record<string, unknown>);
@@ -199,6 +205,7 @@ export const cmsSchemas = {
   news: bilingualNews,
   communities: bilingualCommunities,
   direction: bilingualDirection,
+  catalog: z.array(catalogMemberSchema).max(5000),
   siteContent: siteContentSchema,
 } as const;
 

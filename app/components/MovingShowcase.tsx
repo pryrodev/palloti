@@ -85,7 +85,7 @@ export default function MovingShowcase({ lang }: MovingShowcaseProps) {
     <section className="relative py-12 md:py-16 overflow-hidden bg-[var(--cream2)] border-y border-[var(--gold)]/30">
       {/* Background watermark cross / pattern */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] flex items-center justify-center">
-        <Image src="/p4.png" alt="" width={600} height={600} className="object-contain" />
+        <Image src="/p4.png" alt="" width={206} height={40} className="h-auto w-[600px] object-contain" />
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 mb-8 text-center relative z-10">

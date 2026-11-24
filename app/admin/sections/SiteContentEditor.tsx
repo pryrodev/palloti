@@ -80,6 +80,14 @@ const DEFAULT_CONTENT: SiteContent = {
   it: itDictionary as unknown as EditableDictionary,
   theme: { ...DEFAULT_SITE_THEME },
 };
+
+function toCmsPayload(draft: SiteContent): CmsPayload<"siteContent"> {
+  const payload = { ...draft } as CmsPayload<"siteContent">;
+  // Keep the Italian locale absent until someone actually changes its manual
+  // copy. Otherwise saving an English edit would freeze Italian at its defaults.
+  if (JSON.stringify(draft.it) === JSON.stringify(itDictionary)) delete payload.it;
+  return payload;
+}
 const DYNAMIC_CONTENT_PATHS = new Set([
   "newsSection.articles",
   "communities.items",
@@ -247,7 +255,7 @@ export default function SiteContentEditor() {
   const serverSnapshot = useRef<string | null>(null);
   const serverRevision = useRef<number | null>(null);
   const query = useCmsCollection<SiteContent>("siteContent");
-  const saveCollection = useSaveCmsCollection<SiteContent>("siteContent", () => serverRevision.current);
+  const saveCollection = useSaveCmsCollection<CmsPayload<"siteContent">>("siteContent", () => serverRevision.current);
 
   useEffect(() => {
     if (!query.data) return;
@@ -338,7 +346,7 @@ export default function SiteContentEditor() {
   async function save() {
     setMessage("");
     try {
-      const saved = await saveCollection.mutateAsync(draft);
+      const saved = await saveCollection.mutateAsync(toCmsPayload(draft));
       serverSnapshot.current = JSON.stringify(draft);
       serverRevision.current = saved.revision;
       setMessage("Site content and theme saved.");
@@ -362,7 +370,7 @@ export default function SiteContentEditor() {
     };
     setMessage("");
     try {
-      const saved = await saveCollection.mutateAsync(nextDraft);
+      const saved = await saveCollection.mutateAsync(toCmsPayload(nextDraft));
       setDraft(nextDraft);
       serverSnapshot.current = JSON.stringify(nextDraft);
       serverRevision.current = saved.revision;

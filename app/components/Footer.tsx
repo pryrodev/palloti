@@ -79,7 +79,7 @@ export const Footer = ({ lang, dict, navigation }: FooterProps) => {
               <div className="relative shrink-0">
                 <div className="absolute -inset-2  border border-[var(--gold)]/30 group-hover:border-[var(--gold)] transition-colors duration-700" />
                 <div className="relative bg-white p-2  shadow-xl border-2 border-[var(--gold)] transition-transform group-hover:scale-105">
-                  <Image src="/p4.png" alt="SAC Logo" width={60} height={60} className="object-contain" />
+                  <Image src="/p4.png" alt="SAC Logo" width={206} height={40} className="h-auto w-[60px] object-contain" />
                 </div>
               </div>
               <div className="pt-1">

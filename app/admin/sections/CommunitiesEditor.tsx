@@ -236,7 +236,7 @@ export default function CommunitiesEditor() {
 
       {/* Edit / Create modal */}
       {editing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onMouseDown={(event) => { if (event.target === event.currentTarget) setEditing(null); }}>
           <div className="max-h-[90dvh] w-full max-w-lg overflow-y-auto overscroll-contain bg-white p-4 shadow-2xl sm:p-6">
             <h2 className="font-black text-lg mb-4 text-gray-800">
               {items.some((c) => c.id === editing.id) ? "Edit Community" : "New Community"}

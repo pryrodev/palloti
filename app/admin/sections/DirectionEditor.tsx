@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Check, ImageOff, Pencil, Plus, Trash2, X } from "lucide-react";
@@ -215,7 +215,7 @@ export default function DirectionEditor() {
         return isEditing ? <label className="block">
           <span className="sr-only">Biography</span>
           <textarea rows={2} value={editingMember.biography ?? ""} disabled={savingIndex !== null} placeholder="Short bio..." onChange={(event) => setEditingMember((current) => current ? { ...current, biography: event.target.value } : current)} className="w-full min-w-0 resize-y border border-input bg-background px-2 py-1 text-xs text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30" />
-        </label> : <p className="line-clamp-2 text-xs text-muted-foreground">{row.original.biography || "—"}</p>;
+        </label> : <p className="line-clamp-2 text-xs text-muted-foreground">{row.original.biography || "â€”"}</p>;
       },
     },
     {
@@ -231,7 +231,7 @@ export default function DirectionEditor() {
         const rowSaving = savingIndex === index;
         return isEditing ? <div className="flex items-center gap-2">
           <Button type="button" size="sm" disabled={savingIndex !== null || !editingMember?.name.trim() || !editingMember?.role.trim()} className="bg-[#5C3317] text-white hover:bg-[#70411e]" style={{ backgroundColor: "#5C3317", color: "#fff" }} onClick={() => void saveRow(index)}>
-            <Check data-icon="inline-start" />{rowSaving ? "Saving…" : "Save"}
+            <Check data-icon="inline-start" />{rowSaving ? "Savingâ€¦" : "Save"}
           </Button>
           <Button type="button" size="sm" variant="outline" disabled={savingIndex !== null} onClick={cancelEdit}>
             <X data-icon="inline-start" />Cancel
@@ -242,7 +242,7 @@ export default function DirectionEditor() {
           </Button>
           <ConfirmDeleteAction
             title="Delete member?"
-            description={`Are you sure you want to remove “${row.original.name}”?`}
+            description={`Are you sure you want to remove â€œ${row.original.name}â€?`}
             confirmLabel="Delete"
             onConfirm={() => void deleteMember(index)}
           >
@@ -254,7 +254,7 @@ export default function DirectionEditor() {
   ], [members, editingIndex, editingMember, savingIndex, saveRow, cancelEdit, editRow, deleteMember]);
 
   return <section className="flex flex-col gap-4">
-    {query.isLoading && <p role="status" className="text-sm text-muted-foreground">Loading direction…</p>}
+    {query.isLoading && <p role="status" className="text-sm text-muted-foreground">Loading directionâ€¦</p>}
     {query.error && <p role="alert" className="text-sm text-destructive">{query.error.message}</p>}
     {message && <p role="status" aria-live="polite" className="text-sm text-muted-foreground">{message}</p>}
 
