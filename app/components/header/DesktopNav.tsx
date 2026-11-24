@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
@@ -34,9 +35,15 @@ export function DesktopNav({
   mediaLabel: string;
   mediaItems: MediaItem[];
 }) {
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+
+  useEffect(() => {
+    setOpenMenu(null);
+  }, [pathname]);
+
   return (
     <div className="hidden xl:flex items-center">
-      <NavigationMenu>
+      <NavigationMenu value={openMenu} onValueChange={setOpenMenu}>
         <NavigationMenuList className="gap-0">
 
           {/* Regular links */}
@@ -69,6 +76,7 @@ export function DesktopNav({
                   <li key={item.href}>
                     <NavigationMenuLink
                       render={<Link href={item.href} />}
+                      onClick={() => setOpenMenu(null)}
                       className={cn(
                         "px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors block",
                         pathname === item.href
